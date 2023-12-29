@@ -22,3 +22,16 @@ public struct GlazedEnvironmentView: View {
             .environmentObject(glazedObserver)
     }
 }
+
+extension View{
+    @ViewBuilder
+    func onChange(connect:some Equatable,action:@escaping () -> Void) -> some View {
+        self
+            .onAppear {
+                action()
+            }
+            .onChange(of: connect){ newValue in
+                action()
+            }
+    }
+}
