@@ -14,9 +14,8 @@ public struct GlazedEnvironmentView: View {
     @State var content:AnyView
     @StateObject var glazedObserver = GlazedObserver()
     
-    public init(content: AnyView, glazedObserver: GlazedObserver = GlazedObserver()) {
+    public init(content: AnyView) {
         self.content = content
-        self.glazedObserver = glazedObserver
     }
     public var body: some View {
         GlazedEnvironmentViewHelper(content: content)
