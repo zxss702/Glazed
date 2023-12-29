@@ -7,8 +7,8 @@
 
 import SwiftUI
 
-class GlazedObserver: ObservableObject {
-    var view:UIView = UIView()
+public class GlazedObserver: ObservableObject {
+    public var view:UIView = UIView()
 }
 public struct GlazedEnvironmentView: View {
     @State var content:AnyView
