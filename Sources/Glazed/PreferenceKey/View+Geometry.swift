@@ -35,7 +35,7 @@ extension View {
             binding.wrappedValue = rect
         }
     }
-
+    
     /// Notifies about views rect changes
     /// - Parameters:
     ///   - coordinateSpace: Coordinate space in which rect should be return

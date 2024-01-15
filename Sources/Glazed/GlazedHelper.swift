@@ -12,6 +12,7 @@ class GlazedHelper: UIView, Identifiable, ObservableObject {
     var type:GlazedType
     @Published var buttonFrame:CGRect
     @Published var Viewframe:CGRect = .zero
+    @Published var ViewSize:CGSize = .zero
     @Published var view: AnyView
     @Published var offsetY:CGFloat = 0
     @Published var offsetX:CGFloat = 0
@@ -77,13 +78,10 @@ class GlazedHelper: UIView, Identifiable, ObservableObject {
     override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
         let hit1 = super.hitTest(point, with: event)
         if event?.type != .hover {
-            if Viewframe == .zero {
+            if Viewframe == .zero && type != .Sheet {
                 return nil
             } else {
                 if type == .Sheet {
-                    if !Viewframe.contains(point) {
-                        self.dismiss()
-                    }
                     return hit1
                 } else if type == .EditPopover || type == .PopoverWithOutButton {
                     if Viewframe.contains(point) {

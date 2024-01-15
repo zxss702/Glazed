@@ -34,9 +34,9 @@ struct GlazedPopoverViewModle:View {
                     AnyView
                         .clipShape(RoundedRectangle(cornerRadius: 17))
                 }
-                .shadow()
+                .shadow(radius: 0.3)
+                .shadow(color: Color(.sRGBLinear, white: 0, opacity: 0.2), radius: 35 * showProgres)
             
-                .opacity(showProgres)
                 .scaleEffect(x: showProgres, y: showProgres, anchor: UnitPoint(x: scaleX, y: scaleY))
             
                 .onFrameChange($Helper.Viewframe)
@@ -201,12 +201,12 @@ struct GlazedPopoverViewModle:View {
         
         if onAppear {
             Helper.dismiss = {
-                withAnimation(.spring()) {
+                withAnimation(.spring(dampingFraction: 1)) {
                     showProgres = 0
                     Helper.dismissDefaut()
                 }
             }
-            withAnimation(.spring()) {
+            withAnimation(.spring(dampingFraction: 0.7).speed(1.4)) {
                 showProgres = 1
             }
         }
