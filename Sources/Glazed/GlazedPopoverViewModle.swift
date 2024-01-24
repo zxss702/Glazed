@@ -70,13 +70,25 @@ struct GlazedPopoverViewModle:View {
                 .environment(\.safeAreaInsets, EdgeInsets(top: 17, leading: 17, bottom: 17, trailing: 17))
                 .position(x: Helper.offsetX, y: Helper.offsetY)
                 .onChange(of: GeometryProxy.size) { value in
-                    setValue(GeometryProxy: GeometryProxy)
+                    if showProgres == 1 {
+                        withAnimation(.spring()) {
+                            setValue(GeometryProxy: GeometryProxy)
+                        }
+                    }
                 }
                 .onChange(of: Helper.Viewframe) { value in
-                    setValue(GeometryProxy: GeometryProxy)
+                    if showProgres == 1 {
+                        withAnimation(.spring()) {
+                            setValue(GeometryProxy: GeometryProxy)
+                        }
+                    }
                 }
                 .onChange(of: Helper.buttonFrame) { value in
-                    setValue(GeometryProxy: GeometryProxy)
+                    if showProgres == 1 {
+                        withAnimation(.spring()) {
+                            setValue(GeometryProxy: GeometryProxy)
+                        }
+                    }
                 }
                 .onAppear {
                     setValue(onAppear: true, GeometryProxy: GeometryProxy)

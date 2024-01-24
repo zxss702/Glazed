@@ -96,20 +96,21 @@ extension View {
 struct test: View {
     @State var stack = false
     @State var stack2 = false
+    @State var stack3 = false
     var body: some View {
         VStack {
-            Button {
-                stack.toggle()
-            } label: {
-                Color.green
-                    .clipShape(Circle())
-                    .frame(width:35, height: 35)
-            }
-            .Popover(isPresented: $stack) {
-                Color.yellow
-                    .frame(width: 100, height: 100)
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
+//            Button {
+//                stack.toggle()
+//            } label: {
+//                Color.green
+//                    .clipShape(Circle())
+//                    .frame(width:35, height: 35)
+//            }
+//            .Popover(isPresented: $stack) {
+//                Color.yellow
+//                    .frame(width: 100, height: 100)
+//            }
+//            .frame(maxWidth: .infinity, maxHeight: .infinity)
             Button {
                 stack2.toggle()
             } label: {
@@ -119,7 +120,19 @@ struct test: View {
             }
             .Sheet(isPresented: $stack2) {
                 Color.yellow
-                    .frame(maxWidth: .infinity, maxHeight: 400)
+                    .frame(maxWidth: 400, maxHeight: stack3 ? 400 : 100)
+                    .overlay {
+                        Button {
+                            withAnimation(.spring()) {
+                                stack3.toggle()
+                            }
+                            
+                        } label: {
+                            Color.green
+                                .clipShape(Circle())
+                                .frame(width:35, height: 35)
+                        }
+                    }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }

@@ -38,7 +38,9 @@ struct GlazedSheetViewModle:View {
                 Helper.view
                     .background(.regularMaterial)
                     .clipShape(GlazedSheetViewClliShape(bool: Helper.ViewSize.width < GeometryProxy.size.width))
-                    .onSizeChange($Helper.ViewSize)
+                    .onSizeChange({ CGSize in
+                        Helper.ViewSize = CGSize
+                    })
                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: Helper.ViewSize.width < GeometryProxy.size.width ? .center : .bottom)
                     .padding(.top, (Helper.ViewSize.width < GeometryProxy.size.width ? 20 : 0))
                     .ignoresSafeArea(.container, edges: Helper.ViewSize.width < GeometryProxy.size.width ? [.leading, .trailing] : [.leading, .trailing, .bottom])
