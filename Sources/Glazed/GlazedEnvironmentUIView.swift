@@ -30,4 +30,40 @@ class GlazedEnvironmentUIView: UIViewController {
             HostVC!.view.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 0)
         ])
     }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        while view.window == nil { }
+        if view.window != nil {
+            setContent()
+        }
+    }
+    
+    func setContent() {
+        HostVC?.rootView = AnyView(
+            RootView.content
+                .environment(\.window, view.window)
+                .environment(\.glazedDoAction, { [self] action in
+                    var id:UUID = UUID()
+                    let helper = GlazedHelper(type: .Progres, buttonFrame: .zero, view: AnyView(EmptyView())) { [self] in
+                        for i in RootView.glazedObserver.view.subviews {
+                            if let view = i as? GlazedHelper, view.id == id {
+                                DispatchQueue.main.async(1) {
+                                    view.removeFromSuperview()
+                                }
+                            }
+                        }
+                    } ProgresAction: {
+                        action()
+                    }
+                    id = helper.id
+                    RootView.glazedObserver.view.addSubview(helper)
+                    NSLayoutConstraint.activate([
+                        helper.topAnchor.constraint(equalTo: RootView.glazedObserver.view.topAnchor, constant: 0),
+                        helper.leadingAnchor.constraint(equalTo: RootView.glazedObserver.view.leadingAnchor, constant: 0),
+                        helper.bottomAnchor.constraint(equalTo: RootView.glazedObserver.view.bottomAnchor, constant: 0),
+                        helper.trailingAnchor.constraint(equalTo: RootView.glazedObserver.view.trailingAnchor, constant: 0)
+                    ])
+                })
+        )
+    }
 }

@@ -10,15 +10,15 @@ import SwiftUI
 public class GlazedObserver: ObservableObject {
     public var view:UIView = UIView()
 }
-public struct GlazedEnvironmentView: View {
-    @State var content:AnyView
+public struct GlazedEnvironmentView<Content: View>: View {
+    let content: Content
     @StateObject var glazedObserver = GlazedObserver()
     
-    public init(content: AnyView) {
-        self.content = content
+    public init(@ViewBuilder content: () -> Content) {
+        self.content = content()
     }
     public var body: some View {
-        GlazedEnvironmentViewHelper(content: content)
+        GlazedEnvironmentViewHelper(content: AnyView(content))
             .environmentObject(glazedObserver)
     }
 }
@@ -89,7 +89,9 @@ extension View {
 }
 
 #Preview {
-    GlazedEnvironmentView(content: AnyView(test()))
+    GlazedEnvironmentView {
+        test()
+    }
         .ignoresSafeArea()
 }
 
