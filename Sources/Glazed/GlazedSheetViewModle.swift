@@ -81,7 +81,7 @@ struct GlazedSheetViewModle:View {
                     .environment(\.safeAreaInsets, EdgeInsets(top: 17, leading: 17, bottom: 17, trailing: 17))
 
                     .simultaneousGesture(
-                        DragGesture(minimumDistance: 15)
+                        DragGesture(minimumDistance: 30)
                             .updating($isDrag) { Value, State, Transaction in
                                 State = true
                                 DispatchQueue.main.async {
