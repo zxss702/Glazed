@@ -67,7 +67,7 @@ struct GlazedSheetViewModle:View {
                                 }
                             }
                         } ProgresAction: {
-                            action()
+                            await action()
                         }
                         id = helper.id
                         glazedObserver.view.addSubview(helper)

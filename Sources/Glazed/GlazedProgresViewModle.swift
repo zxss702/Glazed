@@ -48,9 +48,11 @@ struct GlazedProgresViewModle:View {
             }
             
             DispatchQueue.global().async {
-                Helper.ProgresAction()
-                DispatchQueue.main.async {
-                    Helper.dismiss()
+                Task {
+                    await Helper.ProgresAction()
+                    DispatchQueue.main.async {
+                        Helper.dismiss()
+                    }
                 }
             }
         }

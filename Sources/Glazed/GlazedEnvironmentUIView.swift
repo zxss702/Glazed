@@ -53,7 +53,7 @@ class GlazedEnvironmentUIView: UIViewController {
                             }
                         }
                     } ProgresAction: {
-                        action()
+                        await action()
                     }
                     id = helper.id
                     RootView.glazedObserver.view.addSubview(helper)

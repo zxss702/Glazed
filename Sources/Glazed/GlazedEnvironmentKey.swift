@@ -19,7 +19,7 @@ public extension EnvironmentValues {
         get { self[WindowKey.self] }
         set { self[WindowKey.self] = newValue }
     }
-    var glazedDoAction:(_ action: @escaping () -> Void) -> Void {
+    var glazedDoAction:(_ action: @escaping () async -> Void) -> Void {
         get { self[GlazedDoActionKey.self] }
         set { self[GlazedDoActionKey.self] = newValue }
     }
@@ -29,9 +29,11 @@ public struct WindowKey: EnvironmentKey {
     public static var defaultValue: UIWindow? = nil
 }
 public struct GlazedDoActionKey: EnvironmentKey {
-    public static var defaultValue: (_ action: @escaping () -> Void) -> Void = { action in
+    public static var defaultValue: (_ action: @escaping () async -> Void) -> Void = { action in
         DispatchQueue.global().async {
-            action()
+            Task {
+                await action()
+            }
         }
     }
 }
