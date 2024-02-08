@@ -46,10 +46,12 @@ struct GlazedInputViewModle<Content1: View>: ViewModifier {
     
     @State var id:UUID?
     func body(content: Content) -> some View {
-        if id != nil {
-            for i in glazedObserver.view.subviews {
-                if let view  = i as? GlazedHelper, view.id == id {
-                    view.view = AnyView(content1().environmentObject(glazedObserver))
+        DispatchQueue.main.async {
+            if id != nil {
+                for i in glazedObserver.view.subviews {
+                    if let view  = i as? GlazedHelper, view.id == id {
+                        view.view = AnyView(content1().environmentObject(glazedObserver))
+                    }
                 }
             }
         }
