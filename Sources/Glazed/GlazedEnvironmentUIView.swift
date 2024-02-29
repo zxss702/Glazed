@@ -67,3 +67,20 @@ class GlazedEnvironmentUIView: UIViewController {
         )
     }
 }
+
+struct blurModifier: ViewModifier {
+    let state:Bool
+    func body(content: Content) -> some View {
+        content
+            .blur(radius: state ? 20 : 0)
+    }
+}
+
+extension AnyTransition {
+    static var blur: AnyTransition {
+        .modifier(
+            active: blurModifier(state: true),
+            identity: blurModifier(state: false)
+        ).combined(with: .opacity)
+    }
+}

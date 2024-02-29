@@ -120,7 +120,7 @@ struct test: View {
                     .clipShape(Circle())
                     .frame(width:35, height: 35)
             }
-            .Sheet(isPresented: $stack2) {
+            .Popover(isPresented: $stack2) {
                 Color.yellow
                     .frame(maxWidth: 400, maxHeight: stack3 ? 400 : 100)
                     .overlay {
@@ -136,7 +136,7 @@ struct test: View {
                         }
                     }
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .frame(maxWidth: 250, maxHeight: 450)
         }
        
     }
