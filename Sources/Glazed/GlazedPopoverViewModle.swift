@@ -37,7 +37,7 @@ struct GlazedPopoverViewModle:View {
                 .shadow(radius: 0.3)
                 .shadow(color: Color(.sRGBLinear, white: 0, opacity: 0.2), radius: 35 * showProgres)
             
-                .scaleEffect(x: max(showProgres, 0.2), y: max(showProgres, 0.2), anchor: UnitPoint(x: scaleX, y: scaleY))
+                .scaleEffect(x: showProgres, y: showProgres, anchor: UnitPoint(x: scaleX, y: scaleY))
                 .blur(radius: 10 - showProgres * 10)
                 .onFrameChange($Helper.Viewframe)
                 .compositingGroup()
