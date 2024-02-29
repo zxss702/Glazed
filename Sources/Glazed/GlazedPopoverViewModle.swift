@@ -38,7 +38,6 @@ struct GlazedPopoverViewModle:View {
                 .shadow(color: Color(.sRGBLinear, white: 0, opacity: 0.2), radius: 35 * showProgres)
             
                 .scaleEffect(x: max(showProgres, 0.2), y: max(showProgres, 0.2), anchor: UnitPoint(x: scaleX, y: scaleY))
-                .opacity(showProgres)
                 .blur(radius: 10 - showProgres * 10)
                 .onFrameChange($Helper.Viewframe)
                 .compositingGroup()
@@ -214,12 +213,12 @@ struct GlazedPopoverViewModle:View {
         
         if onAppear {
             Helper.dismiss = {
-                withAnimation(.spring(dampingFraction: 1).speed(1.3)) {
+                withAnimation(.spring(dampingFraction: 1).speed(1.2)) {
                     showProgres = 0
                     Helper.dismissDefaut()
                 }
             }
-            withAnimation(.spring(dampingFraction: 0.7).speed(1.7)) {
+            withAnimation(.spring(dampingFraction: 0.7).speed(1.5)) {
                 showProgres = 1
             }
         }
