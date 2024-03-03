@@ -44,14 +44,11 @@ struct GlazedInputViewModle<Content1: View>: ViewModifier {
     @ViewBuilder var content1:() -> Content1
     @EnvironmentObject var glazedObserver: GlazedObserver
     
-    @State var id:UUID?
+    @State var helper:GlazedHelper?
+    
     func body(content: Content) -> some View {
-        if id != nil {
-            for i in glazedObserver.view.subviews {
-                if let view  = i as? GlazedHelper, view.id == id {
-                    view.view = AnyView(content1().environmentObject(glazedObserver))
-                }
-            }
+        if helper != nil {
+            helper?.view = AnyView(content1().environmentObject(glazedObserver))
         }
         return content
             .overlay {
@@ -60,19 +57,15 @@ struct GlazedInputViewModle<Content1: View>: ViewModifier {
                         Color.clear
                             .transition(.identity)
                             .onChange(connect: GeometryProxy.frame(in: .global)) {
-                                if id != nil {
-                                    for i in glazedObserver.view.subviews {
-                                        if let view  = i as? GlazedHelper, view.id == id {
-                                            view.buttonFrame = GeometryProxy.frame(in: .global)
-                                        }
-                                    }
+                                if helper != nil {
+                                    helper?.buttonFrame = GeometryProxy.frame(in: .global)
                                 }
                             }
                             .onAppear {
                                 let helper = GlazedHelper(type: type, buttonFrame: GeometryProxy.frame(in: .global), view: AnyView(content1())) {
                                     Dismiss()
                                 }
-                                id = helper.id
+                                self.helper = helper
                                 glazedObserver.view.addSubview(helper)
                                 NSLayoutConstraint.activate([
                                     helper.topAnchor.constraint(equalTo: glazedObserver.view.topAnchor, constant: 0),
@@ -82,12 +75,8 @@ struct GlazedInputViewModle<Content1: View>: ViewModifier {
                                 ])
                             }
                             .onDisappear {
-                                if id != nil {
-                                    for i in glazedObserver.view.subviews {
-                                        if let view  = i as? GlazedHelper, view.id == id {
-                                            view.dismiss()
-                                        }
-                                    }
+                                if helper != nil {
+                                    helper?.dismiss()
                                 }
                             }
                     }
@@ -96,18 +85,15 @@ struct GlazedInputViewModle<Content1: View>: ViewModifier {
     }
     
     func Dismiss() {
-        if id != nil {
-            for i in glazedObserver.view.subviews {
-                if let view = i as? GlazedHelper, view.id == id {
-                    DispatchQueue.main.async(1) {
-                        view.removeFromSuperview()
-                    }
-                    DispatchQueue.main.async(0.1) {
-                        isPresented = false
-                    }
-                    id = nil
-                }
+        if helper != nil {
+            DispatchQueue.main.async(1) {
+                helper?.removeFromSuperview()
             }
+            DispatchQueue.main.async(0.1) {
+                isPresented = false
+            }
+            helper?.dismiss()
+            helper = nil
         }
     }
 }
