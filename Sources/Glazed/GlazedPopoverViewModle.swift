@@ -40,10 +40,9 @@ struct GlazedPopoverViewModle:View {
                 .scaleEffect(x: showProgres, y: showProgres, anchor: UnitPoint(x: scaleX, y: scaleY))
                 .blur(radius: 10 - showProgres * 10)
                 .onFrameChange($Helper.Viewframe)
-                .compositingGroup()
                 .frame(maxWidth: maxFrameX, maxHeight: maxFrameY)
                 .environment(\.glazedDismiss, {
-                    Helper.dismiss()
+                    Helper.dismissAction()
                 })
                 .environment(\.glazedDoAction, { action in
                     var id:UUID = UUID()
@@ -215,7 +214,6 @@ struct GlazedPopoverViewModle:View {
             Helper.dismiss = {
                 withAnimation(.spring(dampingFraction: 1).speed(1.2)) {
                     showProgres = 0
-                    Helper.dismissDefaut()
                 }
             }
             withAnimation(.spring(dampingFraction: 0.7).speed(1.5)) {

@@ -26,7 +26,7 @@ struct GlazedFullCoverViewModle:View {
                     .transition(.move(edge: .bottom).combined(with: .opacity))
                 
                     .environment(\.glazedDismiss, {
-                        Helper.dismiss()
+                        Helper.dismissAction()
                     })
                     .environment(\.glazedDoAction, { action in
                         var id:UUID = UUID()
@@ -80,7 +80,6 @@ struct GlazedFullCoverViewModle:View {
             Helper.dismiss = {
                 withAnimation(.spring().speed(1.6)) {
                     show = false
-                    Helper.dismissDefaut()
                 }
             }
             withAnimation(.spring().speed(1.5)) {

@@ -41,18 +41,16 @@ public extension View {
 struct GlazedInputViewModle<Content1: View>: ViewModifier {
     let type:GlazedType
     @Binding var isPresented:Bool
-    @ViewBuilder var content1:() -> Content1 {
-        didSet {
-            if helper != nil {
-                helper?.view = AnyView(content1().environmentObject(glazedObserver))
-            }
-        }
-    }
+    @ViewBuilder var content1:() -> Content1
+    
     @EnvironmentObject var glazedObserver: GlazedObserver
     
     @State var helper:GlazedHelper?
     
     func body(content: Content) -> some View {
+        if helper != nil {
+            let _ = helper?.view = AnyView(content1().environmentObject(glazedObserver))
+        }
         content
             .overlay {
                 if isPresented {
@@ -87,15 +85,15 @@ struct GlazedInputViewModle<Content1: View>: ViewModifier {
     }
     
     func Dismiss() {
-        if helper != nil {
+        if let h = helper {
+            helper?.dismiss()
+            helper = nil
             DispatchQueue.main.async(1) {
-                helper?.removeFromSuperview()
+                h.removeFromSuperview()
             }
             DispatchQueue.main.async(0.1) {
                 isPresented = false
             }
-            helper?.dismiss()
-            helper = nil
         }
     }
 }

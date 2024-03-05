@@ -125,12 +125,13 @@ struct test: View {
                     .frame(maxWidth: 400, maxHeight: stack3 ? 400 : 100)
                     .overlay {
                         Button {
-                            withAnimation(.spring()) {
-                                stack3.toggle()
+                            DispatchQueue.global().async {
+                                withAnimation(.spring()) {
+                                    stack3.toggle()
+                                }
                             }
-                            
                         } label: {
-                            Color.green
+                            (stack3 ? Color.green : .black)
                                 .clipShape(Circle())
                                 .frame(width:35, height: 35)
                         }

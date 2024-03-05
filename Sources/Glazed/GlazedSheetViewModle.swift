@@ -54,7 +54,7 @@ struct GlazedSheetViewModle:View {
                         : Helper.offsetY
                     )
                     .environment(\.glazedDismiss, {
-                        Helper.dismiss()
+                        Helper.dismissAction()
                     })
                     .environment(\.glazedDoAction, { action in
                         var id:UUID = UUID()
@@ -115,7 +115,6 @@ struct GlazedSheetViewModle:View {
             Helper.dismiss = {
                 withAnimation(.spring()) {
                     show = false
-                    Helper.dismissDefaut()
                     DispatchQueue.main.async(0.5) {
                         Helper.ViewSize = .zero
                     }

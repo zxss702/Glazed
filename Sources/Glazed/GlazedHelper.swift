@@ -13,14 +13,19 @@ class GlazedHelper: UIView, Identifiable, ObservableObject {
     @Published var buttonFrame:CGRect
     @Published var Viewframe:CGRect = .zero
     @Published var ViewSize:CGSize = .zero
+    
     @Published var view: AnyView
+    
     @Published var offsetY:CGFloat = 0
     @Published var offsetX:CGFloat = 0
-    @Published var dismiss:() -> Void
+    
+    var dismiss:() -> Void = {}
+    
+    var dismissAction:() -> Void
+    
     var dismissDefaut:() -> Void
     var ProgresAction:() async -> Void
     var HostVC:UIHostingController<AnyView>?
-    
     
     init(id: UUID = UUID(), type: GlazedType, buttonFrame: CGRect, view: AnyView, offsetY: CGFloat = 0, offsetX: CGFloat = 0, dismiss: @escaping () -> Void, ProgresAction: @escaping () async -> Void = {}) {
         self.id = id
@@ -29,9 +34,9 @@ class GlazedHelper: UIView, Identifiable, ObservableObject {
         self.view = view
         self.offsetY = offsetY
         self.offsetX = offsetX
-        self.dismiss = dismiss
         self.dismissDefaut = dismiss
         self.ProgresAction = ProgresAction
+        self.dismissAction = dismiss
         super.init(frame: .zero)
         translatesAutoresizingMaskIntoConstraints = false
         HostVC = UIHostingController(rootView: getView())
@@ -99,7 +104,7 @@ class GlazedHelper: UIView, Identifiable, ObservableObject {
                         return hit1
                     } else {
                         if !buttonFrame.contains(point) {
-                            self.dismiss()
+                            self.dismissAction()
                         }
                         return nil
                     }
