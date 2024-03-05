@@ -47,15 +47,16 @@ struct GlazedInputViewModle<Content1: View>: ViewModifier {
     @State var helper:GlazedHelper?
     
     func body(content: Content) -> some View {
-        if helper != nil {
-            helper?.view = AnyView(content1().environmentObject(glazedObserver))
-        }
-        return content
+        content
             .overlay {
                 if isPresented {
                     GeometryReader { GeometryProxy in
+                        let _ = DispatchQueue.main.async {
+                            if helper != nil {
+                                helper?.view = AnyView(content1().environmentObject(glazedObserver))
+                            }
+                        }
                         Color.clear
-                            .transition(.identity)
                             .onChange(connect: GeometryProxy.frame(in: .global)) {
                                 if helper != nil {
                                     helper?.buttonFrame = GeometryProxy.frame(in: .global)
