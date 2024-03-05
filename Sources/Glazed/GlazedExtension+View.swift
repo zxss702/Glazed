@@ -41,7 +41,13 @@ public extension View {
 struct GlazedInputViewModle<Content1: View>: ViewModifier {
     let type:GlazedType
     @Binding var isPresented:Bool
-    @ViewBuilder var content1:() -> Content1
+    @ViewBuilder var content1:() -> Content1 {
+        didSet {
+            if helper != nil {
+                helper?.view = AnyView(content1().environmentObject(glazedObserver))
+            }
+        }
+    }
     @EnvironmentObject var glazedObserver: GlazedObserver
     
     @State var helper:GlazedHelper?
@@ -51,11 +57,6 @@ struct GlazedInputViewModle<Content1: View>: ViewModifier {
             .overlay {
                 if isPresented {
                     GeometryReader { GeometryProxy in
-                        let _ = DispatchQueue.main.async {
-                            if helper != nil {
-                                helper?.view = AnyView(content1().environmentObject(glazedObserver))
-                            }
-                        }
                         Color.clear
                             .onChange(connect: GeometryProxy.frame(in: .global)) {
                                 if helper != nil {
