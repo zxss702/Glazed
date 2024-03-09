@@ -23,7 +23,6 @@ class GlazedHelper: UIView, Identifiable, ObservableObject {
     
     var dismissAction:() -> Void
     
-    var dismissDefaut:() -> Void
     var ProgresAction:() async -> Void
     var HostVC:UIHostingController<AnyView>?
     
@@ -34,7 +33,6 @@ class GlazedHelper: UIView, Identifiable, ObservableObject {
         self.view = view
         self.offsetY = offsetY
         self.offsetX = offsetX
-        self.dismissDefaut = dismiss
         self.ProgresAction = ProgresAction
         self.dismissAction = dismiss
         super.init(frame: .zero)

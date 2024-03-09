@@ -30,7 +30,7 @@ struct GlazedSheetViewModle:View {
                             DragGesture(minimumDistance: 0)
                                 .onChanged { _ in
                                     if show {
-                                        Helper.dismiss()
+                                        Helper.dismissAction()
                                     }
                                 }
                         )
@@ -115,9 +115,6 @@ struct GlazedSheetViewModle:View {
             Helper.dismiss = {
                 withAnimation(.spring()) {
                     show = false
-                    DispatchQueue.main.async(0.5) {
-                        Helper.ViewSize = .zero
-                    }
                 }
             }
             DispatchQueue.main.async(0.1){

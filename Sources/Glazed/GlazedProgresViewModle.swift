@@ -36,7 +36,6 @@ struct GlazedProgresViewModle:View {
                 canShow = false
                 withAnimation(.spring().speed(1.6)) {
                     show = false
-                    Helper.dismissDefaut()
                 }
             }
             DispatchQueue.main.async(0.3) {
@@ -51,7 +50,7 @@ struct GlazedProgresViewModle:View {
                 Task {
                     await Helper.ProgresAction()
                     DispatchQueue.main.async {
-                        Helper.dismiss()
+                        Helper.dismissAction()
                     }
                 }
             }
