@@ -100,7 +100,7 @@ struct GlazedSheetViewModle:View {
                     .onChange(of: isDrag) { v in
                         if !v {
                             if Helper.offsetY > 130 {
-                                Helper.dismiss()
+                                Helper.dismissAction()
                             } else {
                                 withAnimation(.spring(dampingFraction: 1).speed(1.3)) {
                                     Helper.offsetY = 0
