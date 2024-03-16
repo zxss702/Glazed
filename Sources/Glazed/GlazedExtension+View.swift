@@ -35,20 +35,37 @@ public extension View {
         }))
     }
     func PopoverWithOutButton<Content: View>(isPresented: Binding<Bool>, @ViewBuilder content: @escaping () -> Content) -> some View {
-        self.modifier(GlazedInputViewModle(type: .PopoverWithOutButton, isPresented: isPresented, content1: content))
+        self.modifier(GlazedInputViewModle(type: .PopoverWithOutButton, isPresented: isPresented, content1: {
+            content()
+                .background(.regularMaterial)
+                .clipShape(RoundedRectangle(cornerRadius: 17, style: .continuous))
+                
+        }))
     }
     func tipPopover<Content: View>(isPresented: Binding<Bool>, @ViewBuilder content: @escaping () -> Content) -> some View {
-        self.modifier(GlazedInputViewModle(type: .tipPopover, isPresented: isPresented, content1: content))
+        self.modifier(GlazedInputViewModle(type: .tipPopover, isPresented: isPresented, content1: {
+            content()
+                .background(.regularMaterial)
+                .clipShape(Capsule(style: .continuous))
+        }))
     }
     func SharePopover<Content: View>(isPresented: Binding<Bool>, @ViewBuilder content: @escaping () -> Content) -> some View {
-        self.modifier(GlazedInputViewModle(type: .SharePopover, isPresented: isPresented, content1: content))
+        self.modifier(GlazedInputViewModle(type: .SharePopover, isPresented: isPresented, content1: {
+            content()
+                .clipShape(RoundedRectangle(cornerRadius: 17, style: .continuous))
+        }))
     }
     func centerPopover<Content: View>(isPresented: Binding<Bool>, ignorTouch:Bool = false, @ViewBuilder content: @escaping () -> Content) -> some View {
         self
-            .scaleEffect(x: isPresented.wrappedValue ? 0.8 : 1, y: isPresented.wrappedValue ? 0.8 : 1)
-            .opacity(isPresented.wrappedValue ? 0 : 1)
+            .scaleEffect(x: isPresented.wrappedValue ? 0.95 : 1, y: isPresented.wrappedValue ? 0.95 : 1)
+            .blur(radius: isPresented.wrappedValue ? 20 : 0)
             .animation(.spring(), value: isPresented.wrappedValue)
-            .modifier(GlazedInputViewModle(type: .centerPopover, isPresented: isPresented, content1: content))
+            .modifier(GlazedInputViewModle(type: .centerPopover, isPresented: isPresented, content1: {
+                content()
+                    .background(.regularMaterial)
+                    .clipShape(RoundedRectangle(cornerRadius: 17, style: .continuous))
+                    
+            }))
     }
 }
 
