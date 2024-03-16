@@ -97,7 +97,7 @@ struct GlazedInputViewModle<Content1: View>: ViewModifier {
                             if isPresented {
                                 helper?.dismissAction()
                                 let helper = GlazedHelper(type: type, buttonFrame: GeometryProxy.frame(in: .global), view: AnyView(content1().environmentObject(glazedObserver))) {
-                                    Dismiss()
+                                    isPresented = false
                                 }
                                 self.helper = helper
                                 glazedObserver.view.addSubview(helper)
@@ -108,17 +108,13 @@ struct GlazedInputViewModle<Content1: View>: ViewModifier {
                                     helper.trailingAnchor.constraint(equalTo: glazedObserver.view.trailingAnchor, constant: 0)
                                 ])
                             } else {
-                                if helper != nil {
-                                    helper?.dismissAction()
-                                }
+                                Dismiss()
                             }
                         }
                 }
             }
             .onDisappear {
-                if helper != nil {
-                    helper?.dismissAction()
-                }
+                isPresented = false
             }
     }
     
