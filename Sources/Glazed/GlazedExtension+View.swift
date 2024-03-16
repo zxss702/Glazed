@@ -19,7 +19,6 @@ public extension View {
             content()
                 .background(.regularMaterial)
                 .clipShape(RoundedRectangle(cornerRadius: 17, style: .continuous))
-                
         }))
     }
     func EditPopover<Content: View>(isPresented: Binding<Bool>, @ViewBuilder content: @escaping () -> Content) -> some View {
@@ -27,6 +26,13 @@ public extension View {
             content()
                 .background(.regularMaterial)
                 .clipShape(Capsule(style: .continuous))
+        }))
+    }
+    func topBottomPopover<Content: View>(isPresented: Binding<Bool>, @ViewBuilder content: @escaping () -> Content) -> some View {
+        self.modifier(GlazedInputViewModle(type: .EditPopover, isPresented: isPresented, content1: {
+            content()
+                .background(.regularMaterial)
+                .clipShape(RoundedRectangle(cornerRadius: 17, style: .continuous))
         }))
     }
     func clearPopover<Content: View>(isPresented: Binding<Bool>, @ViewBuilder content: @escaping () -> Content) -> some View {
