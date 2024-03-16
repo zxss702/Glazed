@@ -36,7 +36,7 @@ public extension View {
         }))
     }
     func clearPopover<Content: View>(isPresented: Binding<Bool>, @ViewBuilder content: @escaping () -> Content) -> some View {
-        self.modifier(GlazedInputViewModle(type: .EditPopover, isPresented: isPresented, content1: {
+        self.modifier(GlazedInputViewModle(type: .Popover, isPresented: isPresented, content1: {
             content()
         }))
     }
