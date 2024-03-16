@@ -62,20 +62,17 @@ struct GlazedInputViewModle<Content1: View>: ViewModifier {
     @State var helper:GlazedHelper?
     
     func body(content: Content) -> some View {
-        if helper != nil {
-            let _ = helper?.view = AnyView(content1().environmentObject(glazedObserver))
-        }
+        let _ = helper?.view = AnyView(content1().environmentObject(glazedObserver))
         content
             .overlay {
-                if isPresented {
-                    GeometryReader { GeometryProxy in
-                        Color.clear
-                            .onChange(connect: GeometryProxy.frame(in: .global)) {
-                                if helper != nil {
-                                    helper?.buttonFrame = GeometryProxy.frame(in: .global)
-                                }
-                            }
-                            .onAppear {
+                GeometryReader { GeometryProxy in
+                    Color.clear
+                        .onChange(of: GeometryProxy.frame(in: .global)) { V in
+                            helper?.buttonFrame = V
+                        }
+                        .onChange(connect: isPresented) {
+                            if isPresented {
+                                helper?.dismissAction()
                                 let helper = GlazedHelper(type: type, buttonFrame: GeometryProxy.frame(in: .global), view: AnyView(content1().environmentObject(glazedObserver))) {
                                     Dismiss()
                                 }
@@ -87,13 +84,10 @@ struct GlazedInputViewModle<Content1: View>: ViewModifier {
                                     helper.bottomAnchor.constraint(equalTo: glazedObserver.view.bottomAnchor, constant: 0),
                                     helper.trailingAnchor.constraint(equalTo: glazedObserver.view.trailingAnchor, constant: 0)
                                 ])
+                            } else {
+                                helper?.dismissAction()
                             }
-                            .onDisappear {
-                                if helper != nil {
-                                    helper?.dismissAction()
-                                }
-                            }
-                    }
+                        }
                 }
             }
     }
