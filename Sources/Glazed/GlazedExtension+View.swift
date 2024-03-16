@@ -124,8 +124,8 @@ struct GlazedInputViewModle<Content1: View>: ViewModifier {
     
     func Dismiss() {
         if let h = helper {
-            helper = nil
             isPresented = false
+            helper = nil
             h.dismiss()
             DispatchQueue.main.async(1) {
                 h.removeFromSuperview()
