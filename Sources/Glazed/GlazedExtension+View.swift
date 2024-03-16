@@ -115,6 +115,11 @@ struct GlazedInputViewModle<Content1: View>: ViewModifier {
                         }
                 }
             }
+            .onDisappear {
+                if helper != nil {
+                    helper?.dismissAction()
+                }
+            }
     }
     
     func Dismiss() {
