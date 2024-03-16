@@ -26,14 +26,6 @@ struct GlazedPopoverViewModle:View {
     var body: some View {
         GeometryReader { GeometryProxy in
             Helper.view
-                .background(.regularMaterial)
-                .provided(edit) { AnyView in
-                    AnyView
-                        .clipShape(Capsule(style: .continuous))
-                } else: { AnyView in
-                    AnyView
-                        .clipShape(RoundedRectangle(cornerRadius: 17))
-                }
                 .shadow(radius: 0.3)
                 .shadow(color: Color(.sRGBLinear, white: 0, opacity: 0.2), radius: 35 * showProgres)
             

@@ -18,7 +18,7 @@ struct GlazedProgresViewModle:View {
         ZStack {
             if show {
                 Color.black.opacity(0.2).allowsHitTesting(false).ignoresSafeArea()
-                    .transition(.opacity)
+                    .transition(.blur)
                 Color("systemBackColor")
                     .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                     .shadow(radius: 8)
@@ -28,13 +28,13 @@ struct GlazedProgresViewModle:View {
                             .foregroundColor(.accentColor)
                     }
                     .frame(width: 70, height: 70)
-                    .transition(.scale(scale: 0.8).combined(with: .opacity))
+                    .transition(.scale(scale: 0.8).combined(with: .blur))
             }
         }
         .onAppear {
             Helper.dismiss = {
                 canShow = false
-                withAnimation(.spring().speed(1.6)) {
+                withAnimation(.spring().speed(1.5)) {
                     show = false
                 }
             }

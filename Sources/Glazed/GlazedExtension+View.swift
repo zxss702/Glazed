@@ -15,10 +15,24 @@ public extension View {
         self.modifier(GlazedInputViewModle(type: .FullCover, isPresented: isPresented, content1: content))
     }
     func Popover<Content: View>(isPresented: Binding<Bool>, ignorTouch:Bool = false, @ViewBuilder content: @escaping () -> Content) -> some View {
-        self.modifier(GlazedInputViewModle(type: .Popover, isPresented: isPresented, content1: content))
+        self.modifier(GlazedInputViewModle(type: .Popover, isPresented: isPresented, content1: {
+            content()
+                .background(.regularMaterial)
+                .clipShape(RoundedRectangle(cornerRadius: 17, style: .continuous))
+                
+        }))
     }
     func EditPopover<Content: View>(isPresented: Binding<Bool>, @ViewBuilder content: @escaping () -> Content) -> some View {
-        self.modifier(GlazedInputViewModle(type: .EditPopover, isPresented: isPresented, content1: content))
+        self.modifier(GlazedInputViewModle(type: .EditPopover, isPresented: isPresented, content1: {
+            content()
+                .background(.regularMaterial)
+                .clipShape(Capsule(style: .continuous))
+        }))
+    }
+    func clearPopover<Content: View>(isPresented: Binding<Bool>, @ViewBuilder content: @escaping () -> Content) -> some View {
+        self.modifier(GlazedInputViewModle(type: .EditPopover, isPresented: isPresented, content1: {
+            content()
+        }))
     }
     func PopoverWithOutButton<Content: View>(isPresented: Binding<Bool>, @ViewBuilder content: @escaping () -> Content) -> some View {
         self.modifier(GlazedInputViewModle(type: .PopoverWithOutButton, isPresented: isPresented, content1: content))
@@ -62,7 +76,7 @@ struct GlazedInputViewModle<Content1: View>: ViewModifier {
                                 }
                             }
                             .onAppear {
-                                let helper = GlazedHelper(type: type, buttonFrame: GeometryProxy.frame(in: .global), view: AnyView(content1())) {
+                                let helper = GlazedHelper(type: type, buttonFrame: GeometryProxy.frame(in: .global), view: AnyView(content1().environmentObject(glazedObserver))) {
                                     Dismiss()
                                 }
                                 self.helper = helper
