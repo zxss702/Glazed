@@ -85,7 +85,9 @@ struct GlazedInputViewModle<Content1: View>: ViewModifier {
                                     helper.trailingAnchor.constraint(equalTo: glazedObserver.view.trailingAnchor, constant: 0)
                                 ])
                             } else {
-                                helper?.dismissAction()
+                                if helper != nil {
+                                    helper?.dismissAction()
+                                }
                             }
                         }
                 }
@@ -94,13 +96,11 @@ struct GlazedInputViewModle<Content1: View>: ViewModifier {
     
     func Dismiss() {
         if let h = helper {
-            helper?.dismiss()
+            isPresented = false
             helper = nil
+            h.dismiss()
             DispatchQueue.main.async(1) {
                 h.removeFromSuperview()
-            }
-            DispatchQueue.main.async(0.1) {
-                isPresented = false
             }
         }
     }
