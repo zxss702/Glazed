@@ -8,18 +8,41 @@
 import SwiftUI
 
 public class GlazedObserver: ObservableObject {
-    public var view:UIView = UIView()
+    @Published public var view:UIView = UIView()
 }
 public struct GlazedEnvironmentView<Content: View>: View {
-    let content: Content
+    let content:() -> Content
     @StateObject var glazedObserver = GlazedObserver()
     
-    public init(@ViewBuilder content: () -> Content) {
-        self.content = content()
+    public init(@ViewBuilder content: @escaping () -> Content) {
+        self.content = content
     }
     public var body: some View {
-        GlazedEnvironmentViewHelper(content: AnyView(content))
+        GlazedEnvironmentViewHelper(content: content)
             .environmentObject(glazedObserver)
+            .environment(\.window, glazedObserver.view.window)
+            .environment(\.glazedDoAction, { [self] action in
+                var id:UUID = UUID()
+                let helper = GlazedHelper(type: .Progres, buttonFrame: .zero, view: AnyView(EmptyView())) { [self] in
+                    for i in glazedObserver.view.subviews {
+                        if let view = i as? GlazedHelper, view.id == id {
+                            DispatchQueue.main.async(1) {
+                                view.removeFromSuperview()
+                            }
+                        }
+                    }
+                } ProgresAction: {
+                    await action()
+                }
+                id = helper.id
+                glazedObserver.view.addSubview(helper)
+                NSLayoutConstraint.activate([
+                    helper.topAnchor.constraint(equalTo: glazedObserver.view.topAnchor, constant: 0),
+                    helper.leadingAnchor.constraint(equalTo: glazedObserver.view.leadingAnchor, constant: 0),
+                    helper.bottomAnchor.constraint(equalTo: glazedObserver.view.bottomAnchor, constant: 0),
+                    helper.trailingAnchor.constraint(equalTo: glazedObserver.view.trailingAnchor, constant: 0)
+                ])
+            })
     }
 }
 

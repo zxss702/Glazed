@@ -7,15 +7,16 @@
 
 import SwiftUI
 
-struct GlazedEnvironmentViewHelper: UIViewControllerRepresentable {
-    typealias UIViewControllerType = GlazedEnvironmentUIView
+struct GlazedEnvironmentViewHelper<Content: View>: UIViewControllerRepresentable {
+    typealias UIViewControllerType = GlazedEnvironmentUIView<Content>
     
-    @State var content:AnyView
+    @ViewBuilder var content:() -> Content
+    
     @EnvironmentObject var glazedObserver:GlazedObserver
-    func makeUIViewController(context: Context) -> GlazedEnvironmentUIView {
+    func makeUIViewController(context: Context) -> GlazedEnvironmentUIView<Content> {
         return GlazedEnvironmentUIView(RootView: self)
     }
-    func updateUIViewController(_ uiViewController: GlazedEnvironmentUIView, context: Context) {
+    func updateUIViewController(_ uiViewController: GlazedEnvironmentUIView<Content>, context: Context) {
         uiViewController.setContent()
     }
 }
