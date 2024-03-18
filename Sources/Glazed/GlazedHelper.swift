@@ -94,7 +94,7 @@ class GlazedHelper: UIView, Identifiable, ObservableObject {
                         if Viewframe.contains(point) {
                             return hit1
                         } else {
-                            self.dismiss()
+                            self.dismissAction()
                             return nil
                         }
                     } else if type == .tipPopover, case .Progres = type {

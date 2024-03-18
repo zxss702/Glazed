@@ -109,6 +109,7 @@ struct GlazedInputViewModle<Content1: View>: ViewModifier {
                             }
                             .onChange(of: GeometryProxy.frame(in: .global)) { V in
                                 helper?.buttonFrame = V
+                                Dismiss()
                             }
                             .onDisappear {
                                 Dismiss()
