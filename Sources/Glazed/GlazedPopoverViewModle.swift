@@ -25,75 +25,74 @@ struct GlazedPopoverViewModle:View {
     @EnvironmentObject var glazedObserver: GlazedObserver
     var body: some View {
         GeometryReader { GeometryProxy in
-            Helper.view
-                .shadow(radius: 0.3)
-                .shadow(color: Color(.sRGBLinear, white: 0, opacity: 0.2), radius: 35 * showProgres)
-            
-                .scaleEffect(x: showProgres, y: showProgres, anchor: UnitPoint(x: scaleX, y: scaleY))
-                .blur(radius: 10 - showProgres * 10)
-                .onFrameChange($Helper.Viewframe)
-                .frame(maxWidth: maxFrameX, maxHeight: maxFrameY)
-                .environment(\.glazedDismiss, {
-                    Helper.dismissAction()
-                })
-                .environment(\.glazedDoAction, { action in
-                    var id:UUID = UUID()
-                    let helper = GlazedHelper(type: .Progres, buttonFrame: .zero, view: AnyView(EmptyView())) {
-                        for i in glazedObserver.view.subviews {
-                            if let view = i as? GlazedHelper, view.id == id {
-                                DispatchQueue.main.async(1) {
-                                    view.removeFromSuperview()
+            ZStack {
+                Helper.view
+                    .shadow(radius: 0.3)
+                    .shadow(color: Color(.sRGBLinear, white: 0, opacity: 0.2), radius: 35 * showProgres)
+                
+                    .scaleEffect(x: showProgres, y: showProgres, anchor: UnitPoint(x: scaleX, y: scaleY))
+                    .blur(radius: 10 - showProgres * 10)
+                    .onFrameChange($Helper.Viewframe)
+                    .frame(maxWidth: maxFrameX, maxHeight: maxFrameY)
+                    .environment(\.glazedDismiss, {
+                        Helper.dismissAction()
+                    })
+                    .environment(\.glazedDoAction, { action in
+                        var id:UUID = UUID()
+                        let helper = GlazedHelper(type: .Progres, buttonFrame: .zero, view: AnyView(EmptyView())) {
+                            for i in glazedObserver.view.subviews {
+                                if let view = i as? GlazedHelper, view.id == id {
+                                    DispatchQueue.main.async(1) {
+                                        view.removeFromSuperview()
+                                    }
                                 }
                             }
+                        } ProgresAction: {
+                            await action()
                         }
-                    } ProgresAction: {
-                        await action()
-                    }
-                    id = helper.id
-                    glazedObserver.view.addSubview(helper)
-                    NSLayoutConstraint.activate([
-                        helper.topAnchor.constraint(equalTo: glazedObserver.view.topAnchor, constant: 0),
-                        helper.leadingAnchor.constraint(equalTo: glazedObserver.view.leadingAnchor, constant: 0),
-                        helper.bottomAnchor.constraint(equalTo: glazedObserver.view.bottomAnchor, constant: 0),
-                        helper.trailingAnchor.constraint(equalTo: glazedObserver.view.trailingAnchor, constant: 0)
-                    ])
-                })
-                .environment(\.safeAreaInsets, EdgeInsets(top: 17, leading: 17, bottom: 17, trailing: 17))
-                .position(x: Helper.offsetX, y: Helper.offsetY)
-                .onChange(of: GeometryProxy.size) { value in
-                    if showProgres == 1 {
-                        withAnimation(.spring()) {
-                            setValue(GeometryProxy: GeometryProxy)
-                        }
-                    }
-                }
-                .onChange(of: Helper.Viewframe) { value in
-                    if showProgres == 1 {
-                        withAnimation(.spring()) {
-                            setValue(GeometryProxy: GeometryProxy)
-                        }
-                    }
-                }
-                .onChange(of: Helper.buttonFrame) { value in
-                    if showProgres == 1 {
-                        withAnimation(.spring()) {
-                            setValue(GeometryProxy: GeometryProxy)
-                        }
-                    }
-                }
-                .onAppear {
-                    setValue(onAppear: true, GeometryProxy: GeometryProxy)
-                }
-        }
-        .ignoresSafeArea()
-        .background {
-            GeometryReader { Geometry in
+                        id = helper.id
+                        glazedObserver.view.addSubview(helper)
+                        NSLayoutConstraint.activate([
+                            helper.topAnchor.constraint(equalTo: glazedObserver.view.topAnchor, constant: 0),
+                            helper.leadingAnchor.constraint(equalTo: glazedObserver.view.leadingAnchor, constant: 0),
+                            helper.bottomAnchor.constraint(equalTo: glazedObserver.view.bottomAnchor, constant: 0),
+                            helper.trailingAnchor.constraint(equalTo: glazedObserver.view.trailingAnchor, constant: 0)
+                        ])
+                    })
+                    .environment(\.safeAreaInsets, EdgeInsets(top: 17, leading: 17, bottom: 17, trailing: 17))
+                    .position(x: Helper.offsetX, y: Helper.offsetY)
+                    
+                    
                 Color.clear
-                    .onChange(of: Geometry.size) { value in
-                        setValue(GeometryProxy: Geometry)
+                    .onChange(of: GeometryProxy.size) { value in
+                        if showProgres == 1 {
+                            withAnimation(.spring()) {
+                                setValue(GeometryProxy: GeometryProxy)
+                            }
+                        } else {
+                            setValue(GeometryProxy: GeometryProxy)
+                        }
+                    }
+                    .onChange(of: Helper.Viewframe) { value in
+                        if showProgres == 1 {
+                            withAnimation(.spring()) {
+                                setValue(GeometryProxy: GeometryProxy)
+                            }
+                        }
+                    }
+                    .onChange(of: Helper.buttonFrame) { value in
+                        if showProgres == 1 {
+                            withAnimation(.spring()) {
+                                setValue(GeometryProxy: GeometryProxy)
+                            }
+                        }
+                    }
+                    .onAppear {
+                        setValue(onAppear: true, GeometryProxy: GeometryProxy)
                     }
             }
         }
+        .ignoresSafeArea()
     }
     enum PopoverEdge {
         case top, bottom, leading, trailing, center

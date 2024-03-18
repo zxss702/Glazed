@@ -125,10 +125,8 @@ struct test: View {
                     .frame(maxWidth: 400, maxHeight: stack3 ? 400 : 100)
                     .overlay {
                         Button {
-                            DispatchQueue.global().async {
-                                withAnimation(.spring()) {
-                                    stack3.toggle()
-                                }
+                            withAnimation(.spring()) {
+                                stack3.toggle()
                             }
                         } label: {
                             (stack3 ? Color.green : .black)

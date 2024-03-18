@@ -25,6 +25,7 @@ class GlazedHelper: UIView, Identifiable, ObservableObject {
     
     var ProgresAction:() async -> Void
     var HostVC:UIHostingController<AnyView>?
+    var isDis = false
     
     init(id: UUID = UUID(), type: GlazedType, buttonFrame: CGRect, view: AnyView, offsetY: CGFloat = 0, offsetX: CGFloat = 0, dismiss: @escaping () -> Void, ProgresAction: @escaping () async -> Void = {}) {
         self.id = id
@@ -79,37 +80,41 @@ class GlazedHelper: UIView, Identifiable, ObservableObject {
     }
     
     override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
-        let hit1 = super.hitTest(point, with: event)
-        if event?.type != .hover {
-            if Viewframe == .zero && type != .Sheet {
-                return nil
-            } else {
-                if type == .Sheet {
-                    return hit1
-                } else if type == .EditPopover || type == .PopoverWithOutButton {
-                    if Viewframe.contains(point) {
-                        return hit1
-                    } else {
-                        self.dismiss()
-                        return nil
-                    }
-                } else if type == .tipPopover, case .Progres = type {
+        if self.isDis {
+            return nil
+        } else {
+            let hit1 = super.hitTest(point, with: event)
+            if event?.type != .hover {
+                if Viewframe == .zero && type != .Sheet {
                     return nil
-                } else if type == .SharePopover {
-                    return hit1
                 } else {
-                    if Viewframe.contains(point) {
+                    if type == .Sheet {
+                        return hit1
+                    } else if type == .EditPopover || type == .PopoverWithOutButton {
+                        if Viewframe.contains(point) {
+                            return hit1
+                        } else {
+                            self.dismiss()
+                            return nil
+                        }
+                    } else if type == .tipPopover, case .Progres = type {
+                        return nil
+                    } else if type == .SharePopover {
                         return hit1
                     } else {
-                        if !buttonFrame.contains(point) {
-                            self.dismissAction()
+                        if Viewframe.contains(point) {
+                            return hit1
+                        } else {
+                            if !buttonFrame.contains(point) {
+                                self.dismissAction()
+                            }
+                            return nil
                         }
-                        return nil
                     }
                 }
+            } else {
+                return nil
             }
-        } else {
-            return nil
         }
     }
 }

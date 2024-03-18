@@ -85,19 +85,18 @@ struct GlazedInputViewModle<Content1: View>: ViewModifier {
     @State var helper:GlazedHelper?
     
     func body(content: Content) -> some View {
-        let _ = helper?.view = AnyView(content1().environmentObject(glazedObserver))
         content
             .overlay {
-                GeometryReader { GeometryProxy in
-                    Color.clear
-                        .onChange(of: GeometryProxy.frame(in: .global)) { V in
-                            helper?.buttonFrame = V
-                        }
-                        .onChange(connect: isPresented) {
-                            if isPresented {
+                if isPresented {
+                    GeometryReader { GeometryProxy in
+                        let _ = helper?.view = AnyView(content1().environmentObject(glazedObserver))
+                        
+                        Color.clear
+                            .transition(.identity)
+                            .onAppear {
                                 helper?.dismissAction()
                                 let helper = GlazedHelper(type: type, buttonFrame: GeometryProxy.frame(in: .global), view: AnyView(content1().environmentObject(glazedObserver))) {
-                                    isPresented = false
+                                    Dismiss()
                                 }
                                 self.helper = helper
                                 glazedObserver.view.addSubview(helper)
@@ -107,14 +106,15 @@ struct GlazedInputViewModle<Content1: View>: ViewModifier {
                                     helper.bottomAnchor.constraint(equalTo: glazedObserver.view.bottomAnchor, constant: 0),
                                     helper.trailingAnchor.constraint(equalTo: glazedObserver.view.trailingAnchor, constant: 0)
                                 ])
-                            } else {
+                            }
+                            .onChange(of: GeometryProxy.frame(in: .global)) { V in
+                                helper?.buttonFrame = V
+                            }
+                            .onDisappear {
                                 Dismiss()
                             }
-                        }
+                    }
                 }
-            }
-            .onDisappear {
-                isPresented = false
             }
     }
     
@@ -123,6 +123,7 @@ struct GlazedInputViewModle<Content1: View>: ViewModifier {
             isPresented = false
             helper = nil
             h.dismiss()
+            h.isDis = true
             DispatchQueue.main.async(1) {
                 h.removeFromSuperview()
             }
