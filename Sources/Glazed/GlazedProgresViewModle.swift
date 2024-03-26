@@ -12,7 +12,6 @@ struct GlazedProgresViewModle:View {
     @GestureState var isDrag:Bool = false
     
     @State var show = false
-    @State var canShow = true
     
     var body: some View {
         ZStack {
@@ -27,25 +26,19 @@ struct GlazedProgresViewModle:View {
                             .controlSize(.large)
                             .foregroundColor(.accentColor)
                     }
-                    .frame(width: 70, height: 70)
+                    .frame(width: 80, height: 80)
                     .transition(.scale(scale: 0.8).combined(with: .blur))
             }
         }
         .onAppear {
             Helper.dismiss = {
-                canShow = false
-                withAnimation(.spring().speed(1.5)) {
+                withAnimation(.spring()) {
                     show = false
                 }
             }
-            DispatchQueue.main.async(0.3) {
-                if canShow {
-                    withAnimation(.spring().speed(1.5)) {
-                        show = true
-                    }
-                }
+            withAnimation(.spring().speed(1.5)) {
+                show = true
             }
-            
             DispatchQueue.global().async {
                 Task {
                     await Helper.ProgresAction()

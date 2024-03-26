@@ -85,30 +85,34 @@ class GlazedHelper: UIView, Identifiable, ObservableObject {
         } else {
             let hit1 = super.hitTest(point, with: event)
             if event?.type != .hover {
-                if Viewframe == .zero && type != .Sheet {
-                    return nil
+                if case .Progres = type {
+                    return hit1
                 } else {
-                    if type == .Sheet {
-                        return hit1
-                    } else if type == .EditPopover || type == .PopoverWithOutButton {
-                        if Viewframe.contains(point) {
-                            return hit1
-                        } else {
-                            self.dismissAction()
-                            return nil
-                        }
-                    } else if type == .tipPopover, case .Progres = type {
+                    if Viewframe == .zero && type != .Sheet {
                         return nil
-                    } else if type == .SharePopover {
-                        return hit1
                     } else {
-                        if Viewframe.contains(point) {
+                        if type == .Sheet {
+                            return hit1
+                        } else if type == .EditPopover || type == .PopoverWithOutButton {
+                            if Viewframe.contains(point) {
+                                return hit1
+                            } else {
+                                self.dismissAction()
+                                return nil
+                            }
+                        } else if type == .tipPopover {
+                            return nil
+                        } else if type == .SharePopover {
                             return hit1
                         } else {
-                            if !buttonFrame.contains(point) {
-                                self.dismissAction()
+                            if Viewframe.contains(point) {
+                                return hit1
+                            } else {
+                                if !buttonFrame.contains(point) {
+                                    self.dismissAction()
+                                }
+                                return nil
                             }
-                            return nil
                         }
                     }
                 }
