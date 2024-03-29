@@ -29,7 +29,7 @@ public extension View {
         }))
     }
     func topBottomPopover<Content: View>(isPresented: Binding<Bool>, @ViewBuilder content: @escaping () -> Content) -> some View {
-        self.modifier(GlazedInputViewModle(type: .EditPopover, isPresented: isPresented, content1: {
+        self.modifier(GlazedInputViewModle(type: .topBottom, isPresented: isPresented, content1: {
             content()
                 .background(.regularMaterial)
                 .clipShape(RoundedRectangle(cornerRadius: 17, style: .continuous))

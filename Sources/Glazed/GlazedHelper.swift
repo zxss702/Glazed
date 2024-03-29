@@ -59,23 +59,25 @@ class GlazedHelper: UIView, Identifiable, ObservableObject {
     func getView() -> AnyView {
         switch type {
         case .Popover:
-            return AnyView(GlazedPopoverViewModle(Helper: self, edit: false).environment(\.window, window))
+            return AnyView(GlazedPopoverViewModle(Helper: self, edit: false))
         case .Sheet:
-            return AnyView(GlazedSheetViewModle(Helper: self).environment(\.window, window))
+            return AnyView(GlazedSheetViewModle(Helper: self))
         case .FullCover:
-            return AnyView(GlazedFullCoverViewModle(Helper: self).environment(\.window, window))
+            return AnyView(GlazedFullCoverViewModle(Helper: self))
         case .EditPopover:
-            return AnyView(GlazedPopoverViewModle(Helper: self, edit: true).environment(\.window, window))
+            return AnyView(GlazedPopoverViewModle(Helper: self, edit: true))
         case .PopoverWithOutButton:
-            return AnyView(GlazedPopoverViewModle(Helper: self, edit: false).environment(\.window, window))
+            return AnyView(GlazedPopoverViewModle(Helper: self, edit: false))
         case .tipPopover:
-            return AnyView(GlazedPopoverViewModle(Helper: self, edit: true).environment(\.window, window))
+            return AnyView(GlazedPopoverViewModle(Helper: self, edit: true))
         case .SharePopover:
-            return AnyView(GlazedPopoverViewModle(Helper: self, edit: false).environment(\.window, window))
+            return AnyView(GlazedPopoverViewModle(Helper: self, edit: false))
         case .Progres:
-            return AnyView(GlazedProgresViewModle(Helper: self).environment(\.window, window))
+            return AnyView(GlazedProgresViewModle(Helper: self))
         case .centerPopover:
-            return AnyView(GlazedPopoverViewModle(Helper: self, edit: false, center: true).environment(\.window, window))
+            return AnyView(GlazedPopoverViewModle(Helper: self, edit: false, center: true))
+        case .topBottom:
+            return AnyView(GlazedPopoverViewModle(Helper: self, edit: true))
         }
     }
     
@@ -124,6 +126,6 @@ class GlazedHelper: UIView, Identifiable, ObservableObject {
 }
 
 enum GlazedType: Equatable {
-    case Popover, Sheet, FullCover, EditPopover, PopoverWithOutButton, tipPopover, SharePopover, centerPopover
+    case Popover, Sheet, FullCover, EditPopover, PopoverWithOutButton, tipPopover, SharePopover, centerPopover, topBottom
     case Progres
 }
