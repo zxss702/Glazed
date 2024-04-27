@@ -112,8 +112,10 @@ class GlazedHelper: UIView, Identifiable, ObservableObject {
                             } else {
                                 if !buttonFrame.contains(point) {
                                     self.dismissAction()
+                                    return hit1
+                                } else {
+                                    return nil
                                 }
-                                return nil
                             }
                         }
                     }

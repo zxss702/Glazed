@@ -86,18 +86,19 @@ struct GlazedInputViewModle<Content1: View>: ViewModifier {
     
     func body(content: Content) -> some View {
         content
+            .shadow(color: isPresented ? Color(.sRGBLinear, white: 0, opacity: 0.2) : .clear, size: 12)
+            .animation(.autoAnimation, value: isPresented)
             .overlay {
-                if isPresented {
-                    GeometryReader { GeometryProxy in
-                        let _ = helper?.view = AnyView(content1().environmentObject(glazedObserver))
-                        
-                        Color.clear
-                            .transition(.identity)
-                            .onAppear {
+                GeometryReader { GeometryProxy in
+                    let _ = helper?.view = AnyView(content1().environmentObject(glazedObserver))
+                    Color.clear
+                        .task(id: isPresented) {
+                            if isPresented {
                                 helper?.dismissAction()
                                 let helper = GlazedHelper(type: type, buttonFrame: GeometryProxy.frame(in: .global), view: AnyView(content1().environmentObject(glazedObserver))) {
                                     Dismiss()
                                 }
+                                glazedObserver.disIDs.append(helper.id)
                                 self.helper = helper
                                 glazedObserver.view.addSubview(helper)
                                 NSLayoutConstraint.activate([
@@ -106,27 +107,62 @@ struct GlazedInputViewModle<Content1: View>: ViewModifier {
                                     helper.bottomAnchor.constraint(equalTo: glazedObserver.view.bottomAnchor, constant: 0),
                                     helper.trailingAnchor.constraint(equalTo: glazedObserver.view.trailingAnchor, constant: 0)
                                 ])
+                            } else {
+                                Dismiss2()
                             }
-                            .onChange(of: GeometryProxy.frame(in: .global)) { V in
-                                helper?.buttonFrame = V
-                            }
-                            .onDisappear {
-                                Dismiss()
-                            }
-                    }
+                        }
+                        .onChange(of: GeometryProxy.frame(in: .global)) { V in
+                            helper?.buttonFrame = V
+                        }
+                        .onDisappear {
+                            Dismiss()
+                        }
+                        .transition(.identity)
                 }
             }
     }
     
     func Dismiss() {
-        isPresented = false
+        if glazedObserver.disIDs.last == helper?.id {
+            isPresented = false
+            if let h = helper {
+                helper = nil
+                h.dismiss()
+                h.isDis = true
+                DispatchQueue.main.async(0.1) {
+                    glazedObserver.disIDs.removeLast()
+                }
+                DispatchQueue.main.async(1) {
+                    h.removeFromSuperview()
+                }
+            }
+        }
+    }
+    func Dismiss2() {
         if let h = helper {
+            if let int = glazedObserver.disIDs.lastIndex(of: h.id) {
+                glazedObserver.disIDs.removeLast(int)
+            }
             helper = nil
             h.dismiss()
             h.isDis = true
             DispatchQueue.main.async(1) {
                 h.removeFromSuperview()
             }
+        }
+    }
+}
+
+
+
+extension Animation {
+    static var autoAnimation = autoAnimation(speed: 1)
+    
+    static func autoAnimation(speed: CGFloat = 1) -> Animation {
+        if #available(iOS 17.0, *) {
+            return .snappy
+        } else {
+            return .spring().speed(speed)
         }
     }
 }

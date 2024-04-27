@@ -91,12 +91,12 @@ struct GlazedSheetViewModle:View {
         }
         .onAppear {
             Helper.dismiss = {
-                withAnimation(.spring()) {
+                withAnimation(.autoAnimation) {
                     show = false
                 }
             }
             DispatchQueue.main.async(0.1){
-                withAnimation(.spring()) {
+                withAnimation(.autoAnimation) {
                     show = true
                 }
             }

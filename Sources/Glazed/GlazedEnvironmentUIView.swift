@@ -19,7 +19,6 @@ class GlazedEnvironmentUIView<Content: View>: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     override func viewDidLoad() {
-        RootView.glazedObserver.view = view
         HostVC = UIHostingController(rootView: RootView.content())
         HostVC?.view.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(HostVC!.view)
@@ -34,7 +33,9 @@ class GlazedEnvironmentUIView<Content: View>: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         while view.window == nil { }
         if view.window != nil {
-            RootView.glazedObserver.objectWillChange.send()
+            DispatchQueue.main.async { [self] in
+                RootView.glazedObserver.view = view
+            }
             setContent()
         }
     }

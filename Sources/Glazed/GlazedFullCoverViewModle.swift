@@ -56,11 +56,11 @@ struct GlazedFullCoverViewModle:View {
         }
         .onAppear {
             Helper.dismiss = {
-                withAnimation(.spring().speed(1.6)) {
+                withAnimation(.autoAnimation.speed(1.6)) {
                     show = false
                 }
             }
-            withAnimation(.spring().speed(1.5)) {
+            withAnimation(.autoAnimation.speed(1.5)) {
                 show = true
             }
         }

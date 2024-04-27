@@ -9,6 +9,8 @@ import SwiftUI
 
 public class GlazedObserver: ObservableObject {
     @Published public var view:UIView = UIView()
+    var disIDs:[UUID] = []
+    
 }
 public struct GlazedEnvironmentView<Content: View>: View {
     let content:() -> Content
@@ -144,11 +146,11 @@ struct test: View {
                     .frame(width:35, height: 35)
             }
             .Popover(isPresented: $stack2) {
-                Color.yellow
-                    .frame(maxWidth: 400, maxHeight: stack3 ? 400 : 100)
+                Color.clear
+                    .frame(maxWidth: 400, maxHeight: 100)
                     .overlay {
                         Button {
-                            withAnimation(.spring()) {
+                            withAnimation(.autoAnimation) {
                                 stack3.toggle()
                             }
                         } label: {
@@ -156,9 +158,13 @@ struct test: View {
                                 .clipShape(Circle())
                                 .frame(width:35, height: 35)
                         }
+                        .Popover(isPresented: $stack3) {
+                            Color.clear
+                                .frame(maxWidth: 400, maxHeight: 100)
+                        }
                     }
             }
-            .frame(maxWidth: 250, maxHeight: 450)
+            .frame(maxWidth: 250, maxHeight: 450, alignment: .top)
         }
        
     }

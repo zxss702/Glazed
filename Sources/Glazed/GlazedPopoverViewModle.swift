@@ -28,7 +28,7 @@ struct GlazedPopoverViewModle:View {
             ZStack {
                 Helper.view
                     .shadow(radius: 0.3)
-                    .shadow(color: Color(.sRGBLinear, white: 0, opacity: 0.2), radius: 35 * showProgres)
+                    .shadow(color: Color(.sRGBLinear, white: 0, opacity: 0.4), radius: 35 * showProgres)
                 
                     .scaleEffect(x: showProgres, y: showProgres, anchor: UnitPoint(x: scaleX, y: scaleY))
                     .blur(radius: 10 - showProgres * 10)
@@ -39,12 +39,9 @@ struct GlazedPopoverViewModle:View {
                     })
                     .environment(\.safeAreaInsets, EdgeInsets(top: 17, leading: 17, bottom: 17, trailing: 17))
                     .position(x: Helper.offsetX, y: Helper.offsetY)
-                    
-                    
-                Color.clear
                     .onChange(of: GeometryProxy.size) { value in
                         if showProgres == 1 {
-                            withAnimation(.spring()) {
+                            withAnimation(.autoAnimation) {
                                 setValue(GeometryProxy: GeometryProxy)
                             }
                         } else {
@@ -53,14 +50,14 @@ struct GlazedPopoverViewModle:View {
                     }
                     .onChange(of: Helper.Viewframe) { value in
                         if showProgres == 1 {
-                            withAnimation(.spring()) {
+                            withAnimation(.autoAnimation) {
                                 setValue(GeometryProxy: GeometryProxy)
                             }
                         }
                     }
                     .onChange(of: Helper.buttonFrame) { value in
                         if showProgres == 1 {
-                            withAnimation(.spring()) {
+                            withAnimation(.autoAnimation) {
                                 setValue(GeometryProxy: GeometryProxy)
                             }
                         }
@@ -175,9 +172,9 @@ struct GlazedPopoverViewModle:View {
         let width = min(maxFrameX, Helper.Viewframe.width)
         let height = min(maxFrameY, Helper.Viewframe.height)
         let ideaScaleX = (Helper.buttonFrame.midX - Helper.offsetX) / width
-        scaleX = max(min(0.5 + ideaScaleX, 1), 0)
+        scaleX = /*max(min(*/0.5 + ideaScaleX/*, 1), 0)*/
         let ideaScaleY = (Helper.buttonFrame.midY - Helper.offsetY) / height
-        scaleY = max(min(0.5 + ideaScaleY, 1), 0)
+        scaleY = /*max(min(*/0.5 + ideaScaleY/*, 1), 0)*/
         
         if onAppear {
             Helper.dismiss = {

@@ -32,11 +32,11 @@ struct GlazedProgresViewModle:View {
         }
         .onAppear {
             Helper.dismiss = {
-                withAnimation(.spring()) {
+                withAnimation(.autoAnimation) {
                     show = false
                 }
             }
-            withAnimation(.spring().speed(1.5)) {
+            withAnimation(.autoAnimation.speed(1.5)) {
                 show = true
             }
             DispatchQueue.global().async {
