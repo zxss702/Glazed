@@ -124,6 +124,8 @@ struct test: View {
     @State var stack = false
     @State var stack2 = false
     @State var stack3 = false
+    @Environment(\.glazedDoAction) var glazedDoAction
+    
     var body: some View {
         VStack {
 //            Button {
@@ -139,15 +141,18 @@ struct test: View {
 //            }
 //            .frame(maxWidth: .infinity, maxHeight: .infinity)
             Button {
+//                glazedDoAction {
+//                    sleep(100)
+//                }
                 stack2.toggle()
             } label: {
                 Color.green
                     .clipShape(Circle())
                     .frame(width:35, height: 35)
             }
-            .Popover(isPresented: $stack2) {
+            .Sheet(isPresented: $stack2) {
                 Color.clear
-                    .frame(maxWidth: 400, maxHeight: 100)
+                    .frame(maxWidth: 100, maxHeight: 100)
                     .overlay {
                         Button {
                             withAnimation(.autoAnimation) {

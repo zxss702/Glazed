@@ -92,7 +92,7 @@ struct GlazedInputViewModle<Content1: View>: ViewModifier {
                 GeometryReader { GeometryProxy in
                     let _ = helper?.view = AnyView(content1().environmentObject(glazedObserver))
                     Color.clear
-                        .task(id: isPresented) {
+                        .onChange(connect: isPresented) {
                             if isPresented {
                                 helper?.dismissAction()
                                 let helper = GlazedHelper(type: type, buttonFrame: GeometryProxy.frame(in: .global), view: AnyView(content1().environmentObject(glazedObserver))) {
@@ -117,7 +117,6 @@ struct GlazedInputViewModle<Content1: View>: ViewModifier {
                         .onDisappear {
                             Dismiss()
                         }
-                        .transition(.identity)
                 }
             }
     }
