@@ -22,7 +22,7 @@ struct GlazedProgresViewModle:View {
                     .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                     .shadow(radius: 8)
                     .overlay {
-                        WaveView()
+                        P23_Waves()
                     }
                     .frame(width: 80, height: 80)
                     .modifier(Drag3DModifier())
@@ -51,7 +51,7 @@ struct GlazedProgresViewModle:View {
 }
 public struct P23_Waves: View {
     
-    let colors = [Color(hex: 0x1D427B), Color(hex: 0x285D99), Color(hex: 0x3476BA), Color(hex: 0x4091DA), Color(hex: 0x54A7E2), Color(hex: 0x71BDEB), Color(hex: 0x91D3F3), Color(hex: 0xB5E8FC)]
+    let colors = [Color.red, Color.orange, Color.green, Color.teal, Color.blue, Color.purple, Color.pink, Color.brown]
     
     public init() {}
     public var body: some View {
@@ -66,12 +66,12 @@ public struct P23_Waves: View {
                     }
                 }
                 .shadow(color: Color.black.opacity(0.3), radius: 10, x: 0, y: 0)
-                .frame(width: proxy.minSize * 0.8, height: proxy.minSize  * 0.8)
+                .frame(width: proxy.size.width * 0.8, height: proxy.size.height  * 0.8)
                 .overlay(
-                    Circle()
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
                         .stroke(Color(hex: 0x17356B), lineWidth: 20)
-                        .frame(width: proxy.minSize * 0.8 + 20, height: proxy.minSize * 0.8 + 20)
-                        .shadow(color: Color.black.opacity(0.5), radius: proxy.minSize * 0.025, x: proxy.minSize * 0.005, y: proxy.minSize * 0.005)
+                        .frame(width: proxy.size.width * 0.8 + 20, height: proxy.size.height * 0.8 + 20)
+                        .shadow(color: Color.black.opacity(0.5), radius: (proxy.size.width + proxy.size.height) * 0.025 * 0.5, x: proxy.size.width * 0.005, y: proxy.size.height * 0.005)
                 )
 //                .mask(
 //                    Circle()
@@ -82,7 +82,6 @@ public struct P23_Waves: View {
     }
 }
 
-fileprivate
 struct WaveShape: Shape {
     
     var offset: Angle
@@ -117,10 +116,9 @@ struct WaveShape: Shape {
     }
 }
 
-fileprivate
 struct WaveView: View {
     
-    var waveColor: Color
+    var waveColor: Color = .accentColor
     var waveHeight: Double = 0.025
     var progress: Double
     
@@ -140,3 +138,4 @@ struct WaveView: View {
         }
     }
 }
+

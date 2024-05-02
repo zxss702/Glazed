@@ -37,7 +37,7 @@ struct GlazedSheetViewModle:View {
                 }
                 Helper.view
                     .background(.regularMaterial)
-                    .clipShape(GlazedSheetViewClliShape(bool: Helper.ViewSize.width < GeometryProxy.size.width)
+                    .clipShape(GlazedSheetViewClliShape(bool: Helper.ViewSize.width < GeometryProxy.size.width))
                 
                     .onSizeChange({ CGSize in
                         Helper.ViewSize = CGSize

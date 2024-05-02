@@ -141,10 +141,10 @@ struct test: View {
 //            }
 //            .frame(maxWidth: .infinity, maxHeight: .infinity)
             Button {
-//                glazedDoAction {
-//                    sleep(100)
-//                }
-                stack2.toggle()
+                glazedDoAction {
+                    sleep(100)
+                }
+//                stack2.toggle()
             } label: {
                 Color.green
                     .clipShape(Circle())
