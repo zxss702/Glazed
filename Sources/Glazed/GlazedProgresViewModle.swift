@@ -55,12 +55,14 @@ public struct P23_Waves: View {
             ZStack {
                 ForEach(Array(colors.enumerated()), id: \.offset) { index, color in
                     WaveView(waveColor: color,
-                             waveHeight: Double(colors.count - index) * Double.random(in: 0.007...0.008),
-                             progress: Double(colors.count - index) * 10)
+                             waveHeight: Double(index) * Double.random(in: 0.007...0.008),
+                             progress: Double(index) * 10)
+                    .transition(.move(edge: .bottom).combined(with: .blur))
+                    .zIndex(Double(colors.count - index))
                 }
             }
             .shadow(color: Color.black.opacity(0.3), radius: 10, x: 0, y: 0)
-            .frame(width: proxy.size.width, height: proxy.size.height * 0.9)
+            .frame(width: proxy.size.width, height: proxy.size.height)
             .frame(maxHeight: .infinity, alignment: .bottom)
         }
         .overlay(
@@ -74,7 +76,7 @@ public struct P23_Waves: View {
                 return Int.random(in: 0..<2) == 1
             }
             for (index, i) in color.enumerated() {
-                withAnimation(.autoAnimation.delay(Double(index) * 0.1)) {
+                withAnimation(.autoAnimation.delay(Double(index) * Double.random(in: 0.17...0.34))) {
                     colors.append(i)
                 }
             }
