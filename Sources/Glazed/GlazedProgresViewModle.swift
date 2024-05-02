@@ -18,13 +18,11 @@ struct GlazedProgresViewModle:View {
             if show {
                 Color.black.opacity(0.2).allowsHitTesting(false).ignoresSafeArea()
                     .transition(.blur)
-                Color("systemBackColor")
-                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                P23_Waves()
+                    .background(.background)
+                    .clipShape(Circle())
                     .shadow(radius: 8)
-                    .overlay {
-                        P23_Waves()
-                    }
-                    .frame(width: 80, height: 80)
+                    .frame(width: 100, height: 100)
                     .modifier(Drag3DModifier())
                     .transition(.scale(scale: 0.8).combined(with: .blur))
             }
@@ -39,11 +37,9 @@ struct GlazedProgresViewModle:View {
                 show = true
             }
             DispatchQueue.global().async {
-                Task {
-                    await Helper.ProgresAction()
-                    DispatchQueue.main.async {
-                        Helper.dismissAction()
-                    }
+                Helper.ProgresAction()
+                DispatchQueue.main.async {
+                    Helper.dismissAction()
                 }
             }
         }
@@ -51,33 +47,37 @@ struct GlazedProgresViewModle:View {
 }
 public struct P23_Waves: View {
     
-    let colors = [Color.red, Color.orange, Color.green, Color.teal, Color.blue, Color.purple, Color.pink, Color.brown]
+    @State var colors:[Color] = []
     
     public init() {}
     public var body: some View {
         GeometryReader { proxy in
             ZStack {
-                Color.clear
-                ZStack {
-                    ForEach(Array(colors.enumerated()), id: \.offset) { index, color in
-                        WaveView(waveColor: color,
-                                 waveHeight: Double(colors.count - index) * Double.random(in: 0.007...0.008),
-                                 progress: Double(colors.count - index) * 10)
-                    }
+                ForEach(Array(colors.enumerated()), id: \.offset) { index, color in
+                    WaveView(waveColor: color,
+                             waveHeight: Double(colors.count - index) * Double.random(in: 0.007...0.008),
+                             progress: Double(colors.count - index) * 10)
                 }
-                .shadow(color: Color.black.opacity(0.3), radius: 10, x: 0, y: 0)
-                .frame(width: proxy.size.width * 0.8, height: proxy.size.height  * 0.8)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 12, style: .continuous)
-                        .stroke(Color(hex: 0x17356B), lineWidth: 20)
-                        .frame(width: proxy.size.width * 0.8 + 20, height: proxy.size.height * 0.8 + 20)
-                        .shadow(color: Color.black.opacity(0.5), radius: (proxy.size.width + proxy.size.height) * 0.025 * 0.5, x: proxy.size.width * 0.005, y: proxy.size.height * 0.005)
-                )
-//                .mask(
-//                    Circle()
-//                )
             }
-            .edgesIgnoringSafeArea(.all)
+            .shadow(color: Color.black.opacity(0.3), radius: 10, x: 0, y: 0)
+            .frame(width: proxy.size.width, height: proxy.size.height * 0.9)
+            .frame(maxHeight: .infinity, alignment: .bottom)
+        }
+        .overlay(
+            Circle()
+                .stroke(lineWidth: 0.1)
+                .shadow(color: .black.opacity(0.5), radius: 25)
+        )
+        
+        .onAppear {
+            let color = [Color.orange, Color.green, Color.teal, Color.blue, Color.purple, Color.pink, Color.brown, Color.red].sorted { Color, Color2 in
+                return Int.random(in: 0..<2) == 1
+            }
+            for (index, i) in color.enumerated() {
+                withAnimation(.autoAnimation.delay(Double(index) * 0.1)) {
+                    colors.append(i)
+                }
+            }
         }
     }
 }

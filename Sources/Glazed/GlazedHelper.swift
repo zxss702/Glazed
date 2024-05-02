@@ -23,11 +23,11 @@ class GlazedHelper: UIView, Identifiable, ObservableObject {
     
     var dismissAction:() -> Void
     
-    var ProgresAction:() async -> Void
+    var ProgresAction:() -> Void
     var HostVC:UIHostingController<AnyView>?
     var isDis = false
     
-    init(id: UUID = UUID(), type: GlazedType, buttonFrame: CGRect, view: AnyView, offsetY: CGFloat = 0, offsetX: CGFloat = 0, dismiss: @escaping () -> Void, ProgresAction: @escaping () async -> Void = {}) {
+    init(id: UUID = UUID(), type: GlazedType, buttonFrame: CGRect, view: AnyView, offsetY: CGFloat = 0, offsetX: CGFloat = 0, dismiss: @escaping () -> Void, ProgresAction: @escaping () -> Void = {}) {
         self.id = id
         self.type = type
         self.buttonFrame = buttonFrame

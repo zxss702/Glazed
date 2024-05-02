@@ -34,7 +34,7 @@ public struct GlazedEnvironmentView<Content: View>: View {
                         }
                     }
                 } ProgresAction: {
-                    await action()
+                    action()
                 }
                 id = helper.id
                 glazedObserver.view.addSubview(helper)
