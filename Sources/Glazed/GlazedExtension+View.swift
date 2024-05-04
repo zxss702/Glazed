@@ -138,10 +138,10 @@ struct GlazedInputViewModle<Content1: View>: ViewModifier {
         }
     }
     func Dismiss2() {
+        if let int = glazedObserver.disIDs.lastIndex(of: helper?.id ?? UUID()) {
+            glazedObserver.disIDs.removeLast(int)
+        }
         if let h = helper {
-            if let int = glazedObserver.disIDs.lastIndex(of: h.id) {
-                glazedObserver.disIDs.removeLast(int)
-            }
             helper = nil
             h.dismiss()
             h.isDis = true
