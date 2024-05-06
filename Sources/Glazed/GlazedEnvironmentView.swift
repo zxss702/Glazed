@@ -9,8 +9,7 @@ import SwiftUI
 
 public class GlazedObserver: ObservableObject {
     @Published public var view:UIView = UIView()
-    var disIDs:[UUID] = []
-    
+    var Helpers:[GlazedHelper] = []
 }
 public struct GlazedEnvironmentView<Content: View>: View {
     let content:() -> Content
@@ -25,7 +24,7 @@ public struct GlazedEnvironmentView<Content: View>: View {
             .environment(\.window, glazedObserver.view.window)
             .environment(\.glazedDoAction, { [self] action in
                 var id:UUID = UUID()
-                let helper = GlazedHelper(type: .Progres, buttonFrame: .zero, view: AnyView(EmptyView())) { [self] in
+                let helper = GlazedHelper(superHelperID: nil, type: .Progres, buttonFrame: .zero, view: AnyView(EmptyView())) { [self] in
                     for i in glazedObserver.view.subviews {
                         if let view = i as? GlazedHelper, view.id == id {
                             DispatchQueue.main.async(1) {
@@ -110,67 +109,5 @@ extension View {
     func shadow(color: Color, size: CGFloat, Ofset: CGPoint = .zero) -> some View {
         self
             .shadow(color: color, radius: size, x: Ofset.x, y: Ofset.y)
-    }
-}
-
-#Preview {
-    GlazedEnvironmentView {
-        test()
-    }
-        .ignoresSafeArea()
-}
-
-struct test: View {
-    @State var stack = false
-    @State var stack2 = false
-    @State var stack3 = false
-    @Environment(\.glazedDoAction) var glazedDoAction
-    
-    var body: some View {
-        VStack {
-//            Button {
-//                stack.toggle()
-//            } label: {
-//                Color.green
-//                    .clipShape(Circle())
-//                    .frame(width:35, height: 35)
-//            }
-//            .Popover(isPresented: $stack) {
-//                Color.yellow
-//                    .frame(width: 100, height: 100)
-//            }
-//            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            Button {
-                glazedDoAction {
-                    sleep(100)
-                }
-//                stack2.toggle()
-            } label: {
-                Color.green
-                    .clipShape(Circle())
-                    .frame(width:35, height: 35)
-            }
-            .Sheet(isPresented: $stack2) {
-                Color.clear
-                    .frame(maxWidth: 100, maxHeight: 100)
-                    .overlay {
-                        Button {
-                            withAnimation(.autoAnimation) {
-                                stack3.toggle()
-                            }
-                        } label: {
-                            (stack3 ? Color.green : .black)
-                                .clipShape(Circle())
-                                .frame(width:35, height: 35)
-                        }
-                        .Popover(isPresented: $stack3) {
-                            Color.clear
-                                .frame(maxWidth: 400, maxHeight: 100)
-                        }
-                    }
-            }
-            .frame(maxWidth: 250, maxHeight: 450, alignment: .top)
-        }
-       
     }
 }

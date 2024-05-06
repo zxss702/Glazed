@@ -82,82 +82,122 @@ struct GlazedInputViewModle<Content1: View>: ViewModifier {
     
     @EnvironmentObject var glazedObserver: GlazedObserver
     
-    @State var helper:GlazedHelper?
+    @Environment(\.gluzedSuper) var gluazedSuper
+    let helperID: UUID = UUID()
     
     func body(content: Content) -> some View {
         content
-            .shadow(color: isPresented ? Color(.sRGBLinear, white: 0, opacity: 0.2) : .clear, size: 12)
-            .animation(.autoAnimation, value: isPresented)
             .overlay {
-                GeometryReader { GeometryProxy in
-                    let _ = helper?.view = AnyView(content1().environmentObject(glazedObserver))
-                    Color.clear
-                        .onChange(connect: isPresented) {
-                            if isPresented {
-                                helper?.dismissAction()
-                                let helper = GlazedHelper(type: type, buttonFrame: GeometryProxy.frame(in: .global), view: AnyView(content1().environmentObject(glazedObserver))) {
-                                    Dismiss()
+                if isPresented {
+                    GeometryReader { GeometryProxy in
+                        let _ = {
+                            if let int = glazedObserver.Helpers.lastIndex(where: { GlazedHelper in
+                                GlazedHelper.superID == helperID && GlazedHelper.disTime == nil
+                            }) {
+                                glazedObserver.Helpers[glazedObserver.Helpers.count - int - 1].view = AnyView(content1().environmentObject(glazedObserver))
+                            }
+                        }()
+                        Color.clear
+                            .onAppear {
+                                if !glazedObserver.Helpers.contains(where: { GlazedHelper in
+                                    GlazedHelper.superID == helperID &&  GlazedHelper.disTime == nil
+                                }) && gluazedSuper == glazedObserver.Helpers.last(where: { GlazedHelper in
+                                        GlazedHelper.disTime == nil
+                                })?.id {
+                                    let helper = GlazedHelper(id: helperID, superHelperID: gluazedSuper, type: type, buttonFrame: GeometryProxy.frame(in: .global), view: AnyView(content1().environmentObject(glazedObserver))) {
+                                        Dismiss()
+                                    } dismissisp: {
+                                        isPresented = false
+                                    }
+                                    glazedObserver.Helpers.append(helper)
+                                    glazedObserver.view.addSubview(helper)
+                                    NSLayoutConstraint.activate([
+                                        helper.topAnchor.constraint(equalTo: glazedObserver.view.topAnchor, constant: 0),
+                                        helper.leadingAnchor.constraint(equalTo: glazedObserver.view.leadingAnchor, constant: 0),
+                                        helper.bottomAnchor.constraint(equalTo: glazedObserver.view.bottomAnchor, constant: 0),
+                                        helper.trailingAnchor.constraint(equalTo: glazedObserver.view.trailingAnchor, constant: 0)
+                                    ])
                                 }
-                                glazedObserver.disIDs.append(helper.id)
-                                self.helper = helper
-                                glazedObserver.view.addSubview(helper)
-                                NSLayoutConstraint.activate([
-                                    helper.topAnchor.constraint(equalTo: glazedObserver.view.topAnchor, constant: 0),
-                                    helper.leadingAnchor.constraint(equalTo: glazedObserver.view.leadingAnchor, constant: 0),
-                                    helper.bottomAnchor.constraint(equalTo: glazedObserver.view.bottomAnchor, constant: 0),
-                                    helper.trailingAnchor.constraint(equalTo: glazedObserver.view.trailingAnchor, constant: 0)
-                                ])
-                            } else {
+                            }
+                            .onChange(of: GeometryProxy.frame(in: .global)) { V in
+                                if let int = glazedObserver.Helpers.lastIndex(where: { GlazedHelper in
+                                    GlazedHelper.superID == helperID && GlazedHelper.disTime == nil
+                                }) {
+                                    glazedObserver.Helpers[glazedObserver.Helpers.count - int - 1].buttonFrame = V
+                                }
+                            }
+                            .onDisappear {
                                 Dismiss2()
                             }
-                        }
-                        .onChange(of: GeometryProxy.frame(in: .global)) { V in
-                            helper?.buttonFrame = V
-                        }
-                        .onDisappear {
-                            Dismiss()
-                        }
+                            .transition(.identity)
+                    }
+                    .transition(.identity)
                 }
             }
     }
     
     func Dismiss() {
-        if glazedObserver.disIDs.last == helper?.id {
-            isPresented = false
-            if let h = helper {
-                helper = nil
-                h.dismiss()
-                h.isDis = true
-                DispatchQueue.main.async(0.1) {
-                    glazedObserver.disIDs.removeLast()
-                }
-                DispatchQueue.main.async(1) {
-                    h.removeFromSuperview()
-                }
+        if !glazedObserver.Helpers.contains(where: { GlazedHelper in
+            abs(GlazedHelper.disTime?.timeIntervalSinceNow ?? 1) < 0.1
+        }) ,let h = glazedObserver.Helpers.last(where: { GlazedHelper in
+            GlazedHelper.disTime == nil
+        }), h.superID == helperID {
+            h.dismiss()
+            h.dismissisPAction()
+            h.disTime = .now
+            h.superRemoveCell(glazedObserver: glazedObserver)
+            DispatchQueue.main.async(1) {
+                h.removeFromSuperview()
+                h.superRemove(glazedObserver: glazedObserver)
             }
         }
     }
     func Dismiss2() {
-        if let int = glazedObserver.disIDs.lastIndex(of: helper?.id ?? UUID()) {
-            glazedObserver.disIDs.removeLast(int)
-        }
-        if let h = helper {
-            helper = nil
+        if let h = glazedObserver.Helpers.last(where: { GlazedHelper in
+            GlazedHelper.superID == helperID && GlazedHelper.disTime == nil
+        }) {
             h.dismiss()
-            h.isDis = true
+            h.dismissisPAction()
+            h.disTime = .now
+            h.superRemoveCell(glazedObserver: glazedObserver)
             DispatchQueue.main.async(1) {
                 h.removeFromSuperview()
+                h.superRemove(glazedObserver: glazedObserver)
             }
         }
     }
 }
 
+extension GlazedHelper {
+    func superRemoveCell(glazedObserver: GlazedObserver) {
+        glazedObserver.Helpers.forEach { GlazedHelper in
+            if GlazedHelper.superHelperID == id {
+                GlazedHelper.dismiss()
+                GlazedHelper.dismissisPAction()
+                GlazedHelper.disTime = .now
+                GlazedHelper.superRemoveCell(glazedObserver: glazedObserver)
+                DispatchQueue.main.async(1) {
+                    GlazedHelper.removeFromSuperview()
+                    GlazedHelper.superRemove(glazedObserver: glazedObserver)
+                }
+            }
+        }
+    }
+    func superRemove(glazedObserver: GlazedObserver) {
+        glazedObserver.Helpers.removeAll { GlazedHelper in
+            if GlazedHelper.id == id {
+                GlazedHelper.removeFromSuperview()
+            }
+            return GlazedHelper.id == id
+        }
+    }
+}
 
 
 extension Animation {
-    static var autoAnimation = autoAnimation(speed: 1)
+    public static var autoAnimation = autoAnimation(speed: 1)
     
-    static func autoAnimation(speed: CGFloat = 1) -> Animation {
+    public static func autoAnimation(speed: CGFloat = 1) -> Animation {
         if #available(iOS 17.0, *) {
             return .snappy
         } else {
