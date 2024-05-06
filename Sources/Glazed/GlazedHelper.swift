@@ -126,53 +126,9 @@ class GlazedHelper: UIView, Identifiable, ObservableObject {
                 return nil
             case .Progres, .SharePopover:
                 return hit1
-            default:
-                return nil
             }
         }
         return nil
-//        if self.isDis {
-//            return nil
-//        } else {
-//            let hit1 = super.hitTest(point, with: event)
-//            if event?.type != .hover {
-//                if case .Progres = type {
-//                    return hit1
-//                } else {
-//                    if Viewframe == .zero && type != .Sheet {
-//                        return nil
-//                    } else {
-//                        if type == .Sheet {
-//                            return hit1
-//                        } else if type == .EditPopover || type == .PopoverWithOutButton {
-//                            if Viewframe.contains(point) {
-//                                return hit1
-//                            } else {
-//                                self.dismissAction()
-//                                return nil
-//                            }
-//                        } else if type == .tipPopover {
-//                            return nil
-//                        } else if type == .SharePopover {
-//                            return hit1
-//                        } else {
-//                            if Viewframe.contains(point) {
-//                                return hit1
-//                            } else {
-//                                if !buttonFrame.contains(point) {
-//                                    self.dismissAction()
-//                                    return hit1
-//                                } else {
-//                                    return nil
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-//            } else {
-//                return nil
-//            }
-//        }
     }
 }
 
