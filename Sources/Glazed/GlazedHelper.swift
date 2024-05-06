@@ -27,7 +27,7 @@ class GlazedHelper: UIView, Identifiable, ObservableObject {
     @Published var Viewframe:CGRect = .zero
     @Published var ViewSize:CGSize = .zero
     
-    var view: AnyView
+    @Published var view: AnyView
     
     @Published var offsetY:CGFloat = 0
     @Published var offsetX:CGFloat = 0
