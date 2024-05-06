@@ -102,7 +102,7 @@ class GlazedHelper: UIView, Identifiable, ObservableObject {
         } else if event?.type != .hover {
             let hit1 = super.hitTest(point, with: event)
             switch type {
-            case .Popover:
+            case .Popover, .topBottom:
                 if Viewframe.contains(point) {
                     return hit1
                 } else if buttonFrame.contains(point) {
@@ -111,24 +111,21 @@ class GlazedHelper: UIView, Identifiable, ObservableObject {
                     self.dismissAction()
                     return nil
                 }
-//            case .Sheet:
-//                <#code#>
-//            case .FullCover:
-//                <#code#>
-//            case .EditPopover:
-//                <#code#>
-//            case .PopoverWithOutButton:
-//                <#code#>
-//            case .tipPopover:
-//                <#code#>
-//            case .SharePopover:
-//                <#code#>
-//            case .centerPopover:
-//                <#code#>
-//            case .topBottom:
-//                <#code#>
-            case .Progres:
+            case .Sheet:
+                return hit1
+            case .FullCover:
+                return hit1
+            case .EditPopover, .PopoverWithOutButton, .centerPopover:
+                if Viewframe.contains(point) {
+                    return hit1
+                } else {
+                    self.dismissAction()
+                    return nil
+                }
+            case .tipPopover:
                 return nil
+            case .Progres, .SharePopover:
+                return hit1
             default:
                 return nil
             }
