@@ -7,13 +7,17 @@
 
 import SwiftUI
 
-struct GlazedPopoverViewModle:View {
+protocol GlazedViewModle: View where Body: View {
+    @ViewBuilder @MainActor var body: Self.Body { get }
+}
+
+struct GlazedPopoverViewModle: GlazedViewModle {
     @ObservedObject var Helper:GlazedHelper
     let edit:Bool
     var center:Bool = false
     @GestureState var isDrag:Bool = false
     
-    let spacing:CGFloat = 14
+    let spacing:CGFloat = 12
     
     @State var maxFrameX:CGFloat = .infinity
     @State var maxFrameY:CGFloat = .infinity
@@ -23,49 +27,49 @@ struct GlazedPopoverViewModle:View {
     @State var showProgres:Double = 0
     @Environment(\.safeAreaInsets) var safeAreaInsets
     @EnvironmentObject var glazedObserver: GlazedObserver
+    
+    @State var load = true
+    @State var canSet = false
+    
     var body: some View {
         GeometryReader { GeometryProxy in
-            ZStack {
-                Helper.view
-                    .shadow(radius: 0.3)
-                    .shadow(color: Color(.sRGBLinear, white: 0, opacity: 0.4), radius: 35 * showProgres)
-                    .scaleEffect(x: showProgres, y: showProgres, anchor: UnitPoint(x: scaleX, y: scaleY))
-                    .blur(radius: 10 - showProgres * 10)
-                    .onFrameChange($Helper.Viewframe)
-                    .frame(maxWidth: maxFrameX, maxHeight: maxFrameY)
-                
-                    .environment(\.glazedDismiss, {
-                        Helper.dismissAction()
-                    })
-                    .environment(\.safeAreaInsets, EdgeInsets(top: 17, leading: 17, bottom: 17, trailing: 17))
-                    .position(x: Helper.offsetX, y: Helper.offsetY)
-                    .onChange(of: GeometryProxy.size) { value in
-                        if showProgres == 1 {
-                            withAnimation(.autoAnimation) {
-                                setValue(GeometryProxy: GeometryProxy)
-                            }
-                        } else {
+            Helper.view
+                .shadow(radius: 0.3)
+                .shadow(color: Color(.sRGBLinear, white: 0, opacity: 0.4), radius: 35)
+            
+                .scaleEffect(x: load ? 1 : showProgres, y: load ? 1 : showProgres, anchor: UnitPoint(x: scaleX, y: scaleY))
+                .opacity(load ? 0.01 : 1)
+                .onFrameChange(closure: { CGRec in
+                    if canSet {
+                        withAnimation(.autoAnimation) {
+                            Helper.Viewframe = CGRec
+                            setValue(GeometryProxy: GeometryProxy)
+                        }
+                    } else if load {
+                        Helper.Viewframe = CGRec
+                        setValue(onAppear: true, GeometryProxy: GeometryProxy)
+//                        Helper.Viewframe = CGRect(x: Helper.offsetX - maxFrameX / 2, y: Helper.offsetY - maxFrameY / 2, width: maxFrameX, height: maxFrameY)
+                    } else {
+                        Helper.Viewframe = CGRec
+                    }
+                })
+            
+                .blur(radius: 10 - showProgres * 10)
+            
+                .frame(maxWidth: maxFrameX, maxHeight: maxFrameY)
+                .position(x: Helper.offsetX, y: Helper.offsetY)
+                .environment(\.glazedDismiss, {
+                    Helper.dismissAction()
+                })
+                .environment(\.gluzedSuper, Helper.id)
+                .environment(\.safeAreaInsets, EdgeInsets(top: 16, leading: 16, bottom: 16, trailing: 16))
+                .onChange(of: Helper.buttonFrame) { value in
+                    if showProgres == 1 {
+                        withAnimation(.autoAnimation) {
                             setValue(GeometryProxy: GeometryProxy)
                         }
                     }
-                    .onChange(of: Helper.Viewframe) { value in
-                        if showProgres == 1 {
-                            withAnimation(.autoAnimation) {
-                                setValue(GeometryProxy: GeometryProxy)
-                            }
-                        }
-                    }
-                    .onChange(of: Helper.buttonFrame) { value in
-                        if showProgres == 1 {
-                            withAnimation(.autoAnimation) {
-                                setValue(GeometryProxy: GeometryProxy)
-                            }
-                        }
-                    }
-                    .onAppear {
-                        setValue(onAppear: true, GeometryProxy: GeometryProxy)
-                    }
-            }
+                }
         }
         .ignoresSafeArea()
     }
@@ -172,10 +176,11 @@ struct GlazedPopoverViewModle:View {
         let width = min(maxFrameX, Helper.Viewframe.width)
         let height = min(maxFrameY, Helper.Viewframe.height)
         let ideaScaleX = (Helper.buttonFrame.midX - Helper.offsetX) / width
-        scaleX = /*max(min(*/0.5 + ideaScaleX/*, 1), 0)*/
+        scaleX = max(min(0.5 + ideaScaleX, 1.1), -0.1)
         let ideaScaleY = (Helper.buttonFrame.midY - Helper.offsetY) / height
-        scaleY = /*max(min(*/0.5 + ideaScaleY/*, 1), 0)*/
+        scaleY = max(min(0.5 + ideaScaleY, 1.1), -0.1)
         
+        load = false
         if onAppear {
             Helper.dismiss = {
                 withAnimation(.spring(dampingFraction: 1).speed(1.2)) {
@@ -184,6 +189,9 @@ struct GlazedPopoverViewModle:View {
             }
             withAnimation(.spring(dampingFraction: 0.7).speed(1.5)) {
                 showProgres = 1
+            }
+            DispatchQueue.main.async(0.5) {
+                canSet = true
             }
         }
     }

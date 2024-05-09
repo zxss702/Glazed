@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct GlazedFullCoverViewModle:View {
+struct GlazedFullCoverViewModle: GlazedViewModle {
     @ObservedObject var Helper:GlazedHelper
     @GestureState var isDrag:Bool = false
     @State var show = false
@@ -24,7 +24,7 @@ struct GlazedFullCoverViewModle:View {
                     .offset(x: 0, y: Helper.offsetY)
                     .ignoresSafeArea(.container)
                     .transition(.move(edge: .bottom).combined(with: .opacity))
-                
+                    .environment(\.gluzedSuper, Helper.id)
                     .environment(\.glazedDismiss, {
                         Helper.dismissAction()
                     })

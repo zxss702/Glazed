@@ -8,7 +8,7 @@
 import SwiftUI
 
 public class GlazedObserver: ObservableObject {
-    @Published public var view:UIView = UIView()
+    @Published var superWindows: UIWindow? = nil
     var Helpers:[GlazedHelper] = []
 }
 public struct GlazedEnvironmentView<Content: View>: View {
@@ -19,30 +19,37 @@ public struct GlazedEnvironmentView<Content: View>: View {
         self.content = content
     }
     public var body: some View {
-        GlazedEnvironmentViewHelper(content: content)
+        content()
+            .background {
+                GlazedEnvironmentViewHelper()
+            }
             .environmentObject(glazedObserver)
-            .environment(\.window, glazedObserver.view.window)
+            .environment(\.window, glazedObserver.superWindows)
             .environment(\.glazedDoAction, { [self] action in
-                var id:UUID = UUID()
-                let helper = GlazedHelper(superHelperID: nil, type: .Progres, buttonFrame: .zero, view: AnyView(EmptyView())) { [self] in
-                    for i in glazedObserver.view.subviews {
-                        if let view = i as? GlazedHelper, view.id == id {
+                if let window = glazedObserver.superWindows?.windowScene  {
+                    var h: GlazedHelper? = nil
+                    let helper = GlazedHelper(
+                        superHelperID: nil,
+                        windowScene: window,
+                        type: .Progres,
+                        buttonFrame: .zero,
+                        view: AnyView(EmptyView())
+                    ) { [self] in
+                        if let h = h {
+                            h.dismiss()
+                            h.dismissisPAction()
+                            h.disTime = .now
+                            h.superRemoveCell(glazedObserver: glazedObserver)
                             DispatchQueue.main.async(1) {
-                                view.removeFromSuperview()
+                                h.removeFromSuperview()
+                                h.superRemove(glazedObserver: glazedObserver)
                             }
                         }
+                    } ProgresAction: {
+                        action()
                     }
-                } ProgresAction: {
-                    action()
+                    h = helper
                 }
-                id = helper.id
-                glazedObserver.view.addSubview(helper)
-                NSLayoutConstraint.activate([
-                    helper.topAnchor.constraint(equalTo: glazedObserver.view.topAnchor, constant: 0),
-                    helper.leadingAnchor.constraint(equalTo: glazedObserver.view.leadingAnchor, constant: 0),
-                    helper.bottomAnchor.constraint(equalTo: glazedObserver.view.bottomAnchor, constant: 0),
-                    helper.trailingAnchor.constraint(equalTo: glazedObserver.view.trailingAnchor, constant: 0)
-                ])
             })
     }
 }

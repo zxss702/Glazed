@@ -102,21 +102,20 @@ struct GlazedInputViewModle<Content1: View>: ViewModifier {
                                 if !glazedObserver.Helpers.contains(where: { GlazedHelper in
                                     GlazedHelper.superID == helperID &&  GlazedHelper.disTime == nil
                                 }) && gluazedSuper == glazedObserver.Helpers.last(where: { GlazedHelper in
-                                        GlazedHelper.disTime == nil
-                                })?.id {
-                                    let helper = GlazedHelper(id: helperID, superHelperID: gluazedSuper, type: type, buttonFrame: GeometryProxy.frame(in: .global), view: AnyView(content1().environmentObject(glazedObserver))) {
+                                    GlazedHelper.disTime == nil
+                                })?.id, let window = glazedObserver.superWindows?.windowScene {
+                                    glazedObserver.Helpers.append(GlazedHelper(
+                                        id: helperID,
+                                        superHelperID: gluazedSuper,
+                                        windowScene: window,
+                                        type: type,
+                                        buttonFrame: GeometryProxy.frame(in: .global),
+                                        view: AnyView(content1().environmentObject(glazedObserver))
+                                    ) {
                                         Dismiss()
                                     } dismissisp: {
                                         isPresented = false
-                                    }
-                                    glazedObserver.Helpers.append(helper)
-                                    glazedObserver.view.addSubview(helper)
-                                    NSLayoutConstraint.activate([
-                                        helper.topAnchor.constraint(equalTo: glazedObserver.view.topAnchor, constant: 0),
-                                        helper.leadingAnchor.constraint(equalTo: glazedObserver.view.leadingAnchor, constant: 0),
-                                        helper.bottomAnchor.constraint(equalTo: glazedObserver.view.bottomAnchor, constant: 0),
-                                        helper.trailingAnchor.constraint(equalTo: glazedObserver.view.trailingAnchor, constant: 0)
-                                    ])
+                                    })
                                 }
                             }
                             .onChange(of: GeometryProxy.frame(in: .global)) { V in
@@ -135,6 +134,7 @@ struct GlazedInputViewModle<Content1: View>: ViewModifier {
                 }
             }
     }
+
     
     func Dismiss() {
         if !glazedObserver.Helpers.contains(where: { GlazedHelper in

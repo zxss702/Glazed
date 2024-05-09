@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct GlazedProgresViewModle:View {
+struct GlazedProgresViewModle: GlazedViewModle {
     @ObservedObject var Helper:GlazedHelper
     @GestureState var isDrag:Bool = false
     
@@ -18,6 +18,7 @@ struct GlazedProgresViewModle:View {
             if show {
                 Color.black.opacity(0.2).allowsHitTesting(false).ignoresSafeArea()
                     .transition(.blur)
+                    .zIndex(1)
                 P23_Waves()
                     .background(.background)
                     .clipShape(Circle())
@@ -25,6 +26,7 @@ struct GlazedProgresViewModle:View {
                     .frame(width: 100, height: 100)
                     .modifier(Drag3DModifier())
                     .transition(.scale(scale: 0.8).combined(with: .blur))
+                    .zIndex(2)
             }
         }
         .onAppear {

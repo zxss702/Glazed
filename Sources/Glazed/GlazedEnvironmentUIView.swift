@@ -7,10 +7,9 @@
 
 import SwiftUI
 
-class GlazedEnvironmentUIView<Content: View>: UIViewController {
-    var HostVC:UIHostingController<Content>?
-    let RootView:GlazedEnvironmentViewHelper<Content>
-    init(RootView: GlazedEnvironmentViewHelper<Content>) {
+class GlazedEnvironmentUIView: UIViewController {
+    let RootView:GlazedEnvironmentViewHelper
+    init(RootView: GlazedEnvironmentViewHelper) {
         self.RootView = RootView
         super.init(nibName: nil, bundle: nil)
     }
@@ -18,30 +17,14 @@ class GlazedEnvironmentUIView<Content: View>: UIViewController {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    override func viewDidLoad() {
-        HostVC = UIHostingController(rootView: RootView.content())
-        HostVC?.view.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(HostVC!.view)
-        NSLayoutConstraint.activate([
-            HostVC!.view.topAnchor.constraint(equalTo: view.topAnchor, constant: 0),
-            HostVC!.view.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 0),
-            HostVC!.view.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0),
-            HostVC!.view.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 0)
-        ])
-    }
     
     override func viewDidAppear(_ animated: Bool) {
         while view.window == nil { }
         if view.window != nil {
             DispatchQueue.main.async { [self] in
-                RootView.glazedObserver.view = view
+                RootView.glazedObserver.superWindows = view.window
             }
-            setContent()
         }
-    }
-    
-    func setContent() {
-        HostVC?.rootView = RootView.content()
     }
 }
 

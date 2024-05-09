@@ -18,11 +18,12 @@ extension EnvironmentValues {
     }
 }
 
-class GlazedHelper: UIView, Identifiable, ObservableObject {
+class GlazedHelper: UIWindow, Identifiable, ObservableObject {
     var superID: UUID = UUID()
     var superHelperID: UUID?
     var id: UUID = UUID()
     var type:GlazedType
+    
     @Published var buttonFrame:CGRect
     @Published var Viewframe:CGRect = .zero
     @Published var ViewSize:CGSize = .zero
@@ -38,10 +39,21 @@ class GlazedHelper: UIView, Identifiable, ObservableObject {
     var dismissisPAction:() -> Void = {}
     
     var ProgresAction:() -> Void
-    var HostVC:UIHostingController<AnyView>?
     var disTime:Date? = nil
     
-    init(id: UUID = UUID(), superHelperID: UUID?, type: GlazedType, buttonFrame: CGRect, view: AnyView, offsetY: CGFloat = 0, offsetX: CGFloat = 0, dismiss: @escaping () -> Void, dismissisp: @escaping () -> Void = {}, ProgresAction: @escaping () -> Void = {}) {
+    init(
+        id: UUID = UUID(),
+        superHelperID: UUID?,
+        windowScene: UIWindowScene,
+        type: GlazedType,
+        buttonFrame: CGRect,
+        view: AnyView,
+        offsetY: CGFloat = 0,
+        offsetX: CGFloat = 0,
+        dismiss: @escaping () -> Void,
+        dismissisp: @escaping () -> Void = {},
+        ProgresAction: @escaping () -> Void = {}
+    ) {
         self.superID = id
         self.superHelperID = superHelperID
         self.type = type
@@ -52,20 +64,13 @@ class GlazedHelper: UIView, Identifiable, ObservableObject {
         self.ProgresAction = ProgresAction
         self.dismissAction = dismiss
         self.dismissisPAction = dismissisp
-        super.init(frame: .zero)
-        translatesAutoresizingMaskIntoConstraints = false
-        HostVC = UIHostingController(rootView: getView())
-        HostVC?.view.translatesAutoresizingMaskIntoConstraints = false
-        HostVC!.view.isUserInteractionEnabled = true
-        addSubview(HostVC!.view)
-        NSLayoutConstraint.activate([
-            HostVC!.view.topAnchor.constraint(equalTo: topAnchor, constant: 0),
-            HostVC!.view.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 0),
-            HostVC!.view.bottomAnchor.constraint(equalTo: bottomAnchor, constant: 0),
-            HostVC!.view.trailingAnchor.constraint(equalTo: trailingAnchor, constant: 0)
-        ])
-        backgroundColor = .clear
-        HostVC!.view.backgroundColor = .clear
+        
+        super.init(windowScene: windowScene)
+        self.rootViewController = UIHostingController(rootView: getView())
+        self.backgroundColor = .clear
+        self.windowLevel = .statusBar
+        self.makeKeyAndVisible()
+        self.rootViewController?.view.backgroundColor = .clear
     }
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -74,25 +79,25 @@ class GlazedHelper: UIView, Identifiable, ObservableObject {
     func getView() -> AnyView {
         switch type {
         case .Popover:
-            return AnyView(GlazedPopoverViewModle(Helper: self, edit: false).environment(\.gluzedSuper, self.id))
+            return AnyView(GlazedPopoverViewModle(Helper: self, edit: false))
         case .Sheet:
-            return AnyView(GlazedSheetViewModle(Helper: self).environment(\.gluzedSuper, self.id))
+            return AnyView(GlazedSheetViewModle(Helper: self))
         case .FullCover:
-            return AnyView(GlazedFullCoverViewModle(Helper: self).environment(\.gluzedSuper, self.id))
+            return AnyView(GlazedFullCoverViewModle(Helper: self))
         case .EditPopover:
-            return AnyView(GlazedPopoverViewModle(Helper: self, edit: true).environment(\.gluzedSuper, self.id))
+            return AnyView(GlazedPopoverViewModle(Helper: self, edit: true))
         case .PopoverWithOutButton:
-            return AnyView(GlazedPopoverViewModle(Helper: self, edit: false).environment(\.gluzedSuper, self.id))
+            return AnyView(GlazedPopoverViewModle(Helper: self, edit: false))
         case .tipPopover:
-            return AnyView(GlazedPopoverViewModle(Helper: self, edit: true).environment(\.gluzedSuper, self.id))
+            return AnyView(GlazedPopoverViewModle(Helper: self, edit: true))
         case .SharePopover:
-            return AnyView(GlazedPopoverViewModle(Helper: self, edit: false).environment(\.gluzedSuper, self.id))
+            return AnyView(GlazedPopoverViewModle(Helper: self, edit: false))
         case .Progres:
-            return AnyView(GlazedProgresViewModle(Helper: self).environment(\.gluzedSuper, self.id))
+            return AnyView(GlazedProgresViewModle(Helper: self))
         case .centerPopover:
-            return AnyView(GlazedPopoverViewModle(Helper: self, edit: false, center: true).environment(\.gluzedSuper, self.id))
+            return AnyView(GlazedPopoverViewModle(Helper: self, edit: false, center: true))
         case .topBottom:
-            return AnyView(GlazedPopoverViewModle(Helper: self, edit: true).environment(\.gluzedSuper, self.id))
+            return AnyView(GlazedPopoverViewModle(Helper: self, edit: true))
         }
     }
     
