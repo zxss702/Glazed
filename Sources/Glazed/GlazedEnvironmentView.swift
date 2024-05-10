@@ -11,23 +11,11 @@ public class GlazedObserver: ObservableObject {
     @Published var superWindows: UIWindow? = nil
 }
 
-public struct GlazedEnvironmentView<Content: View>: View {
-    let content:() -> Content
-    @StateObject var glazedObserver = GlazedObserver()
-    
-    public init(@ViewBuilder content: @escaping () -> Content) {
-        self.content = content
-    }
-    let id = UUID()
+struct GlazedEnvironmentViewModle: ViewModifier {
     @State var window: GlazedHelper? = nil
     
-    public var body: some View {
-        content()
-            .background {
-                GlazedEnvironmentViewHelper()
-            }
-            .environmentObject(glazedObserver)
-            .environment(\.window, glazedObserver.superWindows)
+    func body(content: Content) -> some View {
+        content
             .environment(\.glazedDoAction) { [self] action in
                 dismiss()
                 if let windowScene = glazedObserver.superWindows?.windowScene {
@@ -48,6 +36,27 @@ public struct GlazedEnvironmentView<Content: View>: View {
                 helper = nil
             }
         }
+    }
+}
+public struct GlazedEnvironmentView<Content: View>: View {
+    let content:() -> Content
+    @StateObject var glazedObserver = GlazedObserver()
+    
+    public init(@ViewBuilder content: @escaping () -> Content) {
+        self.content = content
+    }
+    let id = UUID()
+  
+    
+    public var body: some View {
+        content()
+            .background {
+                GlazedEnvironmentViewHelper()
+            }
+            .environmentObject(glazedObserver)
+            .environment(\.window, glazedObserver.superWindows)
+            .modifier(GlazedEnvironmentViewModle())
+
     }
 }
 
