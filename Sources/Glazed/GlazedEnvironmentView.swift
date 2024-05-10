@@ -28,7 +28,6 @@ public struct GlazedEnvironmentView<Content: View>: View {
             }
             .environmentObject(glazedObserver)
             .environment(\.window, glazedObserver.superWindows)
-        
             .environment(\.glazedDoAction) { [self] action in
                 dismiss()
                 if let windowScene = glazedObserver.superWindows?.windowScene {
