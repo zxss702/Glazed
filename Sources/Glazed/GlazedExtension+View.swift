@@ -95,7 +95,7 @@ struct GlazedInputView<Content: View>: View {
                 }
                 .environmentObject(glazedObserver)
                 .environment(\.window, glazedObserver.superWindows)
-                .modifier(GlazedEnvironmentViewModle())
+                .modifier(GlazedEnvironmentViewModle(glazedObserver: glazedObserver))
             case .Sheet:
                 Binding($value).map { value in
                     GlazedSheetViewModle(value: value, content: content)
@@ -105,7 +105,7 @@ struct GlazedInputView<Content: View>: View {
                 }
                 .environmentObject(glazedObserver)
                 .environment(\.window, glazedObserver.superWindows)
-                .modifier(GlazedEnvironmentViewModle())
+                .modifier(GlazedEnvironmentViewModle(glazedObserver: glazedObserver))
             case .FullCover:
                 Binding($value).map { value in
                     GlazedFullCoverViewModle(value: value, content: content)
@@ -115,7 +115,7 @@ struct GlazedInputView<Content: View>: View {
                 }
                 .environmentObject(glazedObserver)
                 .environment(\.window, glazedObserver.superWindows)
-                .modifier(GlazedEnvironmentViewModle())
+                .modifier(GlazedEnvironmentViewModle(glazedObserver: glazedObserver))
             case .EditPopover, .tipPopover, .topBottom:
                 Binding($value).map { value in
                     GlazedPopoverViewModle(value: value, edit: true, gluazedSuper: gluazedSuper, content: content)
@@ -125,7 +125,7 @@ struct GlazedInputView<Content: View>: View {
                 }
                 .environmentObject(glazedObserver)
                 .environment(\.window, glazedObserver.superWindows)
-                .modifier(GlazedEnvironmentViewModle())
+                .modifier(GlazedEnvironmentViewModle(glazedObserver: glazedObserver))
             case .Progres:
                 EmptyView()
             case .centerPopover:
@@ -137,7 +137,7 @@ struct GlazedInputView<Content: View>: View {
                 }
                 .environmentObject(glazedObserver)
                 .environment(\.window, glazedObserver.superWindows)
-                .modifier(GlazedEnvironmentViewModle())
+                .modifier(GlazedEnvironmentViewModle(glazedObserver: glazedObserver))
             }
     }
 }

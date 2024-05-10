@@ -13,6 +13,7 @@ public class GlazedObserver: ObservableObject {
 
 struct GlazedEnvironmentViewModle: ViewModifier {
     @State var window: GlazedHelper? = nil
+    @ObservedObject var glazedObserver:GlazedObserver
     
     func body(content: Content) -> some View {
         content
@@ -53,10 +54,9 @@ public struct GlazedEnvironmentView<Content: View>: View {
             .background {
                 GlazedEnvironmentViewHelper()
             }
+            .modifier(GlazedEnvironmentViewModle(glazedObserver: glazedObserver))
             .environmentObject(glazedObserver)
             .environment(\.window, glazedObserver.superWindows)
-            .modifier(GlazedEnvironmentViewModle())
-
     }
 }
 
