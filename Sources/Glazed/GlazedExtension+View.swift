@@ -6,6 +6,41 @@
 //
 
 import SwiftUI
+struct TapButtonStyle: ButtonStyle {
+    @State var scale:CGFloat = 1
+    @State var time:Date = Date()
+   
+    func makeBody(configuration: Self.Configuration) -> some View {
+        configuration.label
+            .scaleEffect(x: scale, y: scale)
+            .foregroundColor(.accentColor)
+            .contentShape(Rectangle())
+            .hoverEffect(.automatic)
+            .onChange(of: configuration.isPressed, perform: { newValue in
+                if newValue {
+                    AudioServicesPlaySystemSound(1519)
+                    time = Date()
+                    withAnimation(.autoAnimation.speed(2)) {
+                        scale = 0.9
+                    }
+                } else {
+                    if time.distance(to: Date()) > 0.15 {
+                        AudioServicesPlaySystemSound(1519)
+                        withAnimation(.autoAnimation.speed(1.5)) {
+                            scale = 1
+                        }
+                    } else {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                            withAnimation(.autoAnimation.speed(1.5)) {
+                                scale = 1
+                            }
+                        }
+                    }
+                    
+                }
+            })
+    }
+}
 
 public extension View {
     func Sheet<Content: View>(isPresented: Binding<Bool>, @ViewBuilder content: @escaping () -> Content) -> some View {
@@ -17,6 +52,7 @@ public extension View {
     func Popover<Content: View>(isPresented: Binding<Bool>, ignorTouch:Bool = false, @ViewBuilder content: @escaping () -> Content) -> some View {
         self.modifier(GlazedInputViewModle(type: .Popover, isPresented: isPresented, content1: {
             content()
+                .buttonStyle(TapButtonStyle())
                 .background(.regularMaterial)
                 .clipShape(RoundedRectangle(cornerRadius: 17, style: .continuous))
         }))
@@ -24,6 +60,7 @@ public extension View {
     func EditPopover<Content: View>(isPresented: Binding<Bool>, @ViewBuilder content: @escaping () -> Content) -> some View {
         self.modifier(GlazedInputViewModle(type: .EditPopover, isPresented: isPresented, content1: {
             content()
+                .buttonStyle(TapButtonStyle())
                 .background(.regularMaterial)
                 .clipShape(Capsule(style: .continuous))
         }))
@@ -31,6 +68,7 @@ public extension View {
     func topBottomPopover<Content: View>(isPresented: Binding<Bool>, @ViewBuilder content: @escaping () -> Content) -> some View {
         self.modifier(GlazedInputViewModle(type: .topBottom, isPresented: isPresented, content1: {
             content()
+                .buttonStyle(TapButtonStyle())
                 .background(.regularMaterial)
                 .clipShape(RoundedRectangle(cornerRadius: 17, style: .continuous))
         }))
@@ -38,11 +76,13 @@ public extension View {
     func clearPopover<Content: View>(isPresented: Binding<Bool>, @ViewBuilder content: @escaping () -> Content) -> some View {
         self.modifier(GlazedInputViewModle(type: .Popover, isPresented: isPresented, content1: {
             content()
+                .buttonStyle(TapButtonStyle())
         }))
     }
     func PopoverWithOutButton<Content: View>(isPresented: Binding<Bool>, @ViewBuilder content: @escaping () -> Content) -> some View {
         self.modifier(GlazedInputViewModle(type: .PopoverWithOutButton, isPresented: isPresented, content1: {
             content()
+                .buttonStyle(TapButtonStyle())
                 .background(.regularMaterial)
                 .clipShape(RoundedRectangle(cornerRadius: 17, style: .continuous))
                 
@@ -51,6 +91,7 @@ public extension View {
     func tipPopover<Content: View>(isPresented: Binding<Bool>, @ViewBuilder content: @escaping () -> Content) -> some View {
         self.modifier(GlazedInputViewModle(type: .tipPopover, isPresented: isPresented, content1: {
             content()
+                .buttonStyle(TapButtonStyle())
                 .background(.regularMaterial)
                 .clipShape(Capsule(style: .continuous))
         }))
@@ -58,6 +99,7 @@ public extension View {
     func SharePopover<Content: View>(isPresented: Binding<Bool>, @ViewBuilder content: @escaping () -> Content) -> some View {
         self.modifier(GlazedInputViewModle(type: .SharePopover, isPresented: isPresented, content1: {
             content()
+                .buttonStyle(TapButtonStyle())
                 .clipShape(RoundedRectangle(cornerRadius: 17, style: .continuous))
         }))
     }
@@ -68,6 +110,7 @@ public extension View {
             .animation(.spring(), value: isPresented.wrappedValue)
             .modifier(GlazedInputViewModle(type: .centerPopover, isPresented: isPresented, content1: {
                 content()
+                    .buttonStyle(TapButtonStyle())
                     .background(.regularMaterial)
                     .clipShape(RoundedRectangle(cornerRadius: 17, style: .continuous))
                     
@@ -171,7 +214,7 @@ struct GlazedInputViewModle<Content1: View>: ViewModifier {
                                     } hitTist: { point in
                                         if let value = value {
                                             switch type {
-                                            case .Popover, .topBottom:
+                                            case .Popover, .topBottom, .centerPopover:
                                                 if value.Viewframe.contains(point) {
                                                     return true
                                                 } else if value.buttonFrame.contains(point) {
@@ -184,7 +227,7 @@ struct GlazedInputViewModle<Content1: View>: ViewModifier {
                                                 return true
                                             case .FullCover:
                                                 return true
-                                            case .EditPopover, .PopoverWithOutButton, .centerPopover:
+                                            case .EditPopover, .PopoverWithOutButton:
                                                 if value.Viewframe.contains(point) {
                                                     return true
                                                 } else {
