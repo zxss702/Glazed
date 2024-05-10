@@ -18,122 +18,47 @@ extension EnvironmentValues {
     }
 }
 
-class GlazedHelper: UIWindow, Identifiable, ObservableObject {
-    var superID: UUID = UUID()
-    var superHelperID: UUID?
+struct GlazedHelperValue {
     var id: UUID = UUID()
-    var type:GlazedType
     
-    @Published var buttonFrame:CGRect
-    @Published var Viewframe:CGRect = .zero
-    @Published var ViewSize:CGSize = .zero
+    var buttonFrame:CGRect
+    var Viewframe:CGRect = .zero
     
-    @Published var view: AnyView
+    var offsetY:CGFloat = 0
+    var offsetX:CGFloat = 0
     
-    @Published var offsetY:CGFloat = 0
-    @Published var offsetX:CGFloat = 0
+    var typeDismissAction:() -> Void = {}
+}
+class GlazedHelper: UIWindow, Identifiable, ObservableObject {
+    var isDis = false
+    var hitTist:(CGPoint) -> Bool
     
-    var dismiss:() -> Void = {}
-    
-    var dismissAction:() -> Void
-    var dismissisPAction:() -> Void = {}
-    
-    var ProgresAction:() -> Void
-    var disTime:Date? = nil
-    
-    init(
-        id: UUID = UUID(),
-        superHelperID: UUID?,
+    init<Content: View>(
         windowScene: UIWindowScene,
-        type: GlazedType,
-        buttonFrame: CGRect,
-        view: AnyView,
-        offsetY: CGFloat = 0,
-        offsetX: CGFloat = 0,
-        dismiss: @escaping () -> Void,
-        dismissisp: @escaping () -> Void = {},
-        ProgresAction: @escaping () -> Void = {}
+        @ViewBuilder view: @escaping () -> Content,
+        hitTist: @escaping (CGPoint) -> Bool
     ) {
-        self.superID = id
-        self.superHelperID = superHelperID
-        self.type = type
-        self.buttonFrame = buttonFrame
-        self.view = view
-        self.offsetY = offsetY
-        self.offsetX = offsetX
-        self.ProgresAction = ProgresAction
-        self.dismissAction = dismiss
-        self.dismissisPAction = dismissisp
-        
+        self.hitTist = hitTist
         super.init(windowScene: windowScene)
-        self.rootViewController = UIHostingController(rootView: getView())
-        self.backgroundColor = .clear
-        self.windowLevel = .statusBar
-        self.makeKeyAndVisible()
+        self.rootViewController = UIHostingController(rootView: view())
         self.rootViewController?.view.backgroundColor = .clear
+        self.windowLevel = .alert
+        self.isHidden = false
     }
+    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func getView() -> AnyView {
-        switch type {
-        case .Popover:
-            return AnyView(GlazedPopoverViewModle(Helper: self, edit: false))
-        case .Sheet:
-            return AnyView(GlazedSheetViewModle(Helper: self))
-        case .FullCover:
-            return AnyView(GlazedFullCoverViewModle(Helper: self))
-        case .EditPopover:
-            return AnyView(GlazedPopoverViewModle(Helper: self, edit: true))
-        case .PopoverWithOutButton:
-            return AnyView(GlazedPopoverViewModle(Helper: self, edit: false))
-        case .tipPopover:
-            return AnyView(GlazedPopoverViewModle(Helper: self, edit: true))
-        case .SharePopover:
-            return AnyView(GlazedPopoverViewModle(Helper: self, edit: false))
-        case .Progres:
-            return AnyView(GlazedProgresViewModle(Helper: self))
-        case .centerPopover:
-            return AnyView(GlazedPopoverViewModle(Helper: self, edit: false, center: true))
-        case .topBottom:
-            return AnyView(GlazedPopoverViewModle(Helper: self, edit: true))
-        }
-    }
-    
     override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
-        if (disTime?.timeIntervalSinceNow ?? 0) > 0 {
+        let hit1 = super.hitTest(point, with: event)
+        if isDis {
             return nil
         } else if event?.type != .hover {
-            let hit1 = super.hitTest(point, with: event)
-            switch type {
-            case .Popover, .topBottom:
-                if Viewframe.contains(point) {
-                    return hit1
-                } else if buttonFrame.contains(point) {
-                    return nil
-                } else {
-                    self.dismissAction()
-                    return nil
-                }
-            case .Sheet:
-                return hit1
-            case .FullCover:
-                return hit1
-            case .EditPopover, .PopoverWithOutButton, .centerPopover:
-                if Viewframe.contains(point) {
-                    return hit1
-                } else {
-                    self.dismissAction()
-                    return nil
-                }
-            case .tipPopover:
-                return nil
-            case .Progres, .SharePopover:
-                return hit1
-            }
+            return hitTist(point) ? hit1 : nil
+        } else {
+            return hit1
         }
-        return nil
     }
 }
 

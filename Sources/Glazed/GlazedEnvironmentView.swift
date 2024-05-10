@@ -9,8 +9,8 @@ import SwiftUI
 
 public class GlazedObserver: ObservableObject {
     @Published var superWindows: UIWindow? = nil
-    var Helpers:[GlazedHelper] = []
 }
+
 public struct GlazedEnvironmentView<Content: View>: View {
     let content:() -> Content
     @StateObject var glazedObserver = GlazedObserver()
@@ -18,6 +18,9 @@ public struct GlazedEnvironmentView<Content: View>: View {
     public init(@ViewBuilder content: @escaping () -> Content) {
         self.content = content
     }
+    let id = UUID()
+    @State var window: GlazedHelper? = nil
+    
     public var body: some View {
         content()
             .background {
@@ -25,32 +28,27 @@ public struct GlazedEnvironmentView<Content: View>: View {
             }
             .environmentObject(glazedObserver)
             .environment(\.window, glazedObserver.superWindows)
-            .environment(\.glazedDoAction, { [self] action in
-                if let window = glazedObserver.superWindows?.windowScene  {
-                    var h: GlazedHelper? = nil
-                    let helper = GlazedHelper(
-                        superHelperID: nil,
-                        windowScene: window,
-                        type: .Progres,
-                        buttonFrame: .zero,
-                        view: AnyView(EmptyView())
-                    ) { [self] in
-                        if let h = h {
-                            h.dismiss()
-                            h.dismissisPAction()
-                            h.disTime = .now
-                            h.superRemoveCell(glazedObserver: glazedObserver)
-                            DispatchQueue.main.async(1) {
-                                h.removeFromSuperview()
-                                h.superRemove(glazedObserver: glazedObserver)
-                            }
-                        }
-                    } ProgresAction: {
-                        action()
+        
+            .environment(\.glazedDoAction) { [self] action in
+                dismiss()
+                if let windowScene = glazedObserver.superWindows?.windowScene {
+                    window = GlazedHelper(windowScene: windowScene) {
+                        GlazedProgresViewModle(action: action, dismiss: dismiss)
+                    } hitTist: { point in
+                        return true
                     }
-                    h = helper
                 }
-            })
+            }
+    }
+    func dismiss() {
+        var helper = window
+        if window != nil {
+            window = nil
+            helper?.isDis = true
+            DispatchQueue.main.async(1) {
+                helper = nil
+            }
+        }
     }
 }
 

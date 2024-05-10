@@ -11,13 +11,17 @@ protocol GlazedViewModle: View where Body: View {
     @ViewBuilder @MainActor var body: Self.Body { get }
 }
 
-struct GlazedPopoverViewModle: GlazedViewModle {
-    @ObservedObject var Helper:GlazedHelper
+struct GlazedPopoverViewModle<Content: View>: GlazedViewModle {
+    @Binding var value: GlazedHelperValue
     let edit:Bool
     var center:Bool = false
+    let gluazedSuper: Bool
+    
+    @ViewBuilder var content: () -> Content
+    
     @GestureState var isDrag:Bool = false
     
-    let spacing:CGFloat = 12
+    let spacing:CGFloat = 8
     
     @State var maxFrameX:CGFloat = .infinity
     @State var maxFrameY:CGFloat = .infinity
@@ -33,7 +37,7 @@ struct GlazedPopoverViewModle: GlazedViewModle {
     
     var body: some View {
         GeometryReader { GeometryProxy in
-            Helper.view
+            content()
                 .shadow(radius: 0.3)
                 .shadow(color: Color(.sRGBLinear, white: 0, opacity: 0.4), radius: 35)
             
@@ -42,34 +46,35 @@ struct GlazedPopoverViewModle: GlazedViewModle {
                 .onFrameChange(closure: { CGRec in
                     if canSet {
                         withAnimation(.autoAnimation) {
-                            Helper.Viewframe = CGRec
+                            value.Viewframe = CGRec
                             setValue(GeometryProxy: GeometryProxy)
                         }
                     } else if load {
-                        Helper.Viewframe = CGRec
+                        value.Viewframe = CGRec
                         setValue(onAppear: true, GeometryProxy: GeometryProxy)
-//                        Helper.Viewframe = CGRect(x: Helper.offsetX - maxFrameX / 2, y: Helper.offsetY - maxFrameY / 2, width: maxFrameX, height: maxFrameY)
                     } else {
-                        Helper.Viewframe = CGRec
+                        value.Viewframe = CGRec
                     }
                 })
             
                 .blur(radius: 10 - showProgres * 10)
             
                 .frame(maxWidth: maxFrameX, maxHeight: maxFrameY)
-                .position(x: Helper.offsetX, y: Helper.offsetY)
-                .environment(\.glazedDismiss, {
-                    Helper.dismissAction()
-                })
-                .environment(\.gluzedSuper, Helper.id)
+                .position(x: value.offsetX, y: value.offsetY)
+                .environment(\.gluzedSuper, value.id)
                 .environment(\.safeAreaInsets, EdgeInsets(top: 16, leading: 16, bottom: 16, trailing: 16))
-                .onChange(of: Helper.buttonFrame) { value in
+                .onChange(of: value.buttonFrame) { value in
                     if showProgres == 1 {
                         withAnimation(.autoAnimation) {
                             setValue(GeometryProxy: GeometryProxy)
                         }
                     }
                 }
+        }
+        .background {
+            if gluazedSuper {
+                Color.black.opacity(0.1 * showProgres)
+            }
         }
         .ignoresSafeArea()
     }
@@ -81,10 +86,10 @@ struct GlazedPopoverViewModle: GlazedViewModle {
             if center {
                 return .center
             } else {
-                let leadingSpacing = Helper.buttonFrame.minX - Helper.Viewframe.width
-                let topSpacing = Helper.buttonFrame.minY - Helper.Viewframe.height
-                let bottomSpacing = GeometryProxy.size.height - Helper.buttonFrame.maxY - Helper.Viewframe.height
-                let trailingSpacing = GeometryProxy.size.width - Helper.buttonFrame.maxX - Helper.Viewframe.width
+                let leadingSpacing = value.buttonFrame.minX - value.Viewframe.width
+                let topSpacing = value.buttonFrame.minY - value.Viewframe.height
+                let bottomSpacing = GeometryProxy.size.height - value.buttonFrame.maxY - value.Viewframe.height
+                let trailingSpacing = GeometryProxy.size.width - value.buttonFrame.maxX - value.Viewframe.width
                 if edit {
                     let maxSpacing = max(bottomSpacing,topSpacing)
                     
@@ -109,35 +114,35 @@ struct GlazedPopoverViewModle: GlazedViewModle {
         var ideaX:Double = {
             switch edge {
             case .top:
-                return Helper.buttonFrame.midX
+                return value.buttonFrame.midX
             case .leading:
-                return Helper.buttonFrame.minX - (Helper.Viewframe.width / 2) - spacing
+                return value.buttonFrame.minX - (value.Viewframe.width / 2) - spacing
             case .bottom:
-                return Helper.buttonFrame.midX
+                return value.buttonFrame.midX
             case .trailing:
-                return Helper.buttonFrame.maxX + (Helper.Viewframe.width / 2) + spacing
+                return value.buttonFrame.maxX + (value.Viewframe.width / 2) + spacing
             case .center:
-                return Helper.buttonFrame.midX
+                return value.buttonFrame.midX
             }
         }()
         var ideaY:Double = {
             switch edge {
             case .top:
-                return Helper.buttonFrame.minY - (Helper.Viewframe.height / 2) - spacing
+                return value.buttonFrame.minY - (value.Viewframe.height / 2) - spacing
             case .leading:
-                return Helper.buttonFrame.midY
+                return value.buttonFrame.midY
             case .bottom:
-                return Helper.buttonFrame.maxY + (Helper.Viewframe.height / 2) + spacing
+                return value.buttonFrame.maxY + (value.Viewframe.height / 2) + spacing
             case .trailing:
-                return Helper.buttonFrame.midY
+                return value.buttonFrame.midY
             case .center:
-                return Helper.buttonFrame.midY
+                return value.buttonFrame.midY
             }
         }()
-        let YBottomSpacing = GeometryProxy.size.height - (ideaY + Helper.Viewframe.height * 0.5 + max(safeAreaInsets.bottom, 20))
-        let YTopSpacing = (ideaY - Helper.Viewframe.height * 0.5) - max(safeAreaInsets.top, 20)
-        let XLeftSpacing = (ideaX - Helper.Viewframe.width * 0.5) - max(safeAreaInsets.leading, 20)
-        let XRightSpacing = GeometryProxy.size.width - (ideaX + Helper.Viewframe.width * 0.5 + max(safeAreaInsets.trailing, 20))
+        let YBottomSpacing = GeometryProxy.size.height - (ideaY + value.Viewframe.height * 0.5 + max(safeAreaInsets.bottom, 20))
+        let YTopSpacing = (ideaY - value.Viewframe.height * 0.5) - max(safeAreaInsets.top, 20)
+        let XLeftSpacing = (ideaX - value.Viewframe.width * 0.5) - max(safeAreaInsets.leading, 20)
+        let XRightSpacing = GeometryProxy.size.width - (ideaX + value.Viewframe.width * 0.5 + max(safeAreaInsets.trailing, 20))
         if YBottomSpacing < 0 {
             ideaY -= abs(YBottomSpacing)
         }
@@ -150,8 +155,8 @@ struct GlazedPopoverViewModle: GlazedViewModle {
         if XRightSpacing < 0 {
             ideaX -= abs(XRightSpacing)
         }
-        Helper.offsetX = ideaX
-        Helper.offsetY = ideaY
+        value.offsetX = ideaX
+        value.offsetY = ideaY
         
         let canUseWidth = GeometryProxy.size.width - spacing * 2
         let canUseHeight = GeometryProxy.size.height - spacing * 2
@@ -159,35 +164,35 @@ struct GlazedPopoverViewModle: GlazedViewModle {
         switch edge {
         case .top:
             maxFrameX = canUseWidth
-            maxFrameY = Helper.buttonFrame.minY - spacing * 2
+            maxFrameY = value.buttonFrame.minY - spacing * 2
         case .leading:
-            maxFrameX = Helper.buttonFrame.minX - spacing * 2
+            maxFrameX = value.buttonFrame.minX - spacing * 2
             maxFrameY = canUseHeight
         case .bottom:
             maxFrameX = canUseWidth
-            maxFrameY = canUseHeight - (Helper.buttonFrame.maxY - spacing)
+            maxFrameY = canUseHeight - (value.buttonFrame.maxY - spacing)
         case .trailing:
-            maxFrameX = canUseWidth - (Helper.buttonFrame.maxX - spacing)
+            maxFrameX = canUseWidth - (value.buttonFrame.maxX - spacing)
             maxFrameY = canUseHeight
         case .center:
             maxFrameX = canUseWidth
             maxFrameY = canUseHeight
         }
-        let width = min(maxFrameX, Helper.Viewframe.width)
-        let height = min(maxFrameY, Helper.Viewframe.height)
-        let ideaScaleX = (Helper.buttonFrame.midX - Helper.offsetX) / width
+        let width = min(maxFrameX, value.Viewframe.width)
+        let height = min(maxFrameY, value.Viewframe.height)
+        let ideaScaleX = (value.buttonFrame.midX - value.offsetX) / width
         scaleX = max(min(0.5 + ideaScaleX, 1.1), -0.1)
-        let ideaScaleY = (Helper.buttonFrame.midY - Helper.offsetY) / height
+        let ideaScaleY = (value.buttonFrame.midY - value.offsetY) / height
         scaleY = max(min(0.5 + ideaScaleY, 1.1), -0.1)
         
         load = false
         if onAppear {
-            Helper.dismiss = {
-                withAnimation(.spring(dampingFraction: 1).speed(1.2)) {
+            value.typeDismissAction = {
+                withAnimation(.autoAnimation(speed: 1.2)) {
                     showProgres = 0
                 }
             }
-            withAnimation(.spring(dampingFraction: 0.7).speed(1.5)) {
+            withAnimation(.autoAnimation(speed: 1.5)) {
                 showProgres = 1
             }
             DispatchQueue.main.async(0.5) {

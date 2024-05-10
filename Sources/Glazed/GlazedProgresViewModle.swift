@@ -8,11 +8,12 @@
 import SwiftUI
 
 struct GlazedProgresViewModle: GlazedViewModle {
-    @ObservedObject var Helper:GlazedHelper
+    let action:() -> Void
+    let dismiss:() -> Void
+    
     @GestureState var isDrag:Bool = false
     
     @State var show = false
-    
     var body: some View {
         ZStack {
             if show {
@@ -30,19 +31,9 @@ struct GlazedProgresViewModle: GlazedViewModle {
             }
         }
         .onAppear {
-            Helper.dismiss = {
-                withAnimation(.autoAnimation) {
-                    show = false
-                }
-            }
-            withAnimation(.autoAnimation.speed(1.5)) {
-                show = true
-            }
             DispatchQueue.global().async {
-                Helper.ProgresAction()
-                DispatchQueue.main.async {
-                    Helper.dismissAction()
-                }
+                action()
+                dismiss()
             }
         }
     }

@@ -75,6 +75,63 @@ public extension View {
     }
 }
 
+struct GlazedInputView<Content: View>: View {
+    let type:GlazedType
+    @Binding var value: GlazedHelperValue?
+    @Binding var isPresented:Bool
+    let gluazedSuper: Bool
+    
+    @ViewBuilder var content:() -> Content
+    @ObservedObject var glazedObserver: GlazedObserver
+    
+    var body: some View {
+            switch type {
+            case .Popover, .SharePopover, .PopoverWithOutButton:
+                Binding($value).map { value in
+                    GlazedPopoverViewModle(value: value, edit: false, gluazedSuper: gluazedSuper, content: content)
+                }
+                .environment(\.glazedDismiss) {
+                    isPresented = false
+                }
+                .environmentObject(glazedObserver)
+            case .Sheet:
+                Binding($value).map { value in
+                    GlazedSheetViewModle(value: value, content: content)
+                }
+                .environment(\.glazedDismiss) {
+                    isPresented = false
+                }
+                .environmentObject(glazedObserver)
+            case .FullCover:
+                Binding($value).map { value in
+                    GlazedFullCoverViewModle(value: value, content: content)
+                }
+                .environment(\.glazedDismiss) {
+                    isPresented = false
+                }
+                .environmentObject(glazedObserver)
+            case .EditPopover, .tipPopover, .topBottom:
+                Binding($value).map { value in
+                    GlazedPopoverViewModle(value: value, edit: true, gluazedSuper: gluazedSuper, content: content)
+                }
+                .environment(\.glazedDismiss) {
+                    isPresented = false
+                }
+                .environmentObject(glazedObserver)
+            case .Progres:
+                EmptyView()
+            case .centerPopover:
+                Binding($value).map { value in
+                    GlazedPopoverViewModle(value: value, edit: false, center: true, gluazedSuper: gluazedSuper, content: content)
+                }
+                .environment(\.glazedDismiss) {
+                    isPresented = false
+                }
+                .environmentObject(glazedObserver)
+            }
+    }
+}
+
 struct GlazedInputViewModle<Content1: View>: ViewModifier {
     let type:GlazedType
     @Binding var isPresented:Bool
@@ -83,112 +140,78 @@ struct GlazedInputViewModle<Content1: View>: ViewModifier {
     @EnvironmentObject var glazedObserver: GlazedObserver
     
     @Environment(\.gluzedSuper) var gluazedSuper
-    let helperID: UUID = UUID()
+    
+    @State var value: GlazedHelperValue? = nil
+    @State var window: GlazedHelper? = nil
     
     func body(content: Content) -> some View {
         content
             .overlay {
                 if isPresented {
                     GeometryReader { GeometryProxy in
-                        let _ = {
-                            if let int = glazedObserver.Helpers.lastIndex(where: { GlazedHelper in
-                                GlazedHelper.superID == helperID && GlazedHelper.disTime == nil
-                            }) {
-                                glazedObserver.Helpers[glazedObserver.Helpers.count - int - 1].view = AnyView(content1().environmentObject(glazedObserver))
-                            }
-                        }()
+                       let _ = (window?.rootViewController as? UIHostingController<GlazedInputView>)?.rootView = GlazedInputView(type: type, value: $value, isPresented: $isPresented, gluazedSuper: gluazedSuper != nil, content: content1, glazedObserver: glazedObserver)
                         Color.clear
+                            .preference(key: RectPreferenceKey.self, value: GeometryProxy.frame(in: .global))
                             .onAppear {
-                                if !glazedObserver.Helpers.contains(where: { GlazedHelper in
-                                    GlazedHelper.superID == helperID &&  GlazedHelper.disTime == nil
-                                }) && gluazedSuper == glazedObserver.Helpers.last(where: { GlazedHelper in
-                                    GlazedHelper.disTime == nil
-                                })?.id, let window = glazedObserver.superWindows?.windowScene {
-                                    glazedObserver.Helpers.append(GlazedHelper(
-                                        id: helperID,
-                                        superHelperID: gluazedSuper,
-                                        windowScene: window,
-                                        type: type,
-                                        buttonFrame: GeometryProxy.frame(in: .global),
-                                        view: AnyView(content1().environmentObject(glazedObserver))
-                                    ) {
-                                        Dismiss()
-                                    } dismissisp: {
-                                        isPresented = false
-                                    })
+                                dismiss()
+                                if let windowScene = glazedObserver.superWindows?.windowScene {
+                                    value = GlazedHelperValue(buttonFrame: GeometryProxy.frame(in: .global))
+                                    window = GlazedHelper(windowScene: windowScene) {
+                                        GlazedInputView(type: type, value: $value, isPresented: $isPresented, gluazedSuper: gluazedSuper != nil, content: content1, glazedObserver: glazedObserver)
+                                    } hitTist: { point in
+                                        if let value = value {
+                                            switch type {
+                                            case .Popover, .topBottom:
+                                                if value.Viewframe.contains(point) {
+                                                    return true
+                                                } else if value.buttonFrame.contains(point) {
+                                                    return gluazedSuper != nil
+                                                } else {
+                                                    isPresented = false
+                                                    return gluazedSuper != nil
+                                                }
+                                            case .Sheet:
+                                                return true
+                                            case .FullCover:
+                                                return true
+                                            case .EditPopover, .PopoverWithOutButton, .centerPopover:
+                                                if value.Viewframe.contains(point) {
+                                                    return true
+                                                } else {
+                                                    isPresented = false
+                                                    return gluazedSuper == nil
+                                                }
+                                            case .tipPopover:
+                                                return false
+                                            case .Progres, .SharePopover:
+                                                return true
+                                            }
+                                        }
+                                        return true
+                                    }
                                 }
-                            }
-                            .onChange(of: GeometryProxy.frame(in: .global)) { V in
-                                if let int = glazedObserver.Helpers.lastIndex(where: { GlazedHelper in
-                                    GlazedHelper.superID == helperID && GlazedHelper.disTime == nil
-                                }) {
-                                    glazedObserver.Helpers[glazedObserver.Helpers.count - int - 1].buttonFrame = V
-                                }
-                            }
-                            .onDisappear {
-                                Dismiss2()
                             }
                             .transition(.identity)
+                    }
+                    .onPreferenceChange(RectPreferenceKey.self, perform: { rect in
+                        value?.buttonFrame = rect
+                    })
+                    .onDisappear {
+                        dismiss()
                     }
                     .transition(.identity)
                 }
             }
     }
-
-    
-    func Dismiss() {
-        if !glazedObserver.Helpers.contains(where: { GlazedHelper in
-            abs(GlazedHelper.disTime?.timeIntervalSinceNow ?? 1) < 0.1
-        }) ,let h = glazedObserver.Helpers.last(where: { GlazedHelper in
-            GlazedHelper.disTime == nil
-        }), h.superID == helperID {
-            h.dismiss()
-            h.dismissisPAction()
-            h.disTime = .now
-            h.superRemoveCell(glazedObserver: glazedObserver)
+    func dismiss() {
+        var helper = window
+        if window != nil , let value = value {
+            window = nil
+            value.typeDismissAction()
+            helper?.isDis = true
             DispatchQueue.main.async(1) {
-                h.removeFromSuperview()
-                h.superRemove(glazedObserver: glazedObserver)
+                helper = nil
             }
-        }
-    }
-    func Dismiss2() {
-        if let h = glazedObserver.Helpers.last(where: { GlazedHelper in
-            GlazedHelper.superID == helperID && GlazedHelper.disTime == nil
-        }) {
-            h.dismiss()
-            h.dismissisPAction()
-            h.disTime = .now
-            h.superRemoveCell(glazedObserver: glazedObserver)
-            DispatchQueue.main.async(1) {
-                h.removeFromSuperview()
-                h.superRemove(glazedObserver: glazedObserver)
-            }
-        }
-    }
-}
-
-extension GlazedHelper {
-    func superRemoveCell(glazedObserver: GlazedObserver) {
-        glazedObserver.Helpers.forEach { GlazedHelper in
-            if GlazedHelper.superHelperID == id {
-                GlazedHelper.dismiss()
-                GlazedHelper.dismissisPAction()
-                GlazedHelper.disTime = .now
-                GlazedHelper.superRemoveCell(glazedObserver: glazedObserver)
-                DispatchQueue.main.async(1) {
-                    GlazedHelper.removeFromSuperview()
-                    GlazedHelper.superRemove(glazedObserver: glazedObserver)
-                }
-            }
-        }
-    }
-    func superRemove(glazedObserver: GlazedObserver) {
-        glazedObserver.Helpers.removeAll { GlazedHelper in
-            if GlazedHelper.id == id {
-                GlazedHelper.removeFromSuperview()
-            }
-            return GlazedHelper.id == id
         }
     }
 }

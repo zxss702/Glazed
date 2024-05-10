@@ -15,8 +15,11 @@ struct GlazedSheetViewClliShape: Shape {
     }
 }
 
-struct GlazedSheetViewModle:View {
-    @ObservedObject var Helper:GlazedHelper
+struct GlazedSheetViewModle<Content: View>: GlazedViewModle {
+    @Binding var value: GlazedHelperValue
+    @ViewBuilder var content: () -> Content
+    @Environment(\.glazedDismiss) var glazedDismiss
+    
     @GestureState var isDrag:Bool = false
     
     @State var show = false
@@ -29,48 +32,45 @@ struct GlazedSheetViewModle:View {
                         .simultaneousGesture(
                             DragGesture(minimumDistance: 0)
                                 .onChanged { _ in
-                                    if show {
-                                        Helper.dismissAction()
-                                    }
+                                    glazedDismiss()
                                 }
                         )
                 }
-                Helper.view
+               content()
                     .background(.regularMaterial)
-                    .clipShape(GlazedSheetViewClliShape(bool: Helper.ViewSize.width < GeometryProxy.size.width))
+                    .clipShape(GlazedSheetViewClliShape(bool: value.Viewframe.size.width < GeometryProxy.size.width))
+                    .shadow(radius: 0.3)
+                    .shadow(color: Color(.sRGBLinear, white: 0, opacity: 0.4), radius: 35)
                 
                     .onSizeChange({ CGSize in
-                        Helper.ViewSize = CGSize
+                        value.Viewframe.size = CGSize
                     })
-                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: Helper.ViewSize.width < GeometryProxy.size.width ? .center : .bottom)
-                    .padding(.top, (Helper.ViewSize.width < GeometryProxy.size.width ? 20 : 0))
-                    .ignoresSafeArea(.container, edges: Helper.ViewSize.width < GeometryProxy.size.width ? [.leading, .trailing] : [.leading, .trailing, .bottom])
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: value.Viewframe.size.width < GeometryProxy.size.width ? .center : .bottom)
+                    .padding(.top, (value.Viewframe.size.width < GeometryProxy.size.width ? 20 : 0))
+                    .ignoresSafeArea(.container, edges: value.Viewframe.size.width < GeometryProxy.size.width ? [.leading, .trailing] : [.leading, .trailing, .bottom])
                     .offset(
                         y: !show
                            ? (
-                                Helper.ViewSize.width < GeometryProxy.size.width
-                                ? ((GeometryProxy.size.height - Helper.ViewSize.height) / 2 + Helper.ViewSize.height + 50)
-                                : (Helper.ViewSize.height + 50)
+                                value.Viewframe.size.width < GeometryProxy.size.width
+                                ? ((GeometryProxy.size.height - value.Viewframe.size.height) / 2 + value.Viewframe.size.height + 50)
+                                : (value.Viewframe.size.height + 50)
                             )
-                        : Helper.offsetY
+                        : value.offsetY
                     )
-                    .environment(\.glazedDismiss, {
-                        Helper.dismissAction()
-                    })
                     .environment(\.safeAreaInsets, EdgeInsets(top: 17, leading: 17, bottom: 17, trailing: 17))
-
+                    .environment(\.gluzedSuper, value.id)
                     .gesture(
                         DragGesture(minimumDistance: 30)
                             .updating($isDrag) { Value, State, Transaction in
                                 State = true
                                 DispatchQueue.main.async {
                                     if Value.translation.height > 0 {
-                                        Helper.offsetY = Value.translation.height
+                                        value.offsetY = Value.translation.height
                                     } else {
-                                        if Helper.ViewSize.width < GeometryProxy.size.width {
-                                            Helper.offsetY = -sqrt(abs(Value.translation.height))
+                                        if value.Viewframe.size.width < GeometryProxy.size.width {
+                                            value.offsetY = -sqrt(abs(Value.translation.height))
                                         } else {
-                                            Helper.offsetY = 0
+                                            value.offsetY = 0
                                         }
                                     }
                                 }
@@ -78,28 +78,26 @@ struct GlazedSheetViewModle:View {
                     )
                     .onChange(of: isDrag) { v in
                         if !v {
-                            if Helper.offsetY > 130 {
-                                Helper.dismissAction()
+                            if value.offsetY > 130 {
+                                glazedDismiss()
                             } else {
                                 withAnimation(.spring(dampingFraction: 1).speed(1.3)) {
-                                    Helper.offsetY = 0
+                                    value.offsetY = 0
                                 }
                             }
                         }
                     }
-                    .opacity(Helper.ViewSize == .zero ? 0 : 1)
+                    .opacity(value.Viewframe.size == .zero ? 0 : 1)
             }
         }
         .onAppear {
-            Helper.dismiss = {
+            value.typeDismissAction = {
                 withAnimation(.autoAnimation) {
                     show = false
                 }
             }
-            DispatchQueue.main.async(0.1){
-                withAnimation(.autoAnimation) {
-                    show = true
-                }
+            withAnimation(.autoAnimation) {
+                show = true
             }
         }
     }
