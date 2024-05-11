@@ -234,7 +234,7 @@ struct GlazedInputViewModle<Content1: View>: ViewModifier {
                                                     return true
                                                 } else {
                                                     isPresented = false
-                                                    return gluazedSuper == nil
+                                                    return gluazedSuper != nil
                                                 }
                                             case .tipPopover:
                                                 return false
