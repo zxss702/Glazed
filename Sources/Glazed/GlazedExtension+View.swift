@@ -6,6 +6,8 @@
 //
 
 import SwiftUI
+import AudioToolbox
+
 struct TapButtonStyle: ButtonStyle {
     @State var scale:CGFloat = 1
     @State var time:Date = Date()
