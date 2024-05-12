@@ -61,7 +61,7 @@ struct GlazedProgresViewModle: GlazedViewModle {
                     }
                 }
             }
-            DispatchQueue.global().async {
+            DispatchQueue(label: "").async {
                 action()
                 withAnimation(.autoAnimation) {
                     show = false
