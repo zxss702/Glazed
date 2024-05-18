@@ -112,54 +112,51 @@ public struct GlazedEnvironmentView<Content: View>: View {
         self.content = content
     }
     
-    @State var canHit = true
-    
     public var body: some View {
         GeometryReader { geometry in
-            ZStack {
-                content()
-                    .environment(\.safeAreaInsets, geometry.safeAreaInsets)
-                ForEach(glazedObserver.contentViewList, id: \.self) { view in
-                    let zindex = glazedObserver.contentViewList.firstIndex(of: view) ?? 10000
-                    if let Helper = glazedObserver.contentView[view] {
-                        GlazedInputView(type: Helper.type, helper: Helper, content: Helper.content, GeometryProxy: geometry, zindex: zindex * 3 + 1)
-                            .environment(\.gluzedSuper, view)
-                            .environment(\.glazedDismiss, {
-                                glazedObserver.dismiss(helper: view)
-                            })
-                    }
+            GlazedEnvironmentViewHelper {
+                GlazedEnvironmentViewCell(content: content, geometry: geometry)
+            } hitTest: { point in
+                if
+                    let last = glazedObserver.contentViewList.last(where: { UUID in
+                        !(glazedObserver.contentView[UUID]?.isDismiss ?? false)
+                    }),
+                    let lastContent = glazedObserver.contentView[last]
+                {
+                   return lastContent.hitTest(point, lastContent.value)
                 }
+                return true
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(.background)
-            .allowsHitTesting(canHit)
+            .modifier(GlazedEnvironmentViewModle(glazedObserver: glazedObserver))
+            .environmentObject(glazedObserver)
+            .environment(\.window, glazedObserver.superWindows)
+            .ignoresSafeArea()
+            .environment(\.safeAreaInsets, geometry.safeAreaInsets)
         }
-        .simultaneousGesture(
-            DragGesture(minimumDistance: 0)
-                .onChanged({ Value in
-                    if
-                        Value.location == Value.startLocation,
-                        let last = glazedObserver.contentViewList.last(where: { UUID in
-                            !(glazedObserver.contentView[UUID]?.isDismiss ?? false)
-                        }),
-                        let lastContent = glazedObserver.contentView[last]
-                    {
-                        canHit = !lastContent.hitTest(Value.location, lastContent.value)
-                    }
-                })
-                .onEnded({ Value in
-                    canHit = true
-                })
-        )
-        .background {
-            GlazedEnvironmentViewHelper()
-        }
-        .modifier(GlazedEnvironmentViewModle(glazedObserver: glazedObserver))
-        .environmentObject(glazedObserver)
-        .environment(\.window, glazedObserver.superWindows)
     }
 }
-
+struct GlazedEnvironmentViewCell<Content: View>: View {
+    @EnvironmentObject var glazedObserver:GlazedObserver
+    @ViewBuilder var content:() -> Content
+    let geometry: GeometryProxy
+    
+    var body: some View {
+        ZStack {
+            content()
+            ForEach(glazedObserver.contentViewList, id: \.self) { view in
+                let zindex = glazedObserver.contentViewList.firstIndex(of: view) ?? 10000
+                if let Helper = glazedObserver.contentView[view] {
+                    GlazedInputView(type: Helper.type, helper: Helper, content: Helper.content, GeometryProxy: geometry, zindex: zindex * 3 + 1)
+                        .environment(\.gluzedSuper, view)
+                        .environment(\.glazedDismiss, {
+                            glazedObserver.dismiss(helper: view)
+                        })
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+}
 extension View{
     @ViewBuilder
     func onChange(connect:some Equatable,action:@escaping () -> Void) -> some View {

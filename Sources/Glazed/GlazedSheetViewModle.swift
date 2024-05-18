@@ -61,7 +61,7 @@ struct GlazedSheetViewModle: GlazedViewModle {
                 value.Viewframe.size = CGSize
             })
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: cneterORbottom ? .center : .bottom)
-            .padding(.top, (cneterORbottom ? 0 : 20))
+            .padding(.top, (cneterORbottom ? 0 : 20 + GeometryProxy.safeAreaInsets.top))
             .offset(y: offsetY)
             .gesture(
                 DragGesture(minimumDistance: 30)

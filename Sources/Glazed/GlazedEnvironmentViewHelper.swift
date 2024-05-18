@@ -7,12 +7,17 @@
 
 import SwiftUI
 
-struct GlazedEnvironmentViewHelper: UIViewControllerRepresentable {
-    typealias UIViewControllerType = GlazedEnvironmentUIView
+struct GlazedEnvironmentViewHelper<Content: View>: UIViewControllerRepresentable {
+    typealias UIViewControllerType = GlazedEnvironmentUIView<Content>
+    
+    @ViewBuilder var content:() -> Content
+    var hitTest:(CGPoint) -> Bool
     
     @EnvironmentObject var glazedObserver:GlazedObserver
-    func makeUIViewController(context: Context) -> GlazedEnvironmentUIView {
+    func makeUIViewController(context: Context) -> GlazedEnvironmentUIView<Content> {
         return GlazedEnvironmentUIView(RootView: self)
     }
-    func updateUIViewController(_ uiViewController: GlazedEnvironmentUIView, context: Context) { }
+    func updateUIViewController(_ uiViewController: GlazedEnvironmentUIView<Content>, context: Context) {
+        uiViewController.setContent()
+    }
 }
