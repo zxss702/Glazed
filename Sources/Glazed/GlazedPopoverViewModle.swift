@@ -129,7 +129,7 @@ struct GlazedPopoverViewModle: GlazedViewModle {
             case .center:
                 return buttonFrame.midX
             }
-        }(), rightWidth / 2), GeometryProxy.size.width - rightWidth / 2)
+        }(), rightWidth / 2 + spacing), GeometryProxy.size.width - rightWidth / 2 - spacing)
         
         offsetY = min(max({
             switch edge {
@@ -144,7 +144,7 @@ struct GlazedPopoverViewModle: GlazedViewModle {
             case .center:
                 return buttonFrame.midY
             }
-        }(), rightHeight / 2), GeometryProxy.size.height - rightHeight / 2)
+        }(), rightHeight / 2 + spacing), GeometryProxy.size.height - rightHeight / 2 - spacing)
         
         let ideaScaleX = (buttonFrame.midX - offsetX) / rightWidth
         scaleX = max(min(0.5 + ideaScaleX, 1.1), -0.1)
