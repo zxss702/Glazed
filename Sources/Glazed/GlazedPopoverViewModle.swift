@@ -116,35 +116,35 @@ struct GlazedPopoverViewModle: GlazedViewModle {
         let rightWidth = min(GeometryProxy.size.width - spacing * 2, value.Viewframe.width)
         let rightHeight = min(GeometryProxy.size.height - spacing * 2, value.Viewframe.height)
         
-        offsetX = {
+        offsetX = min(max({
             switch edge {
             case .top:
                 return buttonFrame.midX
             case .leading:
-                return max(buttonFrame.minX - (rightWidth / 2) - spacing, rightWidth / 2)
+                return buttonFrame.minX - (rightWidth / 2) - spacing
             case .bottom:
                 return buttonFrame.midX
             case .trailing:
-                return min(buttonFrame.maxX + (rightWidth / 2) + spacing, GeometryProxy.size.width - rightWidth / 2)
+                return buttonFrame.maxX + (rightWidth / 2) + spacing
             case .center:
                 return buttonFrame.midX
             }
-        }()
+        }(), rightWidth / 2), GeometryProxy.size.width - rightWidth / 2)
         
-        offsetY = {
+        offsetY = min(max({
             switch edge {
             case .top:
-                return max(buttonFrame.minY - (rightHeight / 2) - spacing, rightHeight / 2)
+                return buttonFrame.minY - (rightHeight / 2) - spacing
             case .leading:
                 return buttonFrame.midY
             case .bottom:
-                return min(buttonFrame.maxY + (rightHeight / 2) + spacing, GeometryProxy.size.height - rightHeight / 2)
+                return buttonFrame.maxY + (rightHeight / 2) + spacing
             case .trailing:
                 return buttonFrame.midY
             case .center:
                 return buttonFrame.midY
             }
-        }()
+        }(), rightHeight / 2), GeometryProxy.size.height - rightHeight / 2)
         
         let ideaScaleX = (buttonFrame.midX - offsetX) / rightWidth
         scaleX = max(min(0.5 + ideaScaleX, 1.1), -0.1)
