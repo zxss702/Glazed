@@ -7,37 +7,102 @@
 
 import SwiftUI
 
+class GlazedHelperType: Identifiable {
+    var content: AnyView
+    var id: UUID = UUID()
+    var type: GlazedType
+    var value: GlazedHelperValue
+    var hitTest: (CGPoint, GlazedHelperValue) -> Bool
+    
+    var isDismiss = false
+    
+    init(content: AnyView, id: UUID = UUID(), type: GlazedType, value: GlazedHelperValue, hitTest: @escaping (CGPoint, GlazedHelperValue) -> Bool, isDismiss: Bool = false) {
+        self.content = content
+        self.id = id
+        self.type = type
+        self.value = value
+        self.hitTest = hitTest
+        self.isDismiss = isDismiss
+    }
+}
+
 public class GlazedObserver: ObservableObject {
     @Published var superWindows: UIWindow? = nil
+    var contentView:[UUID:GlazedHelperType] = [:]
+    @Published var contentViewList:[UUID] = []
+    
+    func dismissLast(last: UUID) {
+        if let lastContent = contentView[last], !lastContent.isDismiss {
+            switch lastContent.type {
+            case .Sheet, .FullCover:
+                lastContent.value.isPrisentDismissAction()
+                if let int = contentViewList.firstIndex(of: last) {
+                    withAnimation(.autoAnimation) {
+                        _ = contentViewList.remove(at: int)
+                    }
+                }
+                DispatchQueue.main.async(1) { [self] in
+                    contentView.removeValue(forKey: last)
+                }
+            default :
+                lastContent.value.isPrisentDismissAction()
+                lastContent.value.typeDismissAction()
+                lastContent.isDismiss = true
+                DispatchQueue.main.async(1) { [self] in
+                    if let int = contentViewList.firstIndex(of: last) {
+                        contentViewList.remove(at: int)
+                    }
+                    DispatchQueue.main.async(0.1) { [self] in
+                        contentView.removeValue(forKey: last)
+                    }
+                }
+            }
+        }
+    }
+    
+    func dismiss(helper: UUID) {
+        dismissLast(last: helper)
+    }
 }
 
 struct GlazedEnvironmentViewModle: ViewModifier {
-    @State var window: GlazedHelper? = nil
+//    @State var window: GlazedHelper? = nil
     @ObservedObject var glazedObserver:GlazedObserver
     
     func body(content: Content) -> some View {
+        
         content
             .environment(\.glazedDoAction) { [self] action in
-                dismiss()
-                if let windowScene = glazedObserver.superWindows?.windowScene {
-                    window = GlazedHelper(windowScene: windowScene) {
-                        GlazedProgresViewModle(action: action, dismiss: dismiss)
-                    } hitTist: { point in
+                
+                let Helper = GlazedHelperType(
+                    content: AnyView(EmptyView()),
+                    type: .Progres,
+                    value: GlazedHelperValue(
+                        buttonFrame: .zero,
+                        gluazedSuper: false,
+                        isPrisentDismissAction: { },
+                        progessDoAction: action
+                    )) { point, value in
                         return true
+                    }
+                glazedObserver.contentView[Helper.id] = Helper
+                DispatchQueue.main.async(0.01) {
+                    withAnimation(.autoAnimation) {
+                        glazedObserver.contentViewList.append(Helper.id)
                     }
                 }
             }
     }
-    func dismiss() {
-        var helper = window
-        if window != nil {
-            window = nil
-            helper?.isDis = true
-            DispatchQueue.main.async(1) {
-                helper = nil
-            }
-        }
-    }
+//    func dismiss() {
+//        var helper = window
+//        if window != nil {
+//            window = nil
+//            helper?.isDis = true
+//            DispatchQueue.main.async(1) {
+//                helper = nil
+//            }
+//        }
+//    }
 }
 public struct GlazedEnvironmentView<Content: View>: View {
     let content:() -> Content
@@ -46,17 +111,52 @@ public struct GlazedEnvironmentView<Content: View>: View {
     public init(@ViewBuilder content: @escaping () -> Content) {
         self.content = content
     }
-    let id = UUID()
-  
+    
+    @State var canHit = true
     
     public var body: some View {
-        content()
-            .background {
-                GlazedEnvironmentViewHelper()
+        GeometryReader { geometry in
+            ZStack {
+                content()
+                    .environment(\.safeAreaInsets, geometry.safeAreaInsets)
+                ForEach(glazedObserver.contentViewList, id: \.self) { view in
+                    let zindex = glazedObserver.contentViewList.firstIndex(of: view) ?? 10000
+                    if let Helper = glazedObserver.contentView[view] {
+                        GlazedInputView(type: Helper.type, helper: Helper, content: Helper.content, GeometryProxy: geometry, zindex: zindex * 3 + 1)
+                            .environment(\.gluzedSuper, view)
+                            .environment(\.glazedDismiss, {
+                                glazedObserver.dismiss(helper: view)
+                            })
+                    }
+                }
             }
-            .modifier(GlazedEnvironmentViewModle(glazedObserver: glazedObserver))
-            .environmentObject(glazedObserver)
-            .environment(\.window, glazedObserver.superWindows)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(.background)
+            .allowsHitTesting(canHit)
+        }
+        .simultaneousGesture(
+            DragGesture(minimumDistance: 0)
+                .onChanged({ Value in
+                    if
+                        Value.location == Value.startLocation,
+                        let last = glazedObserver.contentViewList.last(where: { UUID in
+                            !(glazedObserver.contentView[UUID]?.isDismiss ?? false)
+                        }),
+                        let lastContent = glazedObserver.contentView[last]
+                    {
+                        canHit = !lastContent.hitTest(Value.location, lastContent.value)
+                    }
+                })
+                .onEnded({ Value in
+                    canHit = true
+                })
+        )
+        .background {
+            GlazedEnvironmentViewHelper()
+        }
+        .modifier(GlazedEnvironmentViewModle(glazedObserver: glazedObserver))
+        .environmentObject(glazedObserver)
+        .environment(\.window, glazedObserver.superWindows)
     }
 }
 

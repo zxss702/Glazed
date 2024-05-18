@@ -8,8 +8,9 @@
 import SwiftUI
 
 struct GlazedProgresViewModle: GlazedViewModle {
-    let action:() -> Void
-    let dismiss:() -> Void
+    @ObservedObject var value: GlazedHelperValue
+    
+    @Environment(\.glazedDismiss) var glazedDismiss
     
     @State var show = false
     @State var size:Double = 0.1
@@ -61,13 +62,12 @@ struct GlazedProgresViewModle: GlazedViewModle {
                     }
                 }
             }
-            DispatchQueue(label: "").async {
-                
-                action()
+            DispatchQueue.global().async {
+                value.progessDoAction()
                 withAnimation(.autoAnimation) {
                     show = false
                 }
-                dismiss()
+                glazedDismiss()
             }
         }
     }

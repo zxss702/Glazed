@@ -120,70 +120,33 @@ public extension View {
     }
 }
 
-struct GlazedInputView<Content: View>: View {
-    let type:GlazedType
-    @Binding var value: GlazedHelperValue?
-    @Binding var isPresented:Bool
-    let gluazedSuper: Bool
+struct GlazedInputView: View {
+    let type: GlazedType
+    let helper: GlazedHelperType
     
-    @ViewBuilder var content:() -> Content
-    @ObservedObject var glazedObserver: GlazedObserver
+    let content: AnyView
+    let GeometryProxy: GeometryProxy
+    let zindex:Int
     
     var body: some View {
-            switch type {
-            case .Popover, .SharePopover, .PopoverWithOutButton:
-                Binding($value).map { value in
-                    GlazedPopoverViewModle(value: value, edit: false, gluazedSuper: gluazedSuper, content: content)
-                }
-                .environment(\.glazedDismiss) {
-                    isPresented = false
-                }
-                .environmentObject(glazedObserver)
-                .environment(\.window, glazedObserver.superWindows)
-                .modifier(GlazedEnvironmentViewModle(glazedObserver: glazedObserver))
-            case .Sheet:
-                Binding($value).map { value in
-                    GlazedSheetViewModle(value: value, content: content)
-                }
-                .environment(\.glazedDismiss) {
-                    isPresented = false
-                }
-                .environmentObject(glazedObserver)
-                .environment(\.window, glazedObserver.superWindows)
-                .modifier(GlazedEnvironmentViewModle(glazedObserver: glazedObserver))
-            case .FullCover:
-                Binding($value).map { value in
-                    GlazedFullCoverViewModle(value: value, content: content)
-                }
-                .environment(\.glazedDismiss) {
-                    isPresented = false
-                }
-                .environmentObject(glazedObserver)
-                .environment(\.window, glazedObserver.superWindows)
-                .modifier(GlazedEnvironmentViewModle(glazedObserver: glazedObserver))
-            case .EditPopover, .tipPopover, .topBottom:
-                Binding($value).map { value in
-                    GlazedPopoverViewModle(value: value, edit: true, gluazedSuper: gluazedSuper, content: content)
-                }
-                .environment(\.glazedDismiss) {
-                    isPresented = false
-                }
-                .environmentObject(glazedObserver)
-                .environment(\.window, glazedObserver.superWindows)
-                .modifier(GlazedEnvironmentViewModle(glazedObserver: glazedObserver))
-            case .Progres:
-                EmptyView()
-            case .centerPopover:
-                Binding($value).map { value in
-                    GlazedPopoverViewModle(value: value, edit: false, center: true, gluazedSuper: gluazedSuper, content: content)
-                }
-                .environment(\.glazedDismiss) {
-                    isPresented = false
-                }
-                .environmentObject(glazedObserver)
-                .environment(\.window, glazedObserver.superWindows)
-                .modifier(GlazedEnvironmentViewModle(glazedObserver: glazedObserver))
-            }
+        switch type {
+        case .Popover, .SharePopover, .PopoverWithOutButton:
+            GlazedPopoverViewModle(value: helper.value, edit: false, content: content, GeometryProxy: GeometryProxy)
+                .zIndex(Double(zindex))
+        case .Sheet:
+            GlazedSheetViewModle(value: helper.value, content: content, GeometryProxy: GeometryProxy, zindex: zindex)
+        case .FullCover:
+            GlazedFullCoverViewModle(value: helper.value, content: content, zindex: zindex, GeometryProxy: GeometryProxy)
+        case .EditPopover, .tipPopover, .topBottom:
+            GlazedPopoverViewModle(value: helper.value, edit: true, content: content, GeometryProxy: GeometryProxy)
+                .zIndex(Double(zindex))
+        case .Progres:
+            GlazedProgresViewModle(value: helper.value)
+                .zIndex(10000000000)
+        case .centerPopover:
+            GlazedPopoverViewModle(value: helper.value, edit: false, center: true, content: content, GeometryProxy: GeometryProxy)
+                .zIndex(Double(zindex))
+        }
     }
 }
 
@@ -196,78 +159,75 @@ struct GlazedInputViewModle<Content1: View>: ViewModifier {
     
     @Environment(\.gluzedSuper) var gluazedSuper
     
-    @State var value: GlazedHelperValue? = nil
-    @State var window: GlazedHelper? = nil
+    @State var id: UUID = UUID()
     
     func body(content: Content) -> some View {
         content
             .overlay {
                 if isPresented {
                     GeometryReader { GeometryProxy in
-                       let _ = (window?.rootViewController as? UIHostingController<GlazedInputView>)?.rootView = GlazedInputView(type: type, value: $value, isPresented: $isPresented, gluazedSuper: gluazedSuper != nil, content: content1, glazedObserver: glazedObserver)
+                        let _ = glazedObserver.contentView[id]?.content = AnyView(content1())
                         Color.clear
                             .preference(key: RectPreferenceKey.self, value: GeometryProxy.frame(in: .global))
                             .onAppear {
-                                dismiss()
-                                if let windowScene = glazedObserver.superWindows?.windowScene {
-                                    value = GlazedHelperValue(buttonFrame: GeometryProxy.frame(in: .global))
-                                    window = GlazedHelper(windowScene: windowScene) {
-                                        GlazedInputView(type: type, value: $value, isPresented: $isPresented, gluazedSuper: gluazedSuper != nil, content: content1, glazedObserver: glazedObserver)
-                                    } hitTist: { point in
-                                        if let value = value {
-                                            switch type {
-                                            case .Popover, .topBottom, .centerPopover:
-                                                if value.Viewframe.contains(point) {
-                                                    return true
-                                                } else if value.buttonFrame.contains(point) {
-                                                    return gluazedSuper != nil
-                                                } else {
-                                                    isPresented = false
-                                                    return gluazedSuper != nil
-                                                }
-                                            case .Sheet:
-                                                return true
-                                            case .FullCover:
-                                                return true
-                                            case .EditPopover, .PopoverWithOutButton:
-                                                if value.Viewframe.contains(point) {
-                                                    return true
-                                                } else {
-                                                    isPresented = false
-                                                    return gluazedSuper != nil
-                                                }
-                                            case .tipPopover:
-                                                return false
-                                            case .Progres, .SharePopover:
-                                                return true
-                                            }
+                                glazedObserver.dismiss(helper: id)
+                                id = UUID()
+                                let Helper = GlazedHelperType(
+                                    content: AnyView(content1()),
+                                    id: id,
+                                    type: type,
+                                    value: GlazedHelperValue(
+                                        buttonFrame: GeometryProxy.frame(in: .global),
+                                        gluazedSuper: gluazedSuper == nil,
+                                        isPrisentDismissAction: {
+                                            isPresented = false
                                         }
-                                        return true
+                                    )) { point, value in
+                                        switch type {
+                                        case .Popover, .topBottom, .centerPopover:
+                                            if value.Viewframe.contains(point) {
+                                                return true
+                                            } else if value.buttonFrame.contains(point) {
+                                                return gluazedSuper != nil
+                                            } else {
+                                                isPresented = false
+                                                return gluazedSuper != nil
+                                            }
+                                        case .Sheet:
+                                            return true
+                                        case .FullCover:
+                                            return true
+                                        case .EditPopover, .PopoverWithOutButton:
+                                            if value.Viewframe.contains(point) {
+                                                return true
+                                            } else {
+                                                isPresented = false
+                                                return gluazedSuper != nil
+                                            }
+                                        case .tipPopover:
+                                            return false
+                                        case .Progres, .SharePopover:
+                                            return true
+                                        }
+                                    }
+                                glazedObserver.contentView[id] = Helper
+                                DispatchQueue.main.async(0.01) {
+                                    withAnimation(.autoAnimation) {
+                                        glazedObserver.contentViewList.append(Helper.id)
                                     }
                                 }
                             }
                             .transition(.identity)
                     }
                     .onPreferenceChange(RectPreferenceKey.self, perform: { rect in
-                        value?.buttonFrame = rect
+                        glazedObserver.contentView[id]?.value.buttonFrame = rect
                     })
                     .onDisappear {
-                        dismiss()
+                        glazedObserver.dismiss(helper: id)
                     }
                     .transition(.identity)
                 }
             }
-    }
-    func dismiss() {
-        var helper = window
-        if window != nil , let value = value {
-            window = nil
-            value.typeDismissAction()
-            helper?.isDis = true
-            DispatchQueue.main.async(1) {
-                helper = nil
-            }
-        }
     }
 }
 

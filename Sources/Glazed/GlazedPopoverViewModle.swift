@@ -11,85 +11,86 @@ protocol GlazedViewModle: View where Body: View {
     @ViewBuilder @MainActor var body: Self.Body { get }
 }
 
-struct GlazedPopoverViewModle<Content: View>: GlazedViewModle {
-    @Binding var value: GlazedHelperValue
+struct GlazedPopoverViewModle: GlazedViewModle {
+    @ObservedObject var value: GlazedHelperValue
     let edit:Bool
     var center:Bool = false
-    let gluazedSuper: Bool
-    
-    @ViewBuilder var content: () -> Content
+   
+    let content: AnyView
+    let GeometryProxy: GeometryProxy
     
     @GestureState var isDrag:Bool = false
     
     let spacing:CGFloat = 8
     
-    @State var maxFrameX:CGFloat = .infinity
-    @State var maxFrameY:CGFloat = .infinity
     @State var scaleX:CGFloat = 0.5
     @State var scaleY:CGFloat = 0.5
     
     @State var showProgres:Double = 0
-    @Environment(\.safeAreaInsets) var safeAreaInsets
     @EnvironmentObject var glazedObserver: GlazedObserver
     
     @State var load = true
     @State var canSet = false
     
+    @State var offsetY:CGFloat = 0
+    @State var offsetX:CGFloat = 0
+    
     var body: some View {
-        GeometryReader { GeometryProxy in
-            content()
-                .shadow(radius: 0.3)
-                .shadow(color: Color(.sRGBLinear, white: 0, opacity: 0.4), radius: 35)
-            
-                .scaleEffect(x: load ? 1 : showProgres, y: load ? 1 : showProgres, anchor: UnitPoint(x: scaleX, y: scaleY))
-                .opacity(load ? 0.01 : 1)
-                .onFrameChange(closure: { CGRec in
-                    if canSet {
-                        withAnimation(.autoAnimation) {
-                            value.Viewframe = CGRec
-                            setValue(GeometryProxy: GeometryProxy)
-                        }
-                    } else if load {
+        content
+            .shadow(radius: 0.3)
+            .shadow(color: Color(.sRGBLinear, white: 0, opacity: 0.4), radius: 35)
+        
+            .scaleEffect(x: load ? 1 : showProgres, y: load ? 1 : showProgres, anchor: UnitPoint(x: scaleX, y: scaleY))
+            .opacity(load ? 0.01 : 1)
+            .onFrameChange(closure: { CGRec in
+                if canSet {
+                    withAnimation(.autoAnimation) {
                         value.Viewframe = CGRec
-                        setValue(onAppear: true, GeometryProxy: GeometryProxy)
-                    } else {
-                        value.Viewframe = CGRec
+                        setValue(GeometryProxy: GeometryProxy)
                     }
-                })
-            
-                .blur(radius: 10 - showProgres * 10)
-            
-                .frame(maxWidth: maxFrameX, maxHeight: maxFrameY)
-                .position(x: value.offsetX, y: value.offsetY)
-                .environment(\.gluzedSuper, value.id)
-                .environment(\.safeAreaInsets, EdgeInsets(top: 16, leading: 16, bottom: 16, trailing: 16))
-                .onChange(of: value.buttonFrame) { value in
-                    if showProgres == 1 {
-                        withAnimation(.autoAnimation) {
-                            setValue(GeometryProxy: GeometryProxy)
-                        }
+                } else if load {
+                    value.Viewframe = CGRec
+                    setValue(onAppear: true, GeometryProxy: GeometryProxy)
+                } else {
+                    value.Viewframe = CGRec
+                    setValue(GeometryProxy: GeometryProxy)
+                }
+            })
+        
+            .blur(radius: 10 - showProgres * 10)
+        
+            .frame(maxWidth: GeometryProxy.size.width - spacing * 2, maxHeight: GeometryProxy.size.height - spacing * 2)
+            .position(x: offsetX, y: offsetY)
+            .environment(\.safeAreaInsets, EdgeInsets(top: 16, leading: 16, bottom: 16, trailing: 16))
+            .onChange(of: value.buttonFrame) { value in
+                if showProgres == 1 {
+                    withAnimation(.autoAnimation) {
+                        setValue(GeometryProxy: GeometryProxy)
                     }
                 }
-        }
-        .background {
-            if gluazedSuper {
-                Color.black.opacity(0.1 * showProgres)
             }
-        }
-        .ignoresSafeArea()
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background {
+                if !value.gluazedSuper {
+                    Color.black.opacity(0.1 * showProgres)
+                }
+            }
     }
     enum PopoverEdge {
         case top, bottom, leading, trailing, center
     }
     func setValue(onAppear:Bool = false, GeometryProxy: GeometryProxy) {
+        
+        let buttonFrame = CGRect(x: value.buttonFrame.minX - GeometryProxy.safeAreaInsets.leading, y: value.buttonFrame.minY - GeometryProxy.safeAreaInsets.top, width: value.buttonFrame.width, height: value.buttonFrame.height)
+        
         let edge:PopoverEdge = {
             if center {
                 return .center
             } else {
-                let leadingSpacing = value.buttonFrame.minX - value.Viewframe.width
-                let topSpacing = value.buttonFrame.minY - value.Viewframe.height
-                let bottomSpacing = GeometryProxy.size.height - value.buttonFrame.maxY - value.Viewframe.height
-                let trailingSpacing = GeometryProxy.size.width - value.buttonFrame.maxX - value.Viewframe.width
+                let leadingSpacing = buttonFrame.minX - value.Viewframe.width
+                let topSpacing = buttonFrame.minY - value.Viewframe.height
+                let bottomSpacing = GeometryProxy.size.height - buttonFrame.maxY - value.Viewframe.height
+                let trailingSpacing = GeometryProxy.size.width - buttonFrame.maxX - value.Viewframe.width
                 if edit {
                     let maxSpacing = max(bottomSpacing,topSpacing)
                     
@@ -111,78 +112,43 @@ struct GlazedPopoverViewModle<Content: View>: GlazedViewModle {
                 }
             }
         }()
-        var ideaX:Double = {
+        
+        let rightWidth = min(GeometryProxy.size.width - spacing * 2, value.Viewframe.width)
+        let rightHeight = min(GeometryProxy.size.height - spacing * 2, value.Viewframe.height)
+        
+        offsetX = {
             switch edge {
             case .top:
-                return value.buttonFrame.midX
+                return buttonFrame.midX
             case .leading:
-                return value.buttonFrame.minX - (value.Viewframe.width / 2) - spacing
+                return max(buttonFrame.minX - (rightWidth / 2) - spacing, rightWidth / 2)
             case .bottom:
-                return value.buttonFrame.midX
+                return buttonFrame.midX
             case .trailing:
-                return value.buttonFrame.maxX + (value.Viewframe.width / 2) + spacing
+                return min(buttonFrame.maxX + (rightWidth / 2) + spacing, GeometryProxy.size.width - rightWidth / 2)
             case .center:
-                return value.buttonFrame.midX
+                return buttonFrame.midX
             }
         }()
-        var ideaY:Double = {
+        
+        offsetY = {
             switch edge {
             case .top:
-                return value.buttonFrame.minY - (value.Viewframe.height / 2) - spacing
+                return max(buttonFrame.minY - (rightHeight / 2) - spacing, rightHeight / 2)
             case .leading:
-                return value.buttonFrame.midY
+                return buttonFrame.midY
             case .bottom:
-                return value.buttonFrame.maxY + (value.Viewframe.height / 2) + spacing
+                return min(buttonFrame.maxY + (rightHeight / 2) + spacing, GeometryProxy.size.height - rightHeight / 2)
             case .trailing:
-                return value.buttonFrame.midY
+                return buttonFrame.midY
             case .center:
-                return value.buttonFrame.midY
+                return buttonFrame.midY
             }
         }()
-        let YBottomSpacing = GeometryProxy.size.height - (ideaY + value.Viewframe.height * 0.5 + max(safeAreaInsets.bottom, 20))
-        let YTopSpacing = (ideaY - value.Viewframe.height * 0.5) - max(safeAreaInsets.top, 20)
-        let XLeftSpacing = (ideaX - value.Viewframe.width * 0.5) - max(safeAreaInsets.leading, 20)
-        let XRightSpacing = GeometryProxy.size.width - (ideaX + value.Viewframe.width * 0.5 + max(safeAreaInsets.trailing, 20))
-        if YBottomSpacing < 0 {
-            ideaY -= abs(YBottomSpacing)
-        }
-        if YTopSpacing < 0 {
-            ideaY += abs(YTopSpacing)
-        }
-        if XLeftSpacing < 0 {
-            ideaX += abs(XLeftSpacing)
-        }
-        if XRightSpacing < 0 {
-            ideaX -= abs(XRightSpacing)
-        }
-        value.offsetX = ideaX
-        value.offsetY = ideaY
         
-        let canUseWidth = GeometryProxy.size.width - spacing * 2
-        let canUseHeight = GeometryProxy.size.height - spacing * 2
-        
-        switch edge {
-        case .top:
-            maxFrameX = canUseWidth
-            maxFrameY = value.buttonFrame.minY - spacing * 2
-        case .leading:
-            maxFrameX = value.buttonFrame.minX - spacing * 2
-            maxFrameY = canUseHeight
-        case .bottom:
-            maxFrameX = canUseWidth
-            maxFrameY = canUseHeight - (value.buttonFrame.maxY - spacing)
-        case .trailing:
-            maxFrameX = canUseWidth - (value.buttonFrame.maxX - spacing)
-            maxFrameY = canUseHeight
-        case .center:
-            maxFrameX = canUseWidth
-            maxFrameY = canUseHeight
-        }
-        let width = min(maxFrameX, value.Viewframe.width)
-        let height = min(maxFrameY, value.Viewframe.height)
-        let ideaScaleX = (value.buttonFrame.midX - value.offsetX) / width
+        let ideaScaleX = (buttonFrame.midX - offsetX) / rightWidth
         scaleX = max(min(0.5 + ideaScaleX, 1.1), -0.1)
-        let ideaScaleY = (value.buttonFrame.midY - value.offsetY) / height
+        let ideaScaleY = (buttonFrame.midY - offsetY) / rightHeight
         scaleY = max(min(0.5 + ideaScaleY, 1.1), -0.1)
         
         load = false

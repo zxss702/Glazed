@@ -18,47 +18,23 @@ extension EnvironmentValues {
     }
 }
 
-struct GlazedHelperValue {
-    var id: UUID = UUID()
+class GlazedHelperValue: ObservableObject {
+    @Published var buttonFrame:CGRect
+    @Published var Viewframe:CGRect = .zero
     
-    var buttonFrame:CGRect
-    var Viewframe:CGRect = .zero
-    
-    var offsetY:CGFloat = 0
-    var offsetX:CGFloat = 0
+    let gluazedSuper:Bool
     
     var typeDismissAction:() -> Void = {}
-}
-class GlazedHelper: UIWindow, Identifiable, ObservableObject {
-    var isDis = false
-    var hitTist:(CGPoint) -> Bool
+    var isPrisentDismissAction:() -> Void
+    var progessDoAction:() -> Void = {}
     
-    init<Content: View>(
-        windowScene: UIWindowScene,
-        @ViewBuilder view: @escaping () -> Content,
-        hitTist: @escaping (CGPoint) -> Bool
-    ) {
-        self.hitTist = hitTist
-        super.init(windowScene: windowScene)
-        self.rootViewController = UIHostingController(rootView: view())
-        self.rootViewController?.view.backgroundColor = .clear
-        self.windowLevel = .alert
-        self.isHidden = false
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
-        let hit1 = super.hitTest(point, with: event)
-        if isDis {
-            return nil
-        } else if event?.type != .hover {
-            return hitTist(point) ? hit1 : nil
-        } else {
-            return hit1
-        }
+    init(buttonFrame: CGRect, Viewframe: CGRect = .zero, gluazedSuper: Bool, typeDismissAction: @escaping () -> Void = {}, isPrisentDismissAction: @escaping () -> Void, progessDoAction: @escaping () -> Void = {}) {
+        self.buttonFrame = buttonFrame
+        self.Viewframe = Viewframe
+        self.gluazedSuper = gluazedSuper
+        self.typeDismissAction = typeDismissAction
+        self.isPrisentDismissAction = isPrisentDismissAction
+        self.progessDoAction = progessDoAction
     }
 }
 
