@@ -48,7 +48,7 @@ class GlazedEnvironmentUIView<Content: View>: UIViewController {
         ])
         let hittest = GlazedEnvironmentHitTest(RootView: RootView)
         view.addSubview(hittest )
-        hittest .translatesAutoresizingMaskIntoConstraints = false
+        hittest.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             hittest.topAnchor.constraint(equalTo: view.topAnchor, constant: 0),
             hittest.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 0),

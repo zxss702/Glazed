@@ -226,6 +226,7 @@ struct GlazedInputViewModle<Content1: View>: ViewModifier {
                         glazedObserver.dismiss(helper: id)
                     }
                     .transition(.identity)
+                    .allowsHitTesting(false)
                 }
             }
     }
