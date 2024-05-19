@@ -21,7 +21,11 @@ class GlazedEnvironmentHitTest<Content: View>: UIView {
     
     override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
         let h = super.hitTest(point, with: event)
-        return RootView.hitTest(point) ? nil : h
+        if event?.type != .hover {
+            return RootView.hitTest(point) ? nil : h
+        } else {
+            return h
+        }
     }
 }
 

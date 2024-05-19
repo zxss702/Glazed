@@ -72,7 +72,7 @@ struct GlazedPopoverViewModle: GlazedViewModle {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background {
                 if !value.gluazedSuper {
-                    Color.black.opacity(0.1 * showProgres)
+                    Color.black.opacity(0.1 * showProgres).ignoresSafeArea()
                 }
             }
     }
