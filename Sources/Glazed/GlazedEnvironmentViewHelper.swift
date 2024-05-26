@@ -11,7 +11,7 @@ struct GlazedEnvironmentViewHelper<Content: View>: UIViewControllerRepresentable
     typealias UIViewControllerType = GlazedEnvironmentUIView<Content>
     
     @ViewBuilder var content:() -> Content
-    var hitTest:(CGPoint) -> Bool
+    var hitTest:(CGPoint) -> Void
     
     @EnvironmentObject var glazedObserver:GlazedObserver
     func makeUIViewController(context: Context) -> GlazedEnvironmentUIView<Content> {

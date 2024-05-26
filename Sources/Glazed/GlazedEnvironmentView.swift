@@ -12,11 +12,11 @@ class GlazedHelperType: Identifiable {
     var id: UUID = UUID()
     var type: GlazedType
     var value: GlazedHelperValue
-    var hitTest: (CGPoint, GlazedHelperValue) -> Bool
+    var hitTest: (CGPoint, GlazedHelperValue) -> Void
     
     var isDismiss = false
     
-    init(content: AnyView, id: UUID = UUID(), type: GlazedType, value: GlazedHelperValue, hitTest: @escaping (CGPoint, GlazedHelperValue) -> Bool, isDismiss: Bool = false) {
+    init(content: AnyView, id: UUID = UUID(), type: GlazedType, value: GlazedHelperValue, hitTest: @escaping (CGPoint, GlazedHelperValue) -> Void, isDismiss: Bool = false) {
         self.content = content
         self.id = id
         self.type = type
@@ -83,7 +83,7 @@ struct GlazedEnvironmentViewModle: ViewModifier {
                         isPrisentDismissAction: { },
                         progessDoAction: action
                     )) { point, value in
-                        return true
+                        
                     }
                 glazedObserver.contentView[Helper.id] = Helper
                 DispatchQueue.main.async(0.01) {
@@ -123,9 +123,8 @@ public struct GlazedEnvironmentView<Content: View>: View {
                     }),
                     let lastContent = glazedObserver.contentView[last]
                 {
-                   return lastContent.hitTest(point, lastContent.value)
+                    lastContent.hitTest(point, lastContent.value)
                 }
-                return true
             }
             .modifier(GlazedEnvironmentViewModle(glazedObserver: glazedObserver))
             .environmentObject(glazedObserver)

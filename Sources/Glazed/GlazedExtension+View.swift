@@ -185,29 +185,21 @@ struct GlazedInputViewModle<Content1: View>: ViewModifier {
                                     )) { point, value in
                                         switch type {
                                         case .Popover, .topBottom, .centerPopover:
-                                            if value.Viewframe.contains(point) {
-                                                return true
-                                            } else if value.buttonFrame.contains(point) {
-                                                return gluazedSuper != nil
-                                            } else {
+                                            if !value.Viewframe.contains(point) && !value.buttonFrame.contains(point) {
                                                 isPresented = false
-                                                return gluazedSuper != nil
                                             }
                                         case .Sheet:
-                                            return true
+                                            break
                                         case .FullCover:
-                                            return true
+                                            break
                                         case .EditPopover, .PopoverWithOutButton:
-                                            if value.Viewframe.contains(point) {
-                                                return true
-                                            } else {
+                                            if !value.Viewframe.contains(point) {
                                                 isPresented = false
-                                                return gluazedSuper != nil
                                             }
                                         case .tipPopover:
-                                            return false
+                                            break
                                         case .Progres, .SharePopover:
-                                            return true
+                                            break
                                         }
                                     }
                                 glazedObserver.contentView[id] = Helper

@@ -20,12 +20,8 @@ class GlazedEnvironmentHitTest<Content: View>: UIView {
     }
     
     override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
-        let h = super.hitTest(point, with: event)
-        if event?.type != .hover {
-            return RootView.hitTest(point) ? nil : h
-        } else {
-            return h
-        }
+        RootView.hitTest(point)
+        return nil
     }
 }
 
@@ -51,7 +47,7 @@ class GlazedEnvironmentUIView<Content: View>: UIViewController {
             HostVC!.view.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 0)
         ])
         let hittest = GlazedEnvironmentHitTest(RootView: RootView)
-        view.addSubview(hittest )
+        view.addSubview(hittest)
         hittest.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             hittest.topAnchor.constraint(equalTo: view.topAnchor, constant: 0),
@@ -73,26 +69,7 @@ class GlazedEnvironmentUIView<Content: View>: UIViewController {
     func setContent() {
         HostVC?.rootView = RootView.content()
     }
-    
-    
 }
-
-//
-//class GlazedEnvironmentUIView: UIViewController {
-//    let RootView:GlazedEnvironmentViewHelper
-//    init(RootView: GlazedEnvironmentViewHelper) {
-//        self.RootView = RootView
-//        super.init(nibName: nil, bundle: nil)
-//    }
-//    
-//    required init?(coder: NSCoder) {
-//        fatalError("init(coder:) has not been implemented")
-//    }
-//    
-//    override func viewDidAppear(_ animated: Bool) {
-        
-//    }
-//}
 
 struct blurModifier: ViewModifier {
     let state:Bool
