@@ -29,7 +29,6 @@ struct GlazedPopoverViewModle: GlazedViewModle {
     @State var showProgres:Double = 0
     @EnvironmentObject var glazedObserver: GlazedObserver
     
-    @State var load = true
     @State var canSet = false
     
     @State var offsetY:CGFloat = 0
@@ -40,20 +39,16 @@ struct GlazedPopoverViewModle: GlazedViewModle {
             .shadow(radius: 0.3)
             .shadow(color: Color(.sRGBLinear, white: 0, opacity: 0.4), radius: 35)
         
-            .scaleEffect(x: load ? 1 : showProgres, y: load ? 1 : showProgres, anchor: UnitPoint(x: scaleX, y: scaleY))
-            .opacity(load ? 0.01 : 1)
+            .scaleEffect(x: showProgres, y: showProgres, anchor: UnitPoint(x: scaleX, y: scaleY))
             .onFrameChange(closure: { CGRec in
                 if canSet {
                     withAnimation(.autoAnimation) {
                         value.Viewframe = CGRec
                         setValue(GeometryProxy: GeometryProxy)
                     }
-                } else if load {
-                    value.Viewframe = CGRec
-                    setValue(onAppear: true, GeometryProxy: GeometryProxy)
                 } else {
                     value.Viewframe = CGRec
-                    setValue(GeometryProxy: GeometryProxy)
+                    setValue(onAppear: showProgres == 0, GeometryProxy: GeometryProxy)
                 }
             })
         
@@ -151,7 +146,6 @@ struct GlazedPopoverViewModle: GlazedViewModle {
         let ideaScaleY = (buttonFrame.midY - offsetY) / rightHeight
         scaleY = max(min(0.5 + ideaScaleY, 1.1), -0.1)
         
-        load = false
         if onAppear {
             value.typeDismissAction = {
                 withAnimation(.autoAnimation(speed: 1.2)) {
