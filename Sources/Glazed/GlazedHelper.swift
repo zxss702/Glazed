@@ -19,6 +19,7 @@ extension EnvironmentValues {
 }
 
 class GlazedHelperValue: ObservableObject {
+    @Published var content: AnyView
     @Published var buttonFrame:CGRect
     @Published var Viewframe:CGRect = .zero
     
@@ -28,13 +29,14 @@ class GlazedHelperValue: ObservableObject {
     var isPrisentDismissAction:() -> Void
     var progessDoAction:() -> Void = {}
     
-    init(buttonFrame: CGRect, Viewframe: CGRect = .zero, gluazedSuper: Bool, typeDismissAction: @escaping () -> Void = {}, isPrisentDismissAction: @escaping () -> Void, progessDoAction: @escaping () -> Void = {}) {
+    init(buttonFrame: CGRect, Viewframe: CGRect = .zero, gluazedSuper: Bool, content: AnyView, typeDismissAction: @escaping () -> Void = {}, isPrisentDismissAction: @escaping () -> Void, progessDoAction: @escaping () -> Void = {}) {
         self.buttonFrame = buttonFrame
         self.Viewframe = Viewframe
         self.gluazedSuper = gluazedSuper
         self.typeDismissAction = typeDismissAction
         self.isPrisentDismissAction = isPrisentDismissAction
         self.progessDoAction = progessDoAction
+        self.content = content
     }
 }
 

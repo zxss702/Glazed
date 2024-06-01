@@ -16,7 +16,6 @@ struct GlazedPopoverViewModle: GlazedViewModle {
     let edit:Bool
     var center:Bool = false
    
-    let content: AnyView
     let GeometryProxy: GeometryProxy
     
     @GestureState var isDrag:Bool = false
@@ -35,7 +34,7 @@ struct GlazedPopoverViewModle: GlazedViewModle {
     @State var offsetX:CGFloat = 0
     
     var body: some View {
-        content
+        value.content
             .shadow(radius: 0.3)
             .shadow(color: Color(.sRGBLinear, white: 0, opacity: 0.4), radius: 35)
         

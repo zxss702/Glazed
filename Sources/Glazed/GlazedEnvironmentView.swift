@@ -8,7 +8,6 @@
 import SwiftUI
 
 class GlazedHelperType: Identifiable {
-    var content: AnyView
     var id: UUID = UUID()
     var type: GlazedType
     var value: GlazedHelperValue
@@ -16,8 +15,7 @@ class GlazedHelperType: Identifiable {
     
     var isDismiss = false
     
-    init(content: AnyView, id: UUID = UUID(), type: GlazedType, value: GlazedHelperValue, hitTest: @escaping (CGPoint, GlazedHelperValue) -> Void, isDismiss: Bool = false) {
-        self.content = content
+    init(id: UUID = UUID(), type: GlazedType, value: GlazedHelperValue, hitTest: @escaping (CGPoint, GlazedHelperValue) -> Void, isDismiss: Bool = false) {
         self.id = id
         self.type = type
         self.value = value
@@ -27,7 +25,9 @@ class GlazedHelperType: Identifiable {
 }
 
 public class GlazedObserver: ObservableObject {
+    #if !os(macOS)
     @Published var superWindows: UIWindow? = nil
+    #endif
     var contentView:[UUID:GlazedHelperType] = [:]
     @Published var contentViewList:[UUID] = []
     
@@ -35,7 +35,7 @@ public class GlazedObserver: ObservableObject {
         if let lastContent = contentView[last], !lastContent.isDismiss {
             switch lastContent.type {
             case .Sheet, .FullCover:
-                lastContent.value.isPrisentDismissAction()
+                contentView[last]?.value.isPrisentDismissAction()
                 if let int = contentViewList.firstIndex(of: last) {
                     withAnimation(.autoAnimation) {
                         _ = contentViewList.remove(at: int)
@@ -45,9 +45,9 @@ public class GlazedObserver: ObservableObject {
                     contentView.removeValue(forKey: last)
                 }
             default :
-                lastContent.value.isPrisentDismissAction()
-                lastContent.value.typeDismissAction()
-                lastContent.isDismiss = true
+                contentView[last]?.value.isPrisentDismissAction()
+                contentView[last]?.value.typeDismissAction()
+                contentView[last]?.isDismiss = true
                 DispatchQueue.main.async(1) { [self] in
                     if let int = contentViewList.firstIndex(of: last) {
                         contentViewList.remove(at: int)
@@ -66,20 +66,19 @@ public class GlazedObserver: ObservableObject {
 }
 
 struct GlazedEnvironmentViewModle: ViewModifier {
-//    @State var window: GlazedHelper? = nil
     @ObservedObject var glazedObserver:GlazedObserver
     
     func body(content: Content) -> some View {
         
         content
             .environment(\.glazedDoAction) { [self] action in
-                
                 let Helper = GlazedHelperType(
-                    content: AnyView(EmptyView()),
+                    
                     type: .Progres,
                     value: GlazedHelperValue(
                         buttonFrame: .zero,
                         gluazedSuper: false,
+                        content: AnyView(EmptyView()),
                         isPrisentDismissAction: { },
                         progessDoAction: action
                     )) { point, value in
@@ -93,16 +92,6 @@ struct GlazedEnvironmentViewModle: ViewModifier {
                 }
             }
     }
-//    func dismiss() {
-//        var helper = window
-//        if window != nil {
-//            window = nil
-//            helper?.isDis = true
-//            DispatchQueue.main.async(1) {
-//                helper = nil
-//            }
-//        }
-//    }
 }
 public struct GlazedEnvironmentView<Content: View>: View {
     let content:() -> Content
@@ -128,7 +117,9 @@ public struct GlazedEnvironmentView<Content: View>: View {
             }
             .modifier(GlazedEnvironmentViewModle(glazedObserver: glazedObserver))
             .environmentObject(glazedObserver)
+            #if !os(macOS)
             .environment(\.window, glazedObserver.superWindows)
+            #endif
             .ignoresSafeArea()
             .environment(\.safeAreaInsets, geometry.safeAreaInsets)
         }
@@ -145,7 +136,7 @@ struct GlazedEnvironmentViewCell<Content: View>: View {
             ForEach(glazedObserver.contentViewList, id: \.self) { view in
                 let zindex = glazedObserver.contentViewList.firstIndex(of: view) ?? 10000
                 if let Helper = glazedObserver.contentView[view] {
-                    GlazedInputView(type: Helper.type, helper: Helper, content: Helper.content, GeometryProxy: geometry, zindex: zindex * 3 + 1)
+                    GlazedInputView(type: Helper.type, helper: Helper, GeometryProxy: geometry, zindex: zindex * 3 + 1)
                         .environment(\.gluzedSuper, view)
                         .environment(\.glazedDismiss, {
                             glazedObserver.dismiss(helper: view)

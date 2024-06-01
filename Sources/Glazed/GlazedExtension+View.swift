@@ -17,7 +17,9 @@ struct TapButtonStyle: ButtonStyle {
             .scaleEffect(x: scale, y: scale)
             .foregroundColor(.accentColor)
             .contentShape(Rectangle())
+        #if !os(macOS)
             .hoverEffect(.automatic)
+        #endif
             .onChange(of: configuration.isPressed, perform: { newValue in
                 if newValue {
                     AudioServicesPlaySystemSound(1519)
@@ -124,27 +126,26 @@ struct GlazedInputView: View {
     let type: GlazedType
     let helper: GlazedHelperType
     
-    let content: AnyView
     let GeometryProxy: GeometryProxy
     let zindex:Int
     
     var body: some View {
         switch type {
         case .Popover, .SharePopover, .PopoverWithOutButton:
-            GlazedPopoverViewModle(value: helper.value, edit: false, content: content, GeometryProxy: GeometryProxy)
+            GlazedPopoverViewModle(value: helper.value, edit: false, GeometryProxy: GeometryProxy)
                 .zIndex(Double(zindex))
         case .Sheet:
-            GlazedSheetViewModle(value: helper.value, content: content, GeometryProxy: GeometryProxy, zindex: zindex)
+            GlazedSheetViewModle(value: helper.value, GeometryProxy: GeometryProxy, zindex: zindex)
         case .FullCover:
-            GlazedFullCoverViewModle(value: helper.value, content: content, zindex: zindex, GeometryProxy: GeometryProxy)
+            GlazedFullCoverViewModle(value: helper.value, zindex: zindex, GeometryProxy: GeometryProxy)
         case .EditPopover, .tipPopover, .topBottom:
-            GlazedPopoverViewModle(value: helper.value, edit: true, content: content, GeometryProxy: GeometryProxy)
+            GlazedPopoverViewModle(value: helper.value, edit: true, GeometryProxy: GeometryProxy)
                 .zIndex(Double(zindex))
         case .Progres:
             GlazedProgresViewModle(value: helper.value)
                 .zIndex(10000000000)
         case .centerPopover:
-            GlazedPopoverViewModle(value: helper.value, edit: false, center: true, content: content, GeometryProxy: GeometryProxy)
+            GlazedPopoverViewModle(value: helper.value, edit: false, center: true, GeometryProxy: GeometryProxy)
                 .zIndex(Double(zindex))
         }
     }
@@ -166,19 +167,21 @@ struct GlazedInputViewModle<Content1: View>: ViewModifier {
             .overlay {
                 if isPresented {
                     GeometryReader { GeometryProxy in
-                        let _ = glazedObserver.contentView[id]?.content = AnyView(content1())
+                        let _ = withAnimation(.autoAnimation) {
+                            glazedObserver.contentView[id]?.value.content = AnyView(content1())
+                        }
                         Color.clear
                             .preference(key: RectPreferenceKey.self, value: GeometryProxy.frame(in: .global))
                             .onAppear {
                                 glazedObserver.dismiss(helper: id)
                                 id = UUID()
                                 let Helper = GlazedHelperType(
-                                    content: AnyView(content1()),
                                     id: id,
                                     type: type,
                                     value: GlazedHelperValue(
                                         buttonFrame: GeometryProxy.frame(in: .global),
                                         gluazedSuper: gluazedSuper == nil,
+                                        content: AnyView(content1()),
                                         isPrisentDismissAction: {
                                             isPresented = false
                                         }

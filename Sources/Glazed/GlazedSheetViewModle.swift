@@ -11,13 +11,13 @@ struct GlazedSheetViewClliShape: Shape {
     let bool: Bool
     
     func path(in rect: CGRect) -> Path {
-        return Path(UIBezierPath(roundedRect: rect, byRoundingCorners: bool ? [.topLeft, .topRight, .bottomLeft, .bottomRight] : [.topLeft, .topRight], cornerRadii: CGSize(width: 17, height: 17)).cgPath)
+        return Path(roundedRect: rect, cornerRadii: RectangleCornerRadii(topLeading: 17, bottomLeading: bool ? 17 : 0, bottomTrailing: bool ? 17 : 0, topTrailing: 17), style: .continuous)
+        
     }
 }
 
 struct GlazedSheetViewModle: GlazedViewModle {
     @ObservedObject var value: GlazedHelperValue
-    let content: AnyView
     let GeometryProxy: GeometryProxy
     let zindex:Int
     
@@ -42,15 +42,10 @@ struct GlazedSheetViewModle: GlazedViewModle {
             )
         
         let cneterORbottom = value.Viewframe.size.width < GeometryProxy.size.width
-        let shape = UnevenRoundedRectangle(
-            topLeadingRadius: max(GeometryProxy.safeAreaInsets.top, GeometryProxy.safeAreaInsets.leading),
-            bottomLeadingRadius: max(GeometryProxy.safeAreaInsets.bottom, GeometryProxy.safeAreaInsets.leading),
-            bottomTrailingRadius: max(GeometryProxy.safeAreaInsets.bottom, GeometryProxy.safeAreaInsets.trailing),
-            topTrailingRadius: max(GeometryProxy.safeAreaInsets.top, GeometryProxy.safeAreaInsets.trailing),
-            style: .continuous
-        )
+        let radius = min(max(max(GeometryProxy.safeAreaInsets.top, GeometryProxy.safeAreaInsets.leading),max(GeometryProxy.safeAreaInsets.bottom, GeometryProxy.safeAreaInsets.leading)), max(max(GeometryProxy.safeAreaInsets.bottom, GeometryProxy.safeAreaInsets.trailing), max(GeometryProxy.safeAreaInsets.top, GeometryProxy.safeAreaInsets.trailing)))
+        let shape = RoundedRectangle(cornerRadius: radius, style: .continuous)
         
-        content
+        value.content
             .clipShape(shape)
             .background(shape.fill(.background).ignoresSafeArea())
             

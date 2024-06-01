@@ -16,7 +16,6 @@ func avg(_ l: CGFloat...) -> CGFloat {
 }
 struct GlazedFullCoverViewModle: GlazedViewModle {
     @ObservedObject var value: GlazedHelperValue
-    let content: AnyView
     let zindex:Int
     let GeometryProxy: GeometryProxy
     
@@ -34,13 +33,8 @@ struct GlazedFullCoverViewModle: GlazedViewModle {
             .transition(.opacity)
             .ignoresSafeArea()
         
-        let shape = UnevenRoundedRectangle(
-            topLeadingRadius: avg(GeometryProxy.safeAreaInsets.top, GeometryProxy.safeAreaInsets.leading),
-            bottomLeadingRadius: avg(GeometryProxy.safeAreaInsets.bottom, GeometryProxy.safeAreaInsets.leading),
-            bottomTrailingRadius: avg(GeometryProxy.safeAreaInsets.bottom, GeometryProxy.safeAreaInsets.trailing),
-            topTrailingRadius: avg(GeometryProxy.safeAreaInsets.top, GeometryProxy.safeAreaInsets.trailing),
-            style: .circular
-        )
+        let radius = min(max(max(GeometryProxy.safeAreaInsets.top, GeometryProxy.safeAreaInsets.leading),max(GeometryProxy.safeAreaInsets.bottom, GeometryProxy.safeAreaInsets.leading)), max(max(GeometryProxy.safeAreaInsets.bottom, GeometryProxy.safeAreaInsets.trailing), max(GeometryProxy.safeAreaInsets.top, GeometryProxy.safeAreaInsets.trailing)))
+        let shape = RoundedRectangle(cornerRadius: radius, style: .continuous)
         
         shape
             .fill(.background)
@@ -62,7 +56,7 @@ struct GlazedFullCoverViewModle: GlazedViewModle {
                     }
             )
         
-        content
+        value.content
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .clipShape(shape)
             .compositingGroup()
