@@ -18,8 +18,22 @@ extension EnvironmentValues {
     }
 }
 
+
+struct HostingViewModle: UIViewRepresentable {
+    let hosting: UIHostingController<AnyView>
+    
+    typealias UIViewType = UIView
+    
+    func makeUIView(context: Context) -> UIView {
+        return hosting.view
+    }
+    func updateUIView(_ uiView: UIView, context: Context) {
+        
+    }
+}
+
 final class GlazedHelperValue: ObservableObject {
-    @Published var content: AnyView
+    @Published var content: UIHostingController<AnyView>
     @Published var buttonFrame:CGRect
     @Published var Viewframe:CGRect = .zero
     
@@ -36,7 +50,7 @@ final class GlazedHelperValue: ObservableObject {
         self.typeDismissAction = typeDismissAction
         self.isPrisentDismissAction = isPrisentDismissAction
         self.progessDoAction = progessDoAction
-        self.content = content
+        self.content = UIHostingController(rootView: content)
     }
 }
 

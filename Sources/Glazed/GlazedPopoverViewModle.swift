@@ -34,7 +34,7 @@ struct GlazedPopoverViewModle: GlazedViewModle {
     @State var offsetX:CGFloat = 0
     
     var body: some View {
-        value.content
+        HostingViewModle(hosting: value.content)
             .shadow(radius: 0.3)
             .shadow(color: Color(.sRGBLinear, white: 0, opacity: 0.4), radius: 35)
         
@@ -215,7 +215,7 @@ struct GlazedFullPopoverViewModle: GlazedViewModle {
     @State var canSet = false
     
     var body: some View {
-        value.content
+        HostingViewModle(hosting: value.content)
             .shadow(radius: 0.3)
             .shadow(color: Color(.sRGBLinear, white: 0, opacity: 0.4), radius: 35)
         

@@ -164,7 +164,9 @@ struct GlazedInputView: View {
         }
     }
 }
-
+func animation(animation: @escaping () -> Void, completion: @escaping (Bool) -> Void = {_ in }) {
+    UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.825, initialSpringVelocity: 0.6, options: UIView.AnimationOptions.allowUserInteraction, animations: animation, completion: completion)
+}
 struct GlazedInputViewModle<Content1: View>: ViewModifier {
     let type:GlazedType
     @Binding var isPresented:Bool
@@ -181,8 +183,10 @@ struct GlazedInputViewModle<Content1: View>: ViewModifier {
             .overlay {
                 if isPresented {
                     GeometryReader { GeometryProxy in
-                        let _ = withAnimation(.autoAnimation) {
-                            glazedObserver.contentView[id]?.value.content = AnyView(content1())
+                        let _ = DispatchQueue.main.async {
+                            Glazed.animation {
+                                glazedObserver.contentView[id]?.value.content.rootView = AnyView(content1())
+                            }
                         }
                         Color.clear
                             .preference(key: RectPreferenceKey.self, value: GeometryProxy.frame(in: .global))
