@@ -213,18 +213,20 @@ struct GlazedFullPopoverViewModle: GlazedViewModle {
     @State var scaleY:CGFloat = 0.5
     
     @State var showProgres:Double = 0
+    @State var showProgresX:Double = 0
+    @State var showProgresY:Double = 0
+    
     @EnvironmentObject var glazedObserver: GlazedObserver
     
     @State var canSet = false
     
     var body: some View {
         HostingViewModle(hosting: value.content, value: value)
-            .shadow(radius: 0.3)
             .shadow(color: Color(.sRGBLinear, white: 0, opacity: 0.4), radius: 35)
-        
+            .blur(radius: 10 * (1 - showProgres))
             .clipShape(RoundedRectangle(cornerRadius: canSet ? 0 : 12, style: .continuous))
         
-            .scaleEffect(x: showProgres, y: showProgres, anchor: UnitPoint(x: scaleX, y: scaleY))
+            .scaleEffect(x: showProgresX, y: showProgresY, anchor: UnitPoint(x: scaleX, y: scaleY))
             .onFrameChange(closure: { CGRec in
                 if canSet {
                     withAnimation(.autoAnimation) {
@@ -264,6 +266,9 @@ struct GlazedFullPopoverViewModle: GlazedViewModle {
         let ideaScaleY = (buttonFrame.midY - offsetY) / rightHeight
         scaleY = max(min(0.5 + ideaScaleY, 1.1), -0.1)
         
+        showProgresX = buttonFrame.width / GeometryProxy.size.width
+        showProgresY = buttonFrame.height / GeometryProxy.size.height
+        
         if onAppear {
             value.typeDismissAction = {
                 withAnimation(.autoAnimation(speed: 1.2)) {
@@ -272,6 +277,8 @@ struct GlazedFullPopoverViewModle: GlazedViewModle {
             }
             withAnimation(.autoAnimation(speed: 1.5)) {
                 showProgres = 1
+                showProgresX = 1
+                showProgresY = 1
             }
             DispatchQueue.main.async(0.5) {
                 canSet = true
