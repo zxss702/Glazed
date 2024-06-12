@@ -41,6 +41,6 @@ class GlazedHelperValue: ObservableObject {
 }
 
 enum GlazedType: Equatable {
-    case Popover, Sheet, FullCover, EditPopover, PopoverWithOutButton, tipPopover, SharePopover, centerPopover, topBottom
+    case Popover, Sheet, FullCover, EditPopover, PopoverWithOutButton, tipPopover, SharePopover, centerPopover, topBottom, fullPopover
     case Progres
 }

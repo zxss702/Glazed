@@ -15,7 +15,7 @@ struct GlazedPopoverViewModle: GlazedViewModle {
     @ObservedObject var value: GlazedHelperValue
     let edit:Bool
     var center:Bool = false
-   
+    
     let GeometryProxy: GeometryProxy
     
     @GestureState var isDrag:Bool = false
@@ -195,5 +195,81 @@ struct RoundedCorners: InsettableShape {
         var rectangle = self
         rectangle.insetAmount += amount
         return rectangle
+    }
+}
+
+struct GlazedFullPopoverViewModle: GlazedViewModle {
+    @ObservedObject var value: GlazedHelperValue
+    
+    let GeometryProxy: GeometryProxy
+    
+    @GestureState var isDrag:Bool = false
+    
+    @State var scaleX:CGFloat = 0.5
+    @State var scaleY:CGFloat = 0.5
+    
+    @State var showProgres:Double = 0
+    @EnvironmentObject var glazedObserver: GlazedObserver
+    
+    @State var canSet = false
+    
+    var body: some View {
+        value.content
+            .shadow(radius: 0.3)
+            .shadow(color: Color(.sRGBLinear, white: 0, opacity: 0.4), radius: 35)
+        
+            .scaleEffect(x: showProgres, y: showProgres, anchor: UnitPoint(x: scaleX, y: scaleY))
+            .onFrameChange(closure: { CGRec in
+                if canSet {
+                    withAnimation(.autoAnimation) {
+                        value.Viewframe = CGRec
+                        setValue(GeometryProxy: GeometryProxy)
+                    }
+                } else {
+                    value.Viewframe = CGRec
+                    setValue(onAppear: showProgres == 0, GeometryProxy: GeometryProxy)
+                }
+            })
+            .environment(\.safeAreaInsets, EdgeInsets(top: 16, leading: 16, bottom: 16, trailing: 16))
+        
+            .onChange(of: value.buttonFrame) { value in
+                if showProgres == 1 {
+                    withAnimation(.autoAnimation) {
+                        setValue(GeometryProxy: GeometryProxy)
+                    }
+                }
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+    
+    func setValue(onAppear:Bool = false, GeometryProxy: GeometryProxy) {
+        
+        let buttonFrame = CGRect(x: value.buttonFrame.minX - GeometryProxy.safeAreaInsets.leading, y: value.buttonFrame.minY - GeometryProxy.safeAreaInsets.top, width: value.buttonFrame.width, height: value.buttonFrame.height)
+        
+        
+        let rightWidth = min(GeometryProxy.size.width, value.Viewframe.width)
+        let rightHeight = min(GeometryProxy.size.height, value.Viewframe.height)
+        
+        let offsetX = min(max(buttonFrame.midX, rightWidth / 2), GeometryProxy.size.width - rightWidth / 2)
+        let offsetY = min(max(buttonFrame.midY, rightHeight / 2), GeometryProxy.size.height - rightHeight / 2)
+        
+        let ideaScaleX = (buttonFrame.midX - offsetX) / rightWidth
+        scaleX = max(min(0.5 + ideaScaleX, 1.1), -0.1)
+        let ideaScaleY = (buttonFrame.midY - offsetY) / rightHeight
+        scaleY = max(min(0.5 + ideaScaleY, 1.1), -0.1)
+        
+        if onAppear {
+            value.typeDismissAction = {
+                withAnimation(.autoAnimation(speed: 1.2)) {
+                    showProgres = 0
+                }
+            }
+            withAnimation(.autoAnimation(speed: 1.5)) {
+                showProgres = 1
+            }
+            DispatchQueue.main.async(0.5) {
+                canSet = true
+            }
+        }
     }
 }

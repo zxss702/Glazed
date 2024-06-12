@@ -120,6 +120,18 @@ public extension View {
                     
             }))
     }
+    func fullPopover<Content: View>(isPresented: Binding<Bool>, ignorTouch:Bool = false, @ViewBuilder content: @escaping () -> Content) -> some View {
+        self
+            .scaleEffect(x: isPresented.wrappedValue ? 0.95 : 1, y: isPresented.wrappedValue ? 0.95 : 1)
+            .blur(radius: isPresented.wrappedValue ? 20 : 0)
+            .animation(.autoAnimation, value: isPresented.wrappedValue)
+            .modifier(GlazedInputViewModle(type: .fullPopover, isPresented: isPresented, content1: {
+                content()
+                    .buttonStyle(TapButtonStyle())
+                    .background(.background)
+                    .clipped()
+            }))
+    }
 }
 
 struct GlazedInputView: View {
@@ -147,6 +159,9 @@ struct GlazedInputView: View {
         case .centerPopover:
             GlazedPopoverViewModle(value: helper.value, edit: false, center: true, GeometryProxy: GeometryProxy)
                 .zIndex(Double(zindex))
+        case .fullPopover:
+            GlazedFullPopoverViewModle(value: helper.value, GeometryProxy: GeometryProxy)
+                .zIndex(Double(zindex))
         }
     }
 }
@@ -167,8 +182,10 @@ struct GlazedInputViewModle<Content1: View>: ViewModifier {
             .overlay {
                 if isPresented {
                     GeometryReader { GeometryProxy in
-                        let _ = withAnimation(.autoAnimation) {
-                            glazedObserver.contentView[id]?.value.content = AnyView(content1())
+                        let _ = DispatchQueue.main.async {
+                            withAnimation(.autoAnimation) {
+                                glazedObserver.contentView[id]?.value.content = AnyView(content1())
+                            }
                         }
                         Color.clear
                             .preference(key: RectPreferenceKey.self, value: GeometryProxy.frame(in: .global))
@@ -202,6 +219,8 @@ struct GlazedInputViewModle<Content1: View>: ViewModifier {
                                         case .tipPopover:
                                             break
                                         case .Progres, .SharePopover:
+                                            break
+                                        case .fullPopover:
                                             break
                                         }
                                     }
