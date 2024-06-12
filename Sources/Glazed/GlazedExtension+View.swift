@@ -184,7 +184,7 @@ struct GlazedInputViewModle<Content1: View>: ViewModifier {
                 if isPresented {
                     GeometryReader { GeometryProxy in
                         let _ = DispatchQueue.main.async {
-                            Glazed.animation {
+                            withAnimation(.autoAnimation) {
                                 glazedObserver.contentView[id]?.value.content.rootView = AnyView(content1())
                             }
                         }

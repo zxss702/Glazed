@@ -26,7 +26,8 @@ struct HostingViewModle: UIViewRepresentable {
     
     @Environment(\.safeAreaInsets) var safeAreaInsets
     func makeUIView(context: Context) -> UIView {
-        hosting.additionalSafeAreaInsets = UIEdgeInsets(top: safeAreaInsets.top, left: safeAreaInsets.leading, bottom: safeAreaInsets.bottom, right: safeAreaInsets.trailing)
+        hosting.navigationController?.additionalSafeAreaInsets = UIEdgeInsets(top: safeAreaInsets.top, left: safeAreaInsets.leading, bottom: safeAreaInsets.bottom, right: safeAreaInsets.trailing)
+        hosting.view.isUserInteractionEnabled = true
         return hosting.view
     }
     func updateUIView(_ uiView: UIView, context: Context) {
