@@ -201,6 +201,7 @@ struct RoundedCorners: InsettableShape {
 struct GlazedFullPopoverViewModle: GlazedViewModle {
     @ObservedObject var value: GlazedHelperValue
     
+    
     let GeometryProxy: GeometryProxy
     
     @GestureState var isDrag:Bool = false
