@@ -122,8 +122,7 @@ public extension View {
     }
     func fullPopover<Content: View>(isPresented: Binding<Bool>, ignorTouch:Bool = false, @ViewBuilder content: @escaping () -> Content) -> some View {
         self
-            .scaleEffect(x: isPresented.wrappedValue ? 0.95 : 1, y: isPresented.wrappedValue ? 0.95 : 1)
-            .blur(radius: isPresented.wrappedValue ? 20 : 0)
+            .scaleEffect(x: isPresented.wrappedValue ? 0 : 1, y: isPresented.wrappedValue ? 0 : 1)
             .animation(.autoAnimation, value: isPresented.wrappedValue)
             .modifier(GlazedInputViewModle(type: .fullPopover, isPresented: isPresented, content1: {
                 content()

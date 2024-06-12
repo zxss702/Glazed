@@ -231,7 +231,6 @@ struct GlazedFullPopoverViewModle: GlazedViewModle {
                     setValue(onAppear: showProgres == 0, GeometryProxy: GeometryProxy)
                 }
             })
-            .environment(\.safeAreaInsets, EdgeInsets(top: 16, leading: 16, bottom: 16, trailing: 16))
         
             .onChange(of: value.buttonFrame) { value in
                 if showProgres == 1 {
