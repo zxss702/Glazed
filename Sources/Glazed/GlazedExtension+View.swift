@@ -253,7 +253,7 @@ extension Animation {
     
     public static func autoAnimation(speed: CGFloat = 1) -> Animation {
         if #available(iOS 17.0, *) {
-            return .snappy
+            return .smooth(duration: 0.4)
         } else {
             return .spring().speed(speed)
         }

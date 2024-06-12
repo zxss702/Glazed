@@ -24,7 +24,9 @@ struct HostingViewModle: UIViewRepresentable {
     
     typealias UIViewType = UIView
     
+    @Environment(\.safeAreaInsets) var safeAreaInsets
     func makeUIView(context: Context) -> UIView {
+        hosting.additionalSafeAreaInsets = UIEdgeInsets(top: safeAreaInsets.top, left: safeAreaInsets.leading, bottom: safeAreaInsets.bottom, right: safeAreaInsets.trailing)
         return hosting.view
     }
     func updateUIView(_ uiView: UIView, context: Context) {
