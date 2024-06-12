@@ -223,11 +223,11 @@ struct GlazedFullPopoverViewModle: GlazedViewModle {
     var body: some View {
         HostingViewModle(hosting: value.content, value: value)
             .shadow(color: Color(.sRGBLinear, white: 0, opacity: 0.4), radius: 35)
-            .blur(radius: 10 * (1 - showProgres))
             .clipShape(RoundedRectangle(cornerRadius: canSet ? 0 : 12, style: .continuous))
+            .blur(radius: 10 * (1 - showProgres))
         
-            .frame(width: GeometryProxy.size.width, height: GeometryProxy.size.height)
-            .scaleEffect(x: showProgresX, y: showProgresY, anchor: UnitPoint(x: scaleX, y: scaleY))
+            .scaleEffect(x: showProgresX, y: showProgresY)
+            .offset(x: scaleX, y: scaleY)
             .onFrameChange(closure: { CGRec in
                 if canSet {
                     withAnimation(.autoAnimation) {
@@ -251,23 +251,28 @@ struct GlazedFullPopoverViewModle: GlazedViewModle {
     }
     
     func setValue(onAppear:Bool = false, GeometryProxy: GeometryProxy) {
-        showProgresX = value.buttonFrame.width / GeometryProxy.size.width
-        showProgresY = value.buttonFrame.height / GeometryProxy.size.height
         
-        scaleX = (value.buttonFrame.midX / GeometryProxy.size.width) * showProgresX
-        scaleY = (value.buttonFrame.midY / GeometryProxy.size.height) * showProgresY
-        
-        
+        let buttonFrame = CGRect(x: value.buttonFrame.minX - GeometryProxy.safeAreaInsets.leading, y: value.buttonFrame.minY - GeometryProxy.safeAreaInsets.top, width: value.buttonFrame.width, height: value.buttonFrame.height)
         
         if onAppear {
+            scaleX = buttonFrame.midX - GeometryProxy.size.width / 2
+            scaleY = buttonFrame.midY - GeometryProxy.size.height / 2
+            
+            showProgresX = buttonFrame.width / GeometryProxy.size.width
+            showProgresY = buttonFrame.height / GeometryProxy.size.height
+            
             value.typeDismissAction = {
                 withAnimation(.autoAnimation(speed: 1.2)) {
                     showProgres = 0
-                    showProgresX = value.buttonFrame.width / GeometryProxy.size.width
-                    showProgresY = value.buttonFrame.height / GeometryProxy.size.height
+                    scaleX = buttonFrame.midX
+                    scaleY = buttonFrame.midY
+                    showProgresX = buttonFrame.width / GeometryProxy.size.width
+                    showProgresY = buttonFrame.height / GeometryProxy.size.height
                 }
             }
             withAnimation(.autoAnimation(speed: 1.5)) {
+                scaleX = 0
+                scaleY = 0
                 showProgres = 1
                 showProgresX = 1
                 showProgresY = 1
