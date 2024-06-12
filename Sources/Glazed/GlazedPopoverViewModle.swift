@@ -241,6 +241,7 @@ struct GlazedFullPopoverViewModle: GlazedViewModle {
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .ignoresSafeArea(.container, edges: .all)
     }
     
     func setValue(onAppear:Bool = false, GeometryProxy: GeometryProxy) {
