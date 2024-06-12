@@ -251,21 +251,19 @@ struct GlazedFullPopoverViewModle: GlazedViewModle {
     }
     
     func setValue(onAppear:Bool = false, GeometryProxy: GeometryProxy) {
+
+        scaleX = (value.buttonFrame.midX / GeometryProxy.size.width) / value.buttonFrame.width
+        scaleY = (value.buttonFrame.midY / GeometryProxy.size.height) / value.buttonFrame.height
         
-        let buttonFrame = CGRect(x: value.buttonFrame.minX - GeometryProxy.safeAreaInsets.leading, y: value.buttonFrame.minY - GeometryProxy.safeAreaInsets.top, width: value.buttonFrame.width, height: value.buttonFrame.height)
-        
-        scaleX = buttonFrame.midX / GeometryProxy.size.width
-        scaleY = buttonFrame.midY / GeometryProxy.size.height
-        
-        showProgresX = buttonFrame.width / GeometryProxy.size.width
-        showProgresY = buttonFrame.height / GeometryProxy.size.height
+        showProgresX = value.buttonFrame.width / GeometryProxy.size.width
+        showProgresY = value.buttonFrame.height / GeometryProxy.size.height
         
         if onAppear {
             value.typeDismissAction = {
                 withAnimation(.autoAnimation(speed: 1.2)) {
                     showProgres = 0
-                    showProgresX = buttonFrame.width / GeometryProxy.size.width
-                    showProgresY = buttonFrame.height / GeometryProxy.size.height
+                    showProgresX = value.buttonFrame.width / GeometryProxy.size.width
+                    showProgresY = value.buttonFrame.height / GeometryProxy.size.height
                 }
             }
             withAnimation(.autoAnimation(speed: 1.5)) {
