@@ -254,7 +254,6 @@ struct GlazedFullPopoverViewModle: GlazedViewModle {
         
         let buttonFrame = CGRect(x: value.buttonFrame.minX - GeometryProxy.safeAreaInsets.leading, y: value.buttonFrame.minY - GeometryProxy.safeAreaInsets.top, width: value.buttonFrame.width, height: value.buttonFrame.height)
         
-        
         let rightWidth = min(GeometryProxy.size.width, value.Viewframe.width)
         let rightHeight = min(GeometryProxy.size.height, value.Viewframe.height)
         
@@ -273,6 +272,8 @@ struct GlazedFullPopoverViewModle: GlazedViewModle {
             value.typeDismissAction = {
                 withAnimation(.autoAnimation(speed: 1.2)) {
                     showProgres = 0
+                    showProgresX = buttonFrame.width / GeometryProxy.size.width
+                    showProgresY = buttonFrame.height / GeometryProxy.size.height
                 }
             }
             withAnimation(.autoAnimation(speed: 1.5)) {
