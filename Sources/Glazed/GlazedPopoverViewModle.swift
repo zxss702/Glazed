@@ -264,8 +264,8 @@ struct GlazedFullPopoverViewModle: GlazedViewModle {
             value.typeDismissAction = {
                 withAnimation(.autoAnimation(speed: 1.2)) {
                     showProgres = 0
-                    scaleX = buttonFrame.midX
-                    scaleY = buttonFrame.midY
+                    scaleX = buttonFrame.midX - GeometryProxy.size.width / 2
+                    scaleY = buttonFrame.midY - GeometryProxy.size.height / 2
                     showProgresX = buttonFrame.width / GeometryProxy.size.width
                     showProgresY = buttonFrame.height / GeometryProxy.size.height
                 }
