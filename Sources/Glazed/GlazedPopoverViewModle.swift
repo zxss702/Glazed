@@ -254,16 +254,8 @@ struct GlazedFullPopoverViewModle: GlazedViewModle {
         
         let buttonFrame = CGRect(x: value.buttonFrame.minX - GeometryProxy.safeAreaInsets.leading, y: value.buttonFrame.minY - GeometryProxy.safeAreaInsets.top, width: value.buttonFrame.width, height: value.buttonFrame.height)
         
-        let rightWidth = min(GeometryProxy.size.width, value.Viewframe.width)
-        let rightHeight = min(GeometryProxy.size.height, value.Viewframe.height)
-        
-        let offsetX = min(max(buttonFrame.midX, rightWidth / 2), GeometryProxy.size.width - rightWidth / 2)
-        let offsetY = min(max(buttonFrame.midY, rightHeight / 2), GeometryProxy.size.height - rightHeight / 2)
-        
-        let ideaScaleX = (buttonFrame.midX - offsetX) / rightWidth
-        scaleX = 0.5 + ideaScaleX
-        let ideaScaleY = (buttonFrame.midY - offsetY) / rightHeight
-        scaleY = 0.5 + ideaScaleX
+        scaleX = buttonFrame.midX / GeometryProxy.size.width
+        scaleY = buttonFrame.midY / GeometryProxy.size.height
         
         showProgresX = buttonFrame.width / GeometryProxy.size.width
         showProgresY = buttonFrame.height / GeometryProxy.size.height
