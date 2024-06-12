@@ -251,12 +251,13 @@ struct GlazedFullPopoverViewModle: GlazedViewModle {
     }
     
     func setValue(onAppear:Bool = false, GeometryProxy: GeometryProxy) {
-
-        scaleX = value.buttonFrame.midX / GeometryProxy.size.width
-        scaleY = value.buttonFrame.midY / GeometryProxy.size.height
-        
         showProgresX = value.buttonFrame.width / GeometryProxy.size.width
         showProgresY = value.buttonFrame.height / GeometryProxy.size.height
+        
+        scaleX = (value.buttonFrame.midX / GeometryProxy.size.width) * showProgresX
+        scaleY = (value.buttonFrame.midY / GeometryProxy.size.height) * showProgresY
+        
+        
         
         if onAppear {
             value.typeDismissAction = {
