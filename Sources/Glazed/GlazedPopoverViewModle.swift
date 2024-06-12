@@ -226,6 +226,7 @@ struct GlazedFullPopoverViewModle: GlazedViewModle {
             .blur(radius: 10 * (1 - showProgres))
             .clipShape(RoundedRectangle(cornerRadius: canSet ? 0 : 12, style: .continuous))
         
+            .frame(width: GeometryProxy.size.width, height: GeometryProxy.size.height)
             .scaleEffect(x: showProgresX, y: showProgresY, anchor: UnitPoint(x: scaleX, y: scaleY))
             .onFrameChange(closure: { CGRec in
                 if canSet {
@@ -246,14 +247,13 @@ struct GlazedFullPopoverViewModle: GlazedViewModle {
                     }
                 }
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
             .ignoresSafeArea(.container, edges: .all)
     }
     
     func setValue(onAppear:Bool = false, GeometryProxy: GeometryProxy) {
 
-        scaleX = (value.buttonFrame.midX / GeometryProxy.size.width) / value.buttonFrame.width
-        scaleY = (value.buttonFrame.midY / GeometryProxy.size.height) / value.buttonFrame.height
+        scaleX = value.buttonFrame.midX / GeometryProxy.size.width
+        scaleY = value.buttonFrame.midY / GeometryProxy.size.height
         
         showProgresX = value.buttonFrame.width / GeometryProxy.size.width
         showProgresY = value.buttonFrame.height / GeometryProxy.size.height
