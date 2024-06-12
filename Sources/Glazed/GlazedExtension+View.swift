@@ -182,11 +182,7 @@ struct GlazedInputViewModle<Content1: View>: ViewModifier {
             .overlay {
                 if isPresented {
                     GeometryReader { GeometryProxy in
-                        let _ = DispatchQueue.main.async {
-                            withAnimation(.autoAnimation) {
-                                glazedObserver.contentView[id]?.value.content = AnyView(content1())
-                            }
-                        }
+                        let _ = glazedObserver.contentView[id]?.value.content = AnyView(content1())
                         Color.clear
                             .preference(key: RectPreferenceKey.self, value: GeometryProxy.frame(in: .global))
                             .onAppear {
