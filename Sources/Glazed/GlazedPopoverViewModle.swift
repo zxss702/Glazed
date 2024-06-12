@@ -34,11 +34,14 @@ struct GlazedPopoverViewModle: GlazedViewModle {
     @State var offsetX:CGFloat = 0
     
     var body: some View {
-        HostingViewModle(hosting: value.content)
+        HostingViewModle(hosting: value.content, value: value)
             .shadow(radius: 0.3)
             .shadow(color: Color(.sRGBLinear, white: 0, opacity: 0.4), radius: 35)
-        
+//            .frame(width: value.Viewframe.width, height: value.Viewframe.height)
             .scaleEffect(x: showProgres, y: showProgres, anchor: UnitPoint(x: scaleX, y: scaleY))
+//            .onChange(connect: value.Viewframe, action: {
+//                
+//            })
             .onFrameChange(closure: { CGRec in
                 if canSet {
                     withAnimation(.autoAnimation) {
@@ -215,9 +218,11 @@ struct GlazedFullPopoverViewModle: GlazedViewModle {
     @State var canSet = false
     
     var body: some View {
-        HostingViewModle(hosting: value.content)
+        HostingViewModle(hosting: value.content, value: value)
             .shadow(radius: 0.3)
             .shadow(color: Color(.sRGBLinear, white: 0, opacity: 0.4), radius: 35)
+        
+            .clipShape(RoundedRectangle(cornerRadius: canSet ? 0 : 12, style: .continuous))
         
             .scaleEffect(x: showProgres, y: showProgres, anchor: UnitPoint(x: scaleX, y: scaleY))
             .onFrameChange(closure: { CGRec in

@@ -56,7 +56,7 @@ struct GlazedFullCoverViewModle: GlazedViewModle {
                     }
             )
         
-        HostingViewModle(hosting: value.content)
+        HostingViewModle(hosting: value.content, value: value)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .clipShape(shape)
             .compositingGroup()

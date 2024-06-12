@@ -21,17 +21,21 @@ extension EnvironmentValues {
 
 struct HostingViewModle: UIViewRepresentable {
     let hosting: UIHostingController<AnyView>
-    
+    @ObservedObject var value: GlazedHelperValue
+    @EnvironmentObject var glazedObserver: GlazedObserver
     typealias UIViewType = UIView
     
     @Environment(\.safeAreaInsets) var safeAreaInsets
     func makeUIView(context: Context) -> UIView {
-        hosting.navigationController?.additionalSafeAreaInsets = UIEdgeInsets(top: safeAreaInsets.top, left: safeAreaInsets.leading, bottom: safeAreaInsets.bottom, right: safeAreaInsets.trailing)
+//        hosting.navigationController?.additionalSafeAreaInsets = UIEdgeInsets(top: safeAreaInsets.top, left: safeAreaInsets.leading, bottom: safeAreaInsets.bottom, right: safeAreaInsets.trailing)
         hosting.view.isUserInteractionEnabled = true
+        hosting.view.backgroundColor = .clear
         return hosting.view
     }
-    func updateUIView(_ uiView: UIView, context: Context) {
-        
+    func updateUIView(_ uiView: UIView, context: Context) { }
+    
+    func sizeThatFits(_ proposal: ProposedViewSize, uiView: UIView, context: Context) -> CGSize? {
+        return hosting.sizeThatFits(in: CGSize(width: proposal.width ?? glazedObserver.geometry?.size.width ?? 15, height: proposal.height ?? glazedObserver.geometry?.size.height ?? 15))
     }
 }
 

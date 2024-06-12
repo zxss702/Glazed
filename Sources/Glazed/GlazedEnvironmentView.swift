@@ -30,6 +30,7 @@ public class GlazedObserver: ObservableObject {
     #endif
     var contentView:[UUID:GlazedHelperType] = [:]
     @Published var contentViewList:[UUID] = []
+    @Published var geometry: GeometryProxy?
     
     func dismissLast(last: UUID) {
         if let lastContent = contentView[last], !lastContent.isDismiss {
@@ -122,6 +123,9 @@ public struct GlazedEnvironmentView<Content: View>: View {
             #endif
             .ignoresSafeArea()
             .environment(\.safeAreaInsets, geometry.safeAreaInsets)
+            .onChange(connect: geometry.size) {
+                glazedObserver.geometry = geometry
+            }
         }
     }
 }

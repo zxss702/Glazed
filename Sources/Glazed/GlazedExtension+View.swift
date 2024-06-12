@@ -184,9 +184,8 @@ struct GlazedInputViewModle<Content1: View>: ViewModifier {
                 if isPresented {
                     GeometryReader { GeometryProxy in
                         let _ = DispatchQueue.main.async {
-                            withAnimation(.autoAnimation) {
-                                glazedObserver.contentView[id]?.value.content.rootView = AnyView(content1())
-                            }
+                            glazedObserver.contentView[id]?.value.content.rootView = AnyView(content1())
+//                            glazedObserver.contentView[id]?.value.Viewframe.size = glazedObserver.contentView[id]?.value.content.sizeThatFits(in: glazedObserver.geometry?.size ?? .zero) ?? CGSize(width: 15, height: 15)
                         }
                         Color.clear
                             .preference(key: RectPreferenceKey.self, value: GeometryProxy.frame(in: .global))
@@ -226,6 +225,8 @@ struct GlazedInputViewModle<Content1: View>: ViewModifier {
                                         }
                                     }
                                 glazedObserver.contentView[id] = Helper
+                                glazedObserver.contentView[id]?.value.content.sizingOptions = .intrinsicContentSize
+                                
                                 DispatchQueue.main.async(0.01) {
                                     withAnimation(.autoAnimation) {
                                         glazedObserver.contentViewList.append(Helper.id)

@@ -45,10 +45,11 @@ struct GlazedSheetViewModle: GlazedViewModle {
         let radius = min(max(max(GeometryProxy.safeAreaInsets.top, GeometryProxy.safeAreaInsets.leading), max(GeometryProxy.safeAreaInsets.top, GeometryProxy.safeAreaInsets.trailing)), max(max(GeometryProxy.safeAreaInsets.bottom, GeometryProxy.safeAreaInsets.trailing), max(GeometryProxy.safeAreaInsets.bottom, GeometryProxy.safeAreaInsets.leading)))
         let shape = RoundedRectangle(cornerRadius: radius, style: .continuous)
         
-        HostingViewModle(hosting: value.content)
+        HostingViewModle(hosting: value.content, value: value)
             .clipShape(shape)
-            .background(shape.fill(.background).ignoresSafeArea())
-            
+            .background(shape.fill(.background))
+            .ignoresSafeArea()
+        
             .shadow(radius: 0.3)
             .shadow(color: Color(.sRGBLinear, white: 0, opacity: 0.4), radius: 35)
 
