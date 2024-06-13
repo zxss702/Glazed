@@ -225,7 +225,7 @@ struct GlazedFullPopoverViewModle: GlazedViewModle {
             .shadow(color: Color(.sRGBLinear, white: 0, opacity: 0.4), radius: 35)
             .clipShape(RoundedRectangle(cornerRadius: canSet ? 0 : 12, style: .continuous))
             .blur(radius: 10 * (1 - showProgres))
-        
+            .opacity(showProgres)
             .scaleEffect(x: showProgresX, y: showProgresY)
             .offset(x: scaleX, y: scaleY)
             .onFrameChange(closure: { CGRec in
