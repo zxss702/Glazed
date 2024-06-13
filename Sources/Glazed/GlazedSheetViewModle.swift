@@ -45,9 +45,10 @@ struct GlazedSheetViewModle: GlazedViewModle {
         let radius = min(max(max(GeometryProxy.safeAreaInsets.top, GeometryProxy.safeAreaInsets.leading), max(GeometryProxy.safeAreaInsets.top, GeometryProxy.safeAreaInsets.trailing)), max(max(GeometryProxy.safeAreaInsets.bottom, GeometryProxy.safeAreaInsets.trailing), max(GeometryProxy.safeAreaInsets.bottom, GeometryProxy.safeAreaInsets.leading)))
         let shape = RoundedRectangle(cornerRadius: radius, style: .continuous)
         
-        HostingViewModle(hosting: value.content, value: value)
+//        HostingViewModle(hosting: value.content, value: value)
+        value.content.rootView
             .clipShape(shape)
-            .background(shape.fill(.regularMaterial))
+            .background(shape.fill(.ultraThinMaterial))
             .ignoresSafeArea()
         
             .shadow(radius: 0.3)
@@ -76,7 +77,7 @@ struct GlazedSheetViewModle: GlazedViewModle {
                         }
                     }
             )
-//            .transition(.offset(y: GeometryProxy.size.height + GeometryProxy.safeAreaInsets.bottom).animation(.autoAnimation))
+            .transition(.offset(y: GeometryProxy.size.height + GeometryProxy.safeAreaInsets.bottom).animation(.autoAnimation))
             .onChange(of: isDrag) { v in
                 if !v {
                     if offsetY > 130 {
@@ -91,5 +92,8 @@ struct GlazedSheetViewModle: GlazedViewModle {
             .environment(\.safeAreaInsets, EdgeInsets(top: 17, leading: 17, bottom: 17, trailing: 17))
             .zIndex(Double(zindex + 1))
             .environment(\.gluzedSuper, nil)
+            .onAppear {
+                
+            }
     }
 }
