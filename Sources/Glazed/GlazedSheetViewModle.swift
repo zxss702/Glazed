@@ -53,7 +53,7 @@ struct GlazedSheetViewModle: GlazedViewModle {
             .shadow(radius: 0.3)
             .shadow(color: Color(.sRGBLinear, white: 0, opacity: 0.4), radius: 35)
             .onFrameChange { Rect in
-                value.content.view.bounds =  Rect
+                value.content.view.bounds.size =  Rect.size
                 value.Viewframe.size =  Rect.size
             }
         
