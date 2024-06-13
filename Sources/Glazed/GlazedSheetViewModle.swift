@@ -47,15 +47,16 @@ struct GlazedSheetViewModle: GlazedViewModle {
         
         HostingViewModle(hosting: value.content, value: value)
             .clipShape(shape)
-            .background(shape.fill(.background))
+            .background(shape.fill(.regularMaterial))
             .ignoresSafeArea()
         
             .shadow(radius: 0.3)
             .shadow(color: Color(.sRGBLinear, white: 0, opacity: 0.4), radius: 35)
-
-            .onSizeChange({ CGSize in
-                value.Viewframe.size = CGSize
-            })
+            .onFrameChange { Rect in
+                value.content.view.bounds =  Rect
+                value.Viewframe.size =  Rect.size
+            }
+        
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: cneterORbottom ? .center : .bottom)
             .padding(.top, (cneterORbottom ? 0 : 20 + GeometryProxy.safeAreaInsets.top))
             .offset(y: offsetY)

@@ -230,11 +230,13 @@ struct GlazedFullPopoverViewModle: GlazedViewModle {
             .offset(x: scaleX, y: scaleY)
             .onFrameChange(closure: { CGRec in
                 if canSet {
+                    value.content.view.bounds = value.Viewframe
                     withAnimation(.autoAnimation) {
                         value.Viewframe = CGRec
                         setValue(GeometryProxy: GeometryProxy)
                     }
                 } else {
+                    value.content.view.bounds = value.Viewframe
                     value.Viewframe = CGRec
                     setValue(onAppear: showProgres == 0, GeometryProxy: GeometryProxy)
                 }
