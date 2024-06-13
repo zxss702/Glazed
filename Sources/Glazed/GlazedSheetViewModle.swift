@@ -53,6 +53,8 @@ struct GlazedSheetViewModle: GlazedViewModle {
             .shadow(radius: 0.3)
             .shadow(color: Color(.sRGBLinear, white: 0, opacity: 0.4), radius: 35)
             .onFrameChange { Rect in
+                value.content.view.bounds.origin.x = (GeometryProxy.size.width - Rect.size.width) / 2
+                value.content.view.bounds.origin.y = (GeometryProxy.size.height + GeometryProxy.safeAreaInsets.bottom - Rect.size.height) / 2
                 value.content.view.bounds.size =  Rect.size
                 value.Viewframe.size =  Rect.size
             }
