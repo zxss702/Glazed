@@ -58,7 +58,7 @@ public extension View {
             content()
                 .buttonStyle(TapButtonStyle())
                 .background(.regularMaterial)
-                .clipShape(RoundedRectangle(cornerRadius: 17, style: .continuous))
+                .clipShape(RoundedRectangle(cornerRadius: 26.5, style: .continuous))
         }))
     }
     func EditPopover<Content: View>(isPresented: Binding<Bool>, @ViewBuilder content: @escaping () -> Content) -> some View {
@@ -74,7 +74,7 @@ public extension View {
             content()
                 .buttonStyle(TapButtonStyle())
                 .background(.regularMaterial)
-                .clipShape(RoundedRectangle(cornerRadius: 17, style: .continuous))
+                .clipShape(RoundedRectangle(cornerRadius: 26.5, style: .continuous))
         }))
     }
     func clearPopover<Content: View>(isPresented: Binding<Bool>, @ViewBuilder content: @escaping () -> Content) -> some View {
@@ -88,7 +88,7 @@ public extension View {
             content()
                 .buttonStyle(TapButtonStyle())
                 .background(.regularMaterial)
-                .clipShape(RoundedRectangle(cornerRadius: 17, style: .continuous))
+                .clipShape(RoundedRectangle(cornerRadius: 26.5, style: .continuous))
                 
         }))
     }
@@ -104,7 +104,7 @@ public extension View {
         self.modifier(GlazedInputViewModle(type: .SharePopover, isPresented: isPresented, content1: {
             content()
                 .buttonStyle(TapButtonStyle())
-                .clipShape(RoundedRectangle(cornerRadius: 17, style: .continuous))
+                .clipShape(RoundedRectangle(cornerRadius: 26.5, style: .continuous))
         }))
     }
     func centerPopover<Content: View>(isPresented: Binding<Bool>, ignorTouch:Bool = false, @ViewBuilder content: @escaping () -> Content) -> some View {
@@ -116,7 +116,7 @@ public extension View {
                 content()
                     .buttonStyle(TapButtonStyle())
                     .background(.regularMaterial)
-                    .clipShape(RoundedRectangle(cornerRadius: 17, style: .continuous))
+                    .clipShape(RoundedRectangle(cornerRadius: 26.5, style: .continuous))
                     
             }))
     }

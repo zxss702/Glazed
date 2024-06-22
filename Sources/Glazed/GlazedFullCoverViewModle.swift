@@ -34,7 +34,7 @@ struct GlazedFullCoverViewModle: GlazedViewModle {
             .ignoresSafeArea()
         
         let radius = min(max(max(GeometryProxy.safeAreaInsets.top, GeometryProxy.safeAreaInsets.leading), max(GeometryProxy.safeAreaInsets.top, GeometryProxy.safeAreaInsets.trailing)), max(max(GeometryProxy.safeAreaInsets.bottom, GeometryProxy.safeAreaInsets.trailing), max(GeometryProxy.safeAreaInsets.bottom, GeometryProxy.safeAreaInsets.leading)))
-        let shape = RoundedRectangle(cornerRadius: radius, style: .continuous)
+        let shape = RoundedRectangle(cornerRadius: min(max(radius, 26.5), 60), style: .continuous)
         
         shape
             .fill(.background)
