@@ -40,27 +40,18 @@ struct GlazedPopoverViewModle: GlazedViewModle {
             .scaleEffect(x: showProgres, y: showProgres, anchor: UnitPoint(x: scaleX, y: scaleY))
             .onFrameChange(closure: { CGRec in
                 value.Viewframe = CGRec
-                if showProgres == 0 {
-                    setValue(onAppear: true, GeometryProxy: GeometryProxy)
-                } else {
-                    withAnimation(.autoAnimation) {
-                        setValue(GeometryProxy: GeometryProxy)
-                    }
-                }
-                
+                setValue(GeometryProxy: GeometryProxy)
             })
-        
+            .onAppear {
+                setValue(onAppear: true, GeometryProxy: GeometryProxy)
+            }
             .blur(radius: 10 - showProgres * 10)
         
             .frame(maxWidth: GeometryProxy.size.width - spacing * 2, maxHeight: GeometryProxy.size.height - spacing * 2)
             .position(x: offsetX, y: offsetY)
             .environment(\.safeAreaInsets, EdgeInsets(top: 16, leading: 16, bottom: 16, trailing: 16))
             .onChange(of: value.buttonFrame) { value in
-                if showProgres == 1 {
-                    withAnimation(.autoAnimation) {
-                        setValue(GeometryProxy: GeometryProxy)
-                    }
-                }
+                setValue(GeometryProxy: GeometryProxy)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background {
@@ -68,6 +59,7 @@ struct GlazedPopoverViewModle: GlazedViewModle {
                     Color.black.opacity(0.1 * showProgres).ignoresSafeArea()
                 }
             }
+            .animation(.autoAnimation)
     }
     enum PopoverEdge {
         case top, bottom, leading, trailing, center
