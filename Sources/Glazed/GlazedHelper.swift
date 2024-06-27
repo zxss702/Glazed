@@ -45,7 +45,7 @@ struct HostingViewModle: UIViewRepresentable {
 final class GlazedHelperValue: ObservableObject {
     @Published var content: UIHostingController<AnyView>
     @Published var buttonFrame:CGRect
-    @Published var Viewframe:CGRect = .zero
+    var Viewframe:CGRect = .zero
     
     let gluazedSuper:Bool
     
