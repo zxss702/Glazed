@@ -34,38 +34,40 @@ struct GlazedPopoverViewModle: GlazedViewModle {
     @State var offsetX:CGFloat = 0
     
     var body: some View {
-        HostingViewModle(hosting: value.content, value: value)
-            .shadow(radius: 0.3)
-            .shadow(color: Color(.sRGBLinear, white: 0, opacity: 0.4), radius: 35)
-            .scaleEffect(x: showProgres, y: showProgres, anchor: UnitPoint(x: scaleX, y: scaleY))
-            .onAppear {
+        HostingViewModle(hosting: value.content, value: value) { size in
+            if showProgres == 0 && value.Viewframe == .zero {
+                value.Viewframe.size = size
                 setValue(onAppear: true, GeometryProxy: GeometryProxy)
-            }
-            .onChange(connect: value.Viewframe, action: {
+            } else if showProgres == 1 {
+                value.Viewframe.size = size
                 withAnimation(.autoAnimation) {
                     setValue(GeometryProxy: GeometryProxy)
                 }
-            })
+            }
+            
+        }
+        .shadow(radius: 0.3)
+        .shadow(color: Color(.sRGBLinear, white: 0, opacity: 0.4), radius: 35)
+        .scaleEffect(x: showProgres, y: showProgres, anchor: UnitPoint(x: scaleX, y: scaleY))
+        .blur(radius: 20 - showProgres * 20)
+        .opacity(showProgres)
         
-            .blur(radius: 20 - showProgres * 20)
-            .opacity(showProgres)
-        
-            .frame(maxWidth: GeometryProxy.size.width - spacing * 2, maxHeight: GeometryProxy.size.height - spacing * 2)
-            .position(x: offsetX, y: offsetY)
-            .environment(\.safeAreaInsets, EdgeInsets(top: 16, leading: 16, bottom: 16, trailing: 16))
-            .onChange(of: value.buttonFrame) { value in
-                if showProgres == 1 {
-                    withAnimation(.autoAnimation) {
-                        setValue(GeometryProxy: GeometryProxy)
-                    }
+        .frame(maxWidth: GeometryProxy.size.width - spacing * 2, maxHeight: GeometryProxy.size.height - spacing * 2)
+        .position(x: offsetX, y: offsetY)
+        .environment(\.safeAreaInsets, EdgeInsets(top: 16, leading: 16, bottom: 16, trailing: 16))
+        .onChange(of: value.buttonFrame) { value in
+            if showProgres == 1 {
+                withAnimation(.autoAnimation) {
+                    setValue(GeometryProxy: GeometryProxy)
                 }
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background {
-                if !value.gluazedSuper {
-                    Color.black.opacity(0.1 * showProgres).ignoresSafeArea()
-                }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background {
+            if !value.gluazedSuper {
+                Color.black.opacity(0.1 * showProgres).ignoresSafeArea()
             }
+        }
     }
     enum PopoverEdge {
         case top, bottom, leading, trailing, center

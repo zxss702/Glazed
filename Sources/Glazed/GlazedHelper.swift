@@ -25,6 +25,8 @@ struct HostingViewModle: UIViewRepresentable {
     @EnvironmentObject var glazedObserver: GlazedObserver
     typealias UIViewType = UIView
     
+    var onSizeThatFits: (CGSize) -> Void = { _ in }
+    
     @Environment(\.safeAreaInsets) var safeAreaInsets
     func makeUIView(context: Context) -> UIView {
         hosting.view.isUserInteractionEnabled = true
@@ -35,7 +37,7 @@ struct HostingViewModle: UIViewRepresentable {
     
     func sizeThatFits(_ proposal: ProposedViewSize, uiView: UIView, context: Context) -> CGSize? {
         let size = hosting.sizeThatFits(in: CGSize(width: proposal.width ?? glazedObserver.geometry?.size.width ?? 15, height: proposal.height ?? glazedObserver.geometry?.size.height ?? 15))
-        value.Viewframe.size = size
+        onSizeThatFits(size)
         return size
     }
 }
