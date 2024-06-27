@@ -50,7 +50,6 @@ struct GlazedPopoverViewModle: GlazedViewModle {
         .shadow(color: Color(.sRGBLinear, white: 0, opacity: 0.4), radius: 35)
         .scaleEffect(x: showProgres, y: showProgres, anchor: UnitPoint(x: scaleX, y: scaleY))
         .blur(radius: 20 - showProgres * 20)
-        .opacity(showProgres)
         
         .frame(maxWidth: GeometryProxy.size.width - spacing * 2, maxHeight: GeometryProxy.size.height - spacing * 2)
         .position(x: offsetX, y: offsetY)
