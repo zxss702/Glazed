@@ -40,10 +40,16 @@ struct GlazedPopoverViewModle: GlazedViewModle {
                     value.Viewframe.size = size
                     setValue(onAppear: true, GeometryProxy: GeometryProxy)
                 } else if showProgres == 1 {
-                    value.Viewframe.size = size
-                    withAnimation(.autoAnimation) {
+                    if value.Viewframe == .zero {
+                        value.Viewframe.size = size
                         setValue(GeometryProxy: GeometryProxy)
+                    } else {
+                        value.Viewframe.size = size
+                        withAnimation(.autoAnimation) {
+                            setValue(GeometryProxy: GeometryProxy)
+                        }
                     }
+                    
                 }
             }
         }
@@ -138,6 +144,8 @@ struct GlazedPopoverViewModle: GlazedViewModle {
                 return buttonFrame.midY
             }
         }(), rightHeight / 2 + spacing), GeometryProxy.size.height - rightHeight / 2 - spacing)
+        
+        value.Viewframe.origin = CGPoint(x: offsetX - value.Viewframe.width / 2, y: offsetY - value.Viewframe.height / 2)
         
         let ideaScaleX = (buttonFrame.midX - offsetX) / rightWidth
         scaleX = max(min(0.5 + ideaScaleX, 1.1), -0.1)
