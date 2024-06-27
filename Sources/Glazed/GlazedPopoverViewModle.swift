@@ -40,13 +40,12 @@ struct GlazedPopoverViewModle: GlazedViewModle {
             .scaleEffect(x: showProgres, y: showProgres, anchor: UnitPoint(x: scaleX, y: scaleY))
             .onFrameChange(closure: { CGRec in
                 value.Viewframe = CGRec
-                if showProgres == 1 {
+                if value.Viewframe == .zero {
+                    setValue(onAppear: true, GeometryProxy: GeometryProxy)
+                } else if showProgres == 1 {
                     setValue(GeometryProxy: GeometryProxy)
                 }
             })
-            .onAppear {
-                setValue(onAppear: true, GeometryProxy: GeometryProxy)
-            }
             .blur(radius: 10 - showProgres * 10)
         
             .frame(maxWidth: GeometryProxy.size.width - spacing * 2, maxHeight: GeometryProxy.size.height - spacing * 2)
