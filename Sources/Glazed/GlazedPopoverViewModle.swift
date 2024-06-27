@@ -38,16 +38,17 @@ struct GlazedPopoverViewModle: GlazedViewModle {
             .shadow(radius: 0.3)
             .shadow(color: Color(.sRGBLinear, white: 0, opacity: 0.4), radius: 35)
             .scaleEffect(x: showProgres, y: showProgres, anchor: UnitPoint(x: scaleX, y: scaleY))
+            .onAppear {
+                setValue(onAppear: true, GeometryProxy: GeometryProxy)
+            }
             .onChange(connect: value.Viewframe, action: {
-                if showProgres == 0 {
-                    setValue(onAppear: true, GeometryProxy: GeometryProxy)
-                } else if showProgres == 1 {
-                    withAnimation(.autoAnimation) {
-                        setValue(GeometryProxy: GeometryProxy)
-                    }
+                withAnimation(.autoAnimation) {
+                    setValue(GeometryProxy: GeometryProxy)
                 }
             })
-            .blur(radius: 10 - showProgres * 10)
+        
+            .blur(radius: 20 - showProgres * 20)
+            .opacity(showProgres)
         
             .frame(maxWidth: GeometryProxy.size.width - spacing * 2, maxHeight: GeometryProxy.size.height - spacing * 2)
             .position(x: offsetX, y: offsetY)
