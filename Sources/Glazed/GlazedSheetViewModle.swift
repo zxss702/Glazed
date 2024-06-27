@@ -91,8 +91,5 @@ struct GlazedSheetViewModle: GlazedViewModle {
             .environment(\.safeAreaInsets, EdgeInsets(top: 17, leading: 17, bottom: 17, trailing: 17))
             .zIndex(Double(zindex + 1))
             .environment(\.gluzedSuper, nil)
-            .onAppear {
-                
-            }
     }
 }

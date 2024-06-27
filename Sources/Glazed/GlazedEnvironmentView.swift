@@ -37,6 +37,7 @@ public class GlazedObserver: ObservableObject {
             switch lastContent.type {
             case .Sheet, .FullCover:
                 contentView[last]?.value.isPrisentDismissAction()
+                contentView[last]?.isDismiss = true
                 if let int = contentViewList.firstIndex(of: last) {
                     withAnimation(.autoAnimation) {
                         _ = contentViewList.remove(at: int)
