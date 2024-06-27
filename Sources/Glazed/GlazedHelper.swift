@@ -52,8 +52,9 @@ final class GlazedHelperValue: ObservableObject {
     var typeDismissAction:() -> Void = {}
     var isPrisentDismissAction:() -> Void
     var progessDoAction:() -> Void = {}
+    var progessAsyncAction:() async -> Void = {}
     
-    init(buttonFrame: CGRect, Viewframe: CGRect = .zero, gluazedSuper: Bool, content: AnyView, typeDismissAction: @escaping () -> Void = {}, isPrisentDismissAction: @escaping () -> Void, progessDoAction: @escaping () -> Void = {}) {
+    init(buttonFrame: CGRect, Viewframe: CGRect = .zero, gluazedSuper: Bool, content: AnyView, typeDismissAction: @escaping () -> Void = {}, isPrisentDismissAction: @escaping () -> Void, progessDoAction: @escaping () -> Void = {}, progessAsyncAction:() async -> Void = {}) {
         self.buttonFrame = buttonFrame
         self.Viewframe = Viewframe
         self.gluazedSuper = gluazedSuper
@@ -61,6 +62,7 @@ final class GlazedHelperValue: ObservableObject {
         self.isPrisentDismissAction = isPrisentDismissAction
         self.progessDoAction = progessDoAction
         self.content = UIHostingController(rootView: content)
+        self.progessAsyncAction = progessAsyncAction
     }
 }
 

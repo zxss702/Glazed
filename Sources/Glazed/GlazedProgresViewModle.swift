@@ -64,10 +64,13 @@ struct GlazedProgresViewModle: GlazedViewModle {
             }
             DispatchQueue.global().async {
                 value.progessDoAction()
-                withAnimation(.autoAnimation) {
-                    show = false
+                Task {
+                    await value.progessAsyncAction()
+                    withAnimation(.autoAnimation) {
+                        show = false
+                    }
+                    glazedDismiss()
                 }
-                glazedDismiss()
             }
         }
     }

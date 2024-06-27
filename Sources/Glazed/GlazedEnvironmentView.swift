@@ -92,6 +92,26 @@ struct GlazedEnvironmentViewModle: ViewModifier {
                     }
                 }
             }
+            .environment(\.glazedAsyncAction) { [self] action in
+                let Helper = GlazedHelperType(
+                    
+                    type: .Progres,
+                    value: GlazedHelperValue(
+                        buttonFrame: .zero,
+                        gluazedSuper: false,
+                        content: AnyView(EmptyView()),
+                        isPrisentDismissAction: { },
+                        progessAsyncAction: action
+                    )) { point, value in
+                        
+                    }
+                glazedObserver.contentView[Helper.id] = Helper
+                DispatchQueue.main.async(0.01) {
+                    withAnimation(.autoAnimation) {
+                        glazedObserver.contentViewList.append(Helper.id)
+                    }
+                }
+            }
     }
 }
 public struct GlazedEnvironmentView<Content: View>: View {

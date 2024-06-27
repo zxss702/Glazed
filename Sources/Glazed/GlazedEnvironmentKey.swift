@@ -50,6 +50,10 @@ public extension EnvironmentValues {
         get { self[GlazedDoActionKey.self] }
         set { self[GlazedDoActionKey.self] = newValue }
     }
+    var glazedAsyncAction:(_ action: @escaping () async -> Void) -> Void {
+        get { self[GlazedAsyncActionKey.self] }
+        set { self[GlazedAsyncActionKey.self] = newValue }
+    }
 }
 #if !os(macOS)
 public struct WindowKey: EnvironmentKey {
@@ -60,6 +64,13 @@ public struct GlazedDoActionKey: EnvironmentKey {
     public static var defaultValue: (_ action: @escaping () -> Void) -> Void = { action in
         DispatchQueue.global().async {
             action()
+        }
+    }
+}
+public struct GlazedAsyncActionKey: EnvironmentKey {
+    public static var defaultValue: (_ action: @escaping () async -> Void) -> Void = { action in
+        Task {
+            await action()
         }
     }
 }
