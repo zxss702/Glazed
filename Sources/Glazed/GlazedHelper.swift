@@ -34,7 +34,9 @@ struct HostingViewModle: UIViewRepresentable {
     func updateUIView(_ uiView: UIView, context: Context) { }
     
     func sizeThatFits(_ proposal: ProposedViewSize, uiView: UIView, context: Context) -> CGSize? {
-        return hosting.sizeThatFits(in: CGSize(width: proposal.width ?? glazedObserver.geometry?.size.width ?? 15, height: proposal.height ?? glazedObserver.geometry?.size.height ?? 15))
+        let size = hosting.sizeThatFits(in: CGSize(width: proposal.width ?? glazedObserver.geometry?.size.width ?? 15, height: proposal.height ?? glazedObserver.geometry?.size.height ?? 15))
+        value.Viewframe.size = size
+        return size
     }
 }
 
