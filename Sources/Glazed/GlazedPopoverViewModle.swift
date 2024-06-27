@@ -40,7 +40,9 @@ struct GlazedPopoverViewModle: GlazedViewModle {
             .scaleEffect(x: showProgres, y: showProgres, anchor: UnitPoint(x: scaleX, y: scaleY))
             .onFrameChange(closure: { CGRec in
                 value.Viewframe = CGRec
-                setValue(GeometryProxy: GeometryProxy)
+                if showProgres == 1 {
+                    setValue(GeometryProxy: GeometryProxy)
+                }
             })
             .onAppear {
                 setValue(onAppear: true, GeometryProxy: GeometryProxy)
