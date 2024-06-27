@@ -35,16 +35,17 @@ struct GlazedPopoverViewModle: GlazedViewModle {
     
     var body: some View {
         HostingViewModle(hosting: value.content, value: value) { size in
-            if showProgres == 0 && value.Viewframe == .zero {
-                value.Viewframe.size = size
-                setValue(onAppear: true, GeometryProxy: GeometryProxy)
-            } else if showProgres == 1 {
-                value.Viewframe.size = size
-                withAnimation(.autoAnimation) {
-                    setValue(GeometryProxy: GeometryProxy)
+            DispatchQueue.main.async {
+                if showProgres == 0 && value.Viewframe == .zero {
+                    value.Viewframe.size = size
+                    setValue(onAppear: true, GeometryProxy: GeometryProxy)
+                } else if showProgres == 1 {
+                    value.Viewframe.size = size
+                    withAnimation(.autoAnimation) {
+                        setValue(GeometryProxy: GeometryProxy)
+                    }
                 }
             }
-            
         }
         .shadow(radius: 0.3)
         .shadow(color: Color(.sRGBLinear, white: 0, opacity: 0.4), radius: 35)
