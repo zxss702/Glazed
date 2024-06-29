@@ -57,7 +57,7 @@ public extension View {
         self.modifier(GlazedInputViewModle(type: .Popover, isPresented: isPresented, content1: {
             content()
                 .buttonStyle(TapButtonStyle())
-                .background(.regularMaterial)
+                .background(.background)
                 .clipShape(RoundedRectangle(cornerRadius: 26.5, style: .continuous))
         }))
     }
@@ -65,7 +65,7 @@ public extension View {
         self.modifier(GlazedInputViewModle(type: .EditPopover, isPresented: isPresented, content1: {
             content()
                 .buttonStyle(TapButtonStyle())
-                .background(.regularMaterial)
+                .background(.background)
                 .clipShape(Capsule(style: .continuous))
         }))
     }
@@ -73,7 +73,7 @@ public extension View {
         self.modifier(GlazedInputViewModle(type: .topBottom, isPresented: isPresented, content1: {
             content()
                 .buttonStyle(TapButtonStyle())
-                .background(.regularMaterial)
+                .background(.background)
                 .clipShape(RoundedRectangle(cornerRadius: 26.5, style: .continuous))
         }))
     }
@@ -87,7 +87,7 @@ public extension View {
         self.modifier(GlazedInputViewModle(type: .PopoverWithOutButton, isPresented: isPresented, content1: {
             content()
                 .buttonStyle(TapButtonStyle())
-                .background(.regularMaterial)
+                .background(.background)
                 .clipShape(RoundedRectangle(cornerRadius: 26.5, style: .continuous))
                 
         }))
@@ -96,7 +96,7 @@ public extension View {
         self.modifier(GlazedInputViewModle(type: .tipPopover, isPresented: isPresented, content1: {
             content()
                 .buttonStyle(TapButtonStyle())
-                .background(.regularMaterial)
+                .background(.background)
                 .clipShape(Capsule(style: .continuous))
         }))
     }
@@ -115,7 +115,7 @@ public extension View {
             .modifier(GlazedInputViewModle(type: .centerPopover, isPresented: isPresented, content1: {
                 content()
                     .buttonStyle(TapButtonStyle())
-                    .background(.regularMaterial)
+                    .background(.background)
                     .clipShape(RoundedRectangle(cornerRadius: 26.5, style: .continuous))
                     
             }))
