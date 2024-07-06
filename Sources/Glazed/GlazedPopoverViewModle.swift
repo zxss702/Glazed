@@ -34,6 +34,8 @@ struct GlazedPopoverViewModle: GlazedViewModle {
     @State var offsetX:CGFloat = 0
     
     @State var isDissmis = false
+    @State var isApper = false
+    
     var body: some View {
         HostingViewModle(hosting: value.content, value: value) { size in
             if !isDissmis {
@@ -41,11 +43,14 @@ struct GlazedPopoverViewModle: GlazedViewModle {
                     if showProgres == 0 {
                         value.Viewframe.size = size
                         setValue(onAppear: true, GeometryProxy: GeometryProxy)
-                    } else {
+                    } else if isApper {
                         value.Viewframe.size = size
                         withAnimation(.autoAnimation) {
                             setValue(onAppear: true, GeometryProxy: GeometryProxy)
                         }
+                    } else {
+                        value.Viewframe.size = size
+                            setValue(onAppear: true, GeometryProxy: GeometryProxy)
                     }
                 }
             }
@@ -161,6 +166,7 @@ struct GlazedPopoverViewModle: GlazedViewModle {
             }
             DispatchQueue.main.async(0.5) {
                 canSet = true
+                isApper = true
             }
         }
     }
