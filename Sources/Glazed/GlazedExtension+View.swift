@@ -178,74 +178,79 @@ struct GlazedInputViewModle<Content1: View>: ViewModifier {
     @Environment(\.gluzedSuper) var gluazedSuper
     
     @State var id: UUID = UUID()
-    
+    @State var viewFrame:CGRect = .zero
     func body(content: Content) -> some View {
+        let _ = {
+            if isPresented {
+                DispatchQueue.main.async {
+                    withAnimation(.autoAnimation) {
+                        glazedObserver.contentView[id]?.value.content.rootView = AnyView(content1())
+                    }
+                }
+            }
+        }()
+        
         content
-            .overlay {
-                if isPresented {
-                    GeometryReader { GeometryProxy in
-                        let _ = DispatchQueue.main.async {
-                            withAnimation(.autoAnimation) {
-                                glazedObserver.contentView[id]?.value.content.rootView = AnyView(content1())
+            .onChange(of: isPresented, perform: { value in
+                if value {
+                    glazedObserver.dismiss(helper: id)
+                    id = UUID()
+                    let Helper = GlazedHelperType(
+                        id: id,
+                        type: type,
+                        value: GlazedHelperValue(
+                            buttonFrame: viewFrame,
+                            gluazedSuper: gluazedSuper == nil,
+                            content: AnyView(content1()),
+                            isPrisentDismissAction: {
+                                isPresented = false
+                            }
+                        )) { point, value in
+                            switch type {
+                            case .Popover, .topBottom, .centerPopover:
+                                if !value.Viewframe.contains(point) && !value.buttonFrame.contains(point) {
+                                    isPresented = false
+                                }
+                            case .Sheet:
+                                break
+                            case .FullCover:
+                                break
+                            case .EditPopover, .PopoverWithOutButton:
+                                if !value.Viewframe.contains(point) {
+                                    isPresented = false
+                                }
+                            case .tipPopover:
+                                break
+                            case .Progres, .SharePopover:
+                                break
+                            case .fullPopover:
+                                break
                             }
                         }
-                        Color.clear
-                            .preference(key: RectPreferenceKey.self, value: GeometryProxy.frame(in: .global))
-                            .onAppear {
-                                glazedObserver.dismiss(helper: id)
-                                id = UUID()
-                                let Helper = GlazedHelperType(
-                                    id: id,
-                                    type: type,
-                                    value: GlazedHelperValue(
-                                        buttonFrame: GeometryProxy.frame(in: .global),
-                                        gluazedSuper: gluazedSuper == nil,
-                                        content: AnyView(content1()),
-                                        isPrisentDismissAction: {
-                                            isPresented = false
-                                        }
-                                    )) { point, value in
-                                        switch type {
-                                        case .Popover, .topBottom, .centerPopover:
-                                            if !value.Viewframe.contains(point) && !value.buttonFrame.contains(point) {
-                                                isPresented = false
-                                            }
-                                        case .Sheet:
-                                            break
-                                        case .FullCover:
-                                            break
-                                        case .EditPopover, .PopoverWithOutButton:
-                                            if !value.Viewframe.contains(point) {
-                                                isPresented = false
-                                            }
-                                        case .tipPopover:
-                                            break
-                                        case .Progres, .SharePopover:
-                                            break
-                                        case .fullPopover:
-                                            break
-                                        }
-                                    }
-                                glazedObserver.contentView[id] = Helper
-                                glazedObserver.contentView[id]?.value.content.sizingOptions = .intrinsicContentSize
-                                
-                                DispatchQueue.main.async(0.01) {
-                                    withAnimation(.autoAnimation) {
-                                        glazedObserver.contentViewList.append(Helper.id)
-                                    }
-                                }
-                            }
-                            .transition(.identity)
+                    glazedObserver.contentView[id] = Helper
+                    glazedObserver.contentView[id]?.value.content.sizingOptions = .intrinsicContentSize
+                    
+                    DispatchQueue.main.async(0.01) {
+                        withAnimation(.autoAnimation) {
+                            glazedObserver.contentViewList.append(Helper.id)
+                        }
                     }
-                    .onPreferenceChange(RectPreferenceKey.self, perform: { rect in
-                        glazedObserver.contentView[id]?.value.buttonFrame = rect
-                    })
-                    .onDisappear {
-                        glazedObserver.dismiss(helper: id)
-                    }
-                    .transition(.identity)
-                    .allowsHitTesting(false)
+                } else {
+                    glazedObserver.dismiss(helper: id)
                 }
+            })
+            .overlay {
+                GeometryReader { GeometryProxy in
+                    Color.clear
+                        .preference(key: RectPreferenceKey.self, value: GeometryProxy.frame(in: .global))
+                }
+                .onPreferenceChange(RectPreferenceKey.self, perform: { rect in
+                    viewFrame = rect
+                    if isPresented {
+                        glazedObserver.contentView[id]?.value.buttonFrame = rect
+                    }
+                })
+                .allowsHitTesting(false)
             }
     }
 }
