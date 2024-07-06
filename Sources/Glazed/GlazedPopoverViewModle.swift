@@ -36,14 +36,16 @@ struct GlazedPopoverViewModle: GlazedViewModle {
     @State var isDissmis = false
     var body: some View {
         HostingViewModle(hosting: value.content, value: value) { size in
-            DispatchQueue.main.async {
-                if showProgres == 0 {
-                    value.Viewframe.size = size
-                    setValue(onAppear: true, GeometryProxy: GeometryProxy)
-                } else if !isDissmis {
-                    value.Viewframe.size = size
-                    withAnimation(.autoAnimation) {
+            if !isDissmis {
+                DispatchQueue.main.async {
+                    if showProgres == 0 {
+                        value.Viewframe.size = size
                         setValue(onAppear: true, GeometryProxy: GeometryProxy)
+                    } else {
+                        value.Viewframe.size = size
+                        withAnimation(.autoAnimation) {
+                            setValue(onAppear: true, GeometryProxy: GeometryProxy)
+                        }
                     }
                 }
             }
