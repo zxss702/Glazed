@@ -66,7 +66,7 @@ public extension View {
             content()
                 .buttonStyle(TapButtonStyle())
                 .background(.background)
-                .clipShape(Capsule(style: .continuous))
+                .clipShape(RoundedRectangle(cornerRadius: 26.5, style: .continuous))
         }))
     }
     func topBottomPopover<Content: View>(isPresented: Binding<Bool>, @ViewBuilder content: @escaping () -> Content) -> some View {
@@ -169,6 +169,7 @@ func animation(animation: @escaping () -> Void, completion: @escaping (Bool) -> 
     UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.825, initialSpringVelocity: 0.6, options: UIView.AnimationOptions.allowUserInteraction, animations: animation, completion: completion)
 }
 struct GlazedInputViewModle<Content1: View>: ViewModifier {
+    
     let type:GlazedType
     @Binding var isPresented:Bool
     @ViewBuilder var content1:() -> Content1
