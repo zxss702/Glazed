@@ -37,24 +37,23 @@ struct GlazedPopoverViewModle: GlazedViewModle {
     @State var isApper = false
     
     var body: some View {
-        HostingViewModle(hosting: value.content, value: value) { size in
-            if !isDissmis {
-                DispatchQueue.main.async {
+        HostingViewModle(hosting: value.content, value: value)
+            .onFrameChange { size in
+                if !isDissmis {
                     if showProgres == 0 {
-                        value.Viewframe.size = size
+                        value.Viewframe = size
                         setValue(onAppear: true, GeometryProxy: GeometryProxy)
                     } else if isApper {
-                        value.Viewframe.size = size
+                        value.Viewframe = size
                         withAnimation(.autoAnimation) {
                             setValue(onAppear: true, GeometryProxy: GeometryProxy)
                         }
                     } else {
-                        value.Viewframe.size = size
-                            setValue(onAppear: true, GeometryProxy: GeometryProxy)
+                        value.Viewframe = size
+                        setValue(onAppear: true, GeometryProxy: GeometryProxy)
                     }
                 }
             }
-        }
         .shadow(radius: 0.3)
         .shadow(color: Color(.sRGBLinear, white: 0, opacity: 0.4), radius: 35)
         .scaleEffect(x: showProgres, y: showProgres, anchor: UnitPoint(x: scaleX, y: scaleY))
@@ -147,7 +146,6 @@ struct GlazedPopoverViewModle: GlazedViewModle {
             }
         }(), rightHeight / 2 + spacing), GeometryProxy.size.height - rightHeight / 2 - spacing)
         
-        value.Viewframe.origin = CGPoint(x: offsetX - value.Viewframe.width / 2, y: offsetY - value.Viewframe.height / 2)
         
         let ideaScaleX = (buttonFrame.midX - offsetX) / rightWidth
         scaleX = max(min(0.5 + ideaScaleX, 1.1), -0.1)
