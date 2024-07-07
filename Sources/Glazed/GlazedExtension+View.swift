@@ -192,6 +192,9 @@ struct GlazedInputViewModle<Content1: View>: ViewModifier {
         }()
         
         content
+            .onDisappear {
+                glazedObserver.dismiss(helper: id)
+            }
             .onChange(of: isPresented, perform: { value in
                 if value {
                     glazedObserver.dismiss(helper: id)
