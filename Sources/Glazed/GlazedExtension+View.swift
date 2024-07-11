@@ -69,14 +69,6 @@ public extension View {
                 .clipShape(RoundedRectangle(cornerRadius: 26.5, style: .continuous))
         }))
     }
-    func topBottomPopover<Content: View>(isPresented: Binding<Bool>, @ViewBuilder content: @escaping () -> Content) -> some View {
-        self.modifier(GlazedInputViewModle(type: .topBottom, isPresented: isPresented, content1: {
-            content()
-                .buttonStyle(TapButtonStyle())
-                .background(.background)
-                .clipShape(RoundedRectangle(cornerRadius: 26.5, style: .continuous))
-        }))
-    }
     func clearPopover<Content: View>(isPresented: Binding<Bool>, @ViewBuilder content: @escaping () -> Content) -> some View {
         self.modifier(GlazedInputViewModle(type: .Popover, isPresented: isPresented, content1: {
             content()
