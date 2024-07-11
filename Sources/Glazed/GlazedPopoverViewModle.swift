@@ -86,20 +86,27 @@ struct GlazedPopoverViewModle: GlazedViewModle {
         let edge:PopoverEdge = {
             if center {
                 return .center
+            } else if edit {
+                return .top
             } else {
-                let leadingSpacing = buttonFrame.minX - value.Viewframe.width
-                let topSpacing = buttonFrame.minY - value.Viewframe.height
-                let bottomSpacing = GeometryProxy.size.height - buttonFrame.maxY - value.Viewframe.height
-                let trailingSpacing = GeometryProxy.size.width - buttonFrame.maxX - value.Viewframe.width
-                if edit {
-                    let maxSpacing = max(bottomSpacing,topSpacing)
-                    
-                    switch maxSpacing {
-                    case topSpacing: return .top
-                    case bottomSpacing: return .bottom
-                    default: return .bottom
-                    }
+                let bottomRect = CGRect(x: 0, y: GeometryProxy.size.height * 0.75, width: GeometryProxy.size.width, height: GeometryProxy.size.height * 0.25)
+                let topRect = CGRect(x: 0, y: 0, width: GeometryProxy.size.width, height: GeometryProxy.size.height * 0.25)
+                let leftRect = CGRect(x: 0, y: GeometryProxy.size.height * 0.25, width: GeometryProxy.size.width * 0.25, height: GeometryProxy.size.height * 0.5)
+                let rightRect = CGRect(x: GeometryProxy.size.width * 0.75, y: GeometryProxy.size.height * 0.25, width: GeometryProxy.size.width * 0.25, height: GeometryProxy.size.height * 0.5)
+                
+                if bottomRect.contains(CGPoint(x: buttonFrame.midX, y: buttonFrame.midY)) {
+                    return .top
+                } else if topRect.contains(CGPoint(x: buttonFrame.midX, y: buttonFrame.midY)) {
+                    return .bottom
+                } else if leftRect.contains(CGPoint(x: buttonFrame.midX, y: buttonFrame.midY)) {
+                    return .trailing
+                } else if rightRect.contains(CGPoint(x: buttonFrame.midX, y: buttonFrame.midY)) {
+                    return .leading
                 } else {
+                    let leadingSpacing = buttonFrame.minX - value.Viewframe.width
+                    let topSpacing = buttonFrame.minY - value.Viewframe.height
+                    let bottomSpacing = GeometryProxy.size.height - buttonFrame.maxY - value.Viewframe.height
+                    let trailingSpacing = GeometryProxy.size.width - buttonFrame.maxX - value.Viewframe.width
                     let maxSpacing = max(max(leadingSpacing,trailingSpacing), max(bottomSpacing,topSpacing))
                     
                     switch maxSpacing {
