@@ -172,7 +172,7 @@ struct GlazedEnvironmentViewCell<Content: View>: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }
-extension View{
+public extension View{
     @ViewBuilder
     func onChange(connect:some Equatable,action:@escaping () -> Void) -> some View {
         self
@@ -185,7 +185,7 @@ extension View{
     }
 }
 
-extension DispatchQueue {
+public extension DispatchQueue {
     func async(_ name: String = "async", Action: @escaping () throws -> Void) {
         self.async(execute: DispatchWorkItem(block: {
             do {
@@ -208,7 +208,7 @@ extension DispatchQueue {
     }
 }
 
-extension View {
+public extension View {
     func ifMode(@ViewBuilder ifAction: (AnyView) -> some View) -> some View {
         ifAction(AnyView(self))
     }

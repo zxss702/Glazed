@@ -43,11 +43,16 @@ struct GlazedSheetViewModle: GlazedViewModle {
         
         let cneterORbottom = value.Viewframe.size.width < GeometryProxy.size.width
         let radius = min(max(max(GeometryProxy.safeAreaInsets.top, GeometryProxy.safeAreaInsets.leading), max(GeometryProxy.safeAreaInsets.top, GeometryProxy.safeAreaInsets.trailing)), max(max(GeometryProxy.safeAreaInsets.bottom, GeometryProxy.safeAreaInsets.trailing), max(GeometryProxy.safeAreaInsets.bottom, GeometryProxy.safeAreaInsets.leading)))
-        let shape = RoundedRectangle(cornerRadius: min(max(radius, 26.5), 60), style: .continuous)
+        let shape = UnevenRoundedRectangle(cornerRadii: RectangleCornerRadii(
+            topLeading: 26.5,
+            bottomLeading: min(max(radius, 26.5), 60),
+            bottomTrailing: min(max(radius, 26.5), 60),
+            topTrailing: 26.5
+        ), style: .continuous)
         
         value.content.rootView
+            .background(.thinMaterial)
             .clipShape(shape)
-            .background(shape.fill(.ultraThinMaterial))
             .ignoresSafeArea()
         
             .shadow(radius: 0.3)

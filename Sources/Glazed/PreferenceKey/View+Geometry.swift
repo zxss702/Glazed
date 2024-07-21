@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-extension View {
+public extension View {
     func onSizeChange(_ binding: Binding<CGSize>) -> some View {
         self.onSizeChange { size in
             binding.wrappedValue = size

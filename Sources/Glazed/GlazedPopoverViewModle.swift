@@ -28,40 +28,38 @@ struct GlazedPopoverViewModle: GlazedViewModle {
     @State var showProgres:Double = 0
     @EnvironmentObject var glazedObserver: GlazedObserver
     
-    @State var canSet = false
-    
     @State var offsetY:CGFloat = 0
     @State var offsetX:CGFloat = 0
     
     @State var isDissmis = false
-    @State var isApper = false
+    
+    @State var makePositionRect: CGRect = .zero
     
     var body: some View {
         HostingViewModle(hosting: value.content, value: value)
             .shadow(radius: 0.3)
-            .shadow(color: Color(.sRGBLinear, white: 0, opacity: 0.4), radius: 35)
-            .scaleEffect(x: showProgres, y: showProgres, anchor: UnitPoint(x: scaleX, y: scaleY))
-            .blur(radius: 20 - showProgres * 20)
+            .shadow(color: Color(.sRGBLinear, white: 0, opacity: 0.4), radius: 35 * showProgres)
+        
             .onFrameChange { size in
-                if !isDissmis {
-                    if showProgres == 0 {
-                        value.Viewframe = size
-                        setValue(onAppear: true, GeometryProxy: GeometryProxy)
-                    } else if isApper {
-                        value.Viewframe = size
-                        withAnimation(.autoAnimation) {
-                            setValue(onAppear: false, GeometryProxy: GeometryProxy)
-                        }
-                    } else {
-                        value.Viewframe = size
-                        setValue(onAppear: false, GeometryProxy: GeometryProxy)
-                    }
+                value.Viewframe = size
+            }
+            .scaleEffect(x: showProgres, y: showProgres, anchor: UnitPoint(x: scaleX, y: scaleY))
+        
+            .blur(radius: 5 - showProgres * 5)
+            .onSizeChange { size in
+                makePositionRect.size = size
+            }
+        
+            .position(x: offsetX, y: offsetY)
+            .environment(\.safeAreaInsets, EdgeInsets(top: 8, leading: 8, bottom: 8, trailing: 8))
+        
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background {
+                if !value.gluazedSuper {
+                    Color.black.opacity(0.1 * showProgres).ignoresSafeArea()
                 }
             }
         
-            .frame(maxWidth: GeometryProxy.size.width - spacing * 2, maxHeight: GeometryProxy.size.height - spacing * 2)
-            .position(x: offsetX, y: offsetY)
-            .environment(\.safeAreaInsets, EdgeInsets(top: 16, leading: 16, bottom: 16, trailing: 16))
             .onChange(of: value.buttonFrame) { value in
                 if showProgres == 1 {
                     withAnimation(.autoAnimation) {
@@ -69,10 +67,13 @@ struct GlazedPopoverViewModle: GlazedViewModle {
                     }
                 }
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background {
-                if !value.gluazedSuper {
-                    Color.black.opacity(0.1 * showProgres).ignoresSafeArea()
+            .onChange(of: makePositionRect) { newValue in
+                if showProgres == 1 {
+//                    withAnimation(.autoAnimation) {
+                        setValue(GeometryProxy: GeometryProxy)
+//                    }
+                } else if !isDissmis {
+                    setValue(onAppear: true, GeometryProxy: GeometryProxy)
                 }
             }
     }
@@ -103,10 +104,10 @@ struct GlazedPopoverViewModle: GlazedViewModle {
                 } else if rightRect.contains(CGPoint(x: buttonFrame.midX, y: buttonFrame.midY)) {
                     return .leading
                 } else {
-                    let leadingSpacing = buttonFrame.minX - value.Viewframe.width
-                    let topSpacing = buttonFrame.minY - value.Viewframe.height
-                    let bottomSpacing = GeometryProxy.size.height - buttonFrame.maxY - value.Viewframe.height
-                    let trailingSpacing = GeometryProxy.size.width - buttonFrame.maxX - value.Viewframe.width
+                    let leadingSpacing = buttonFrame.minX - makePositionRect.width
+                    let topSpacing = buttonFrame.minY - makePositionRect.height
+                    let bottomSpacing = GeometryProxy.size.height - buttonFrame.maxY - makePositionRect.height
+                    let trailingSpacing = GeometryProxy.size.width - buttonFrame.maxX - makePositionRect.width
                     let maxSpacing = max(max(leadingSpacing,trailingSpacing), max(bottomSpacing,topSpacing))
                     
                     switch maxSpacing {
@@ -120,8 +121,8 @@ struct GlazedPopoverViewModle: GlazedViewModle {
             }
         }()
         
-        let rightWidth = min(GeometryProxy.size.width - spacing * 2, value.Viewframe.width)
-        let rightHeight = min(GeometryProxy.size.height - spacing * 2, value.Viewframe.height)
+        let rightWidth = min(GeometryProxy.size.width - spacing * 2, makePositionRect.width)
+        let rightHeight = min(GeometryProxy.size.height - spacing * 2, makePositionRect.height)
         
         offsetX = min(max({
             switch edge {
@@ -155,9 +156,9 @@ struct GlazedPopoverViewModle: GlazedViewModle {
         
         
         let ideaScaleX = (buttonFrame.midX - offsetX) / rightWidth
-        scaleX = max(min(0.5 + ideaScaleX, 1.1), -0.1)
+        scaleX = max(min(0.5 + ideaScaleX, 1), 0)
         let ideaScaleY = (buttonFrame.midY - offsetY) / rightHeight
-        scaleY = max(min(0.5 + ideaScaleY, 1.1), -0.1)
+        scaleY = max(min(0.5 + ideaScaleY, 1), 0)
         
         if onAppear {
             value.typeDismissAction = {
@@ -168,10 +169,6 @@ struct GlazedPopoverViewModle: GlazedViewModle {
             }
             withAnimation(.autoAnimation(speed: 1.5)) {
                 showProgres = 1
-            }
-            DispatchQueue.main.async(0.5) {
-                canSet = true
-                isApper = true
             }
         }
     }

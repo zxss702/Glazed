@@ -109,7 +109,6 @@ public extension View {
                     .buttonStyle(TapButtonStyle())
                     .background(.background)
                     .clipShape(RoundedRectangle(cornerRadius: 26.5, style: .continuous))
-                    
             }))
     }
     func fullPopover<Content: View>(isPresented: Binding<Bool>, ignorTouch:Bool = false, @ViewBuilder content: @escaping () -> Content) -> some View {
@@ -142,7 +141,7 @@ struct GlazedInputView: View {
             GlazedSheetViewModle(value: helper.value, GeometryProxy: GeometryProxy, zindex: zindex)
         case .FullCover:
             GlazedFullCoverViewModle(value: helper.value, zindex: zindex, GeometryProxy: GeometryProxy)
-        case .EditPopover, .tipPopover, .topBottom:
+        case .EditPopover, .tipPopover:
             GlazedPopoverViewModle(value: helper.value, edit: true, GeometryProxy: GeometryProxy)
                 .zIndex(Double(zindex))
         case .Progres:
@@ -184,69 +183,67 @@ struct GlazedInputViewModle<Content1: View>: ViewModifier {
         }()
         
         content
-            .onDisappear {
-                glazedObserver.dismiss(helper: id)
-            }
-            .onChange(of: isPresented, perform: { value in
-                if value {
-                    glazedObserver.dismiss(helper: id)
-                    id = UUID()
-                    let Helper = GlazedHelperType(
-                        id: id,
-                        type: type,
-                        value: GlazedHelperValue(
-                            buttonFrame: viewFrame,
-                            gluazedSuper: gluazedSuper == nil,
-                            content: AnyView(content1()),
-                            isPrisentDismissAction: {
-                                isPresented = false
-                            }
-                        )) { point, value in
-                            switch type {
-                            case .Popover, .topBottom, .centerPopover:
-                                if !value.Viewframe.contains(point) && !value.buttonFrame.contains(point) {
-                                    isPresented = false
-                                }
-                            case .Sheet:
-                                break
-                            case .FullCover:
-                                break
-                            case .EditPopover, .PopoverWithOutButton:
-                                if !value.Viewframe.contains(point) {
-                                    isPresented = false
-                                }
-                            case .tipPopover:
-                                break
-                            case .Progres, .SharePopover:
-                                break
-                            case .fullPopover:
-                                break
-                            }
-                        }
-                    glazedObserver.contentView[id] = Helper
-                    glazedObserver.contentView[id]?.value.content.sizingOptions = .intrinsicContentSize
-                    
-                    DispatchQueue.main.async(0.01) {
-                        withAnimation(.autoAnimation) {
-                            glazedObserver.contentViewList.append(Helper.id)
-                        }
-                    }
-                } else {
-                    glazedObserver.dismiss(helper: id)
-                }
-            })
             .overlay {
-                GeometryReader { GeometryProxy in
-                    Color.clear
-                        .preference(key: RectPreferenceKey.self, value: GeometryProxy.frame(in: .global))
-                }
-                .onPreferenceChange(RectPreferenceKey.self, perform: { rect in
-                    viewFrame = rect
-                    if isPresented {
-                        glazedObserver.contentView[id]?.value.buttonFrame = rect
+                if isPresented {
+                    GeometryReader { GeometryProxy in
+                        Color.clear
+                            .preference(key: RectPreferenceKey.self, value: GeometryProxy.frame(in: .global))
+                            .onAppear {
+                                glazedObserver.dismiss(helper: id)
+                                id = UUID()
+                                let Helper = GlazedHelperType(
+                                    id: id,
+                                    type: type,
+                                    value: GlazedHelperValue(
+                                        buttonFrame: GeometryProxy.frame(in: .global),
+                                        gluazedSuper: gluazedSuper == nil,
+                                        content: AnyView(content1()),
+                                        isPrisentDismissAction: {
+                                            isPresented = false
+                                        }
+                                    )) { point, value in
+                                        switch type {
+                                        case .Popover, .centerPopover:
+                                            if !value.Viewframe.padding(8).contains(point) && !value.buttonFrame.padding(8).contains(point) {
+                                                isPresented = false
+                                            }
+                                        case .Sheet:
+                                            break
+                                        case .FullCover:
+                                            break
+                                        case .EditPopover, .PopoverWithOutButton:
+                                            if !value.Viewframe.padding(8).contains(point) {
+                                                isPresented = false
+                                            }
+                                        case .tipPopover:
+                                            break
+                                        case .Progres, .SharePopover:
+                                            break
+                                        case .fullPopover:
+                                            break
+                                        }
+                                    }
+                                glazedObserver.contentView[id] = Helper
+                                glazedObserver.contentView[id]?.value.content.sizingOptions = .intrinsicContentSize
+                                
+                                DispatchQueue.main.async(0.00001) {
+                                    withAnimation(.autoAnimation) {
+                                        glazedObserver.contentViewList.append(Helper.id)
+                                    }
+                                }
+                            }
+                            .onDisappear {
+                                glazedObserver.dismiss(helper: id)
+                            }
+                            .transition(.identity)
                     }
-                })
-                .allowsHitTesting(false)
+                    .onPreferenceChange(RectPreferenceKey.self, perform: { rect in
+                        viewFrame = rect
+                        glazedObserver.contentView[id]?.value.buttonFrame = rect
+                    })
+                    .allowsHitTesting(false)
+                    .transition(.identity)
+                }
             }
     }
 }
@@ -261,5 +258,11 @@ extension Animation {
         } else {
             return .spring().speed(speed)
         }
+    }
+}
+
+extension CGRect {
+    func padding(_ float: CGFloat) -> CGRect {
+        return CGRect(x: self.origin.x - float, y: self.origin.y - float, width: self.width + 2 * float, height: self.height + 2 * float)
     }
 }
