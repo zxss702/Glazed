@@ -111,6 +111,16 @@ public extension View {
                     .clipShape(RoundedRectangle(cornerRadius: 26.5, style: .continuous))
             }))
     }
+    func centerClearPopover<Content: View>(isPresented: Binding<Bool>, ignorTouch:Bool = false, @ViewBuilder content: @escaping () -> Content) -> some View {
+        self
+            .scaleEffect(x: isPresented.wrappedValue ? 0.95 : 1, y: isPresented.wrappedValue ? 0.95 : 1)
+            .blur(radius: isPresented.wrappedValue ? 20 : 0)
+            .animation(.spring(), value: isPresented.wrappedValue)
+            .modifier(GlazedInputViewModle(type: .centerPopover, isPresented: isPresented, content1: {
+                content()
+                    .buttonStyle(TapButtonStyle())
+            }))
+    }
     func fullPopover<Content: View>(isPresented: Binding<Bool>, ignorTouch:Bool = false, @ViewBuilder content: @escaping () -> Content) -> some View {
         self
             .scaleEffect(x: isPresented.wrappedValue ? 0.95 : 1, y: isPresented.wrappedValue ? 0.95 : 1)
