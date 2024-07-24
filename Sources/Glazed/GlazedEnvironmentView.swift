@@ -222,15 +222,26 @@ public extension View {
         }
     }
     
+    @ViewBuilder
     func shadow(Ofset: CGPoint = .zero) -> some View {
-        self
-            .shadow(radius: 0.3)
-            .shadow(color: Color(.sRGBLinear, white: 0, opacity: 0.2), radius: 35, x: Ofset.x, y: Ofset.y)
+        @Environment(\.colorScheme) var colorScheme
+        if colorScheme == .dark {
+            self
+                .shadow(radius: 0.3)
+                .shadow(color: Color(.sRGBLinear, white: 1, opacity: 0.2), radius: 35, x: Ofset.x, y: Ofset.y)
+        } else {
+            self
+                .shadow(radius: 0.3)
+                .shadow(color: Color(.sRGBLinear, white: 0, opacity: 0.2), radius: 35, x: Ofset.x, y: Ofset.y)
+        }
     }
+    
+    @ViewBuilder
     func shadow(size: CGFloat, Ofset: CGPoint = .zero) -> some View {
         self
             .shadow(radius: size, x: Ofset.x, y: Ofset.y)
     }
+    @ViewBuilder
     func shadow(color: Color, size: CGFloat, Ofset: CGPoint = .zero) -> some View {
         self
             .shadow(color: color, radius: size, x: Ofset.x, y: Ofset.y)
