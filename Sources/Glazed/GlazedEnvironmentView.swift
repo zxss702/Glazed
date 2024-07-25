@@ -158,8 +158,7 @@ struct GlazedEnvironmentViewCell<Content: View>: View {
     var body: some View {
         ZStack {
             content()
-            ForEach(glazedObserver.contentViewList, id: \.self) { view in
-                let zindex = glazedObserver.contentViewList.firstIndex(of: view) ?? 10000
+            ForEach(Array(glazedObserver.contentViewList.enumerated()), id: \.self.element) { (zindex, view) in
                 if let Helper = glazedObserver.contentView[view] {
                     GlazedInputView(type: Helper.type, helper: Helper, GeometryProxy: geometry, zindex: zindex * 3 + 1)
                         .environment(\.gluzedSuper, view)

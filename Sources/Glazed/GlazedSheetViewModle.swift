@@ -23,11 +23,10 @@ struct GlazedSheetViewModle: GlazedViewModle {
     
     @Environment(\.glazedDismiss) var glazedDismiss
     
-    @GestureState var isDrag:Bool = false
-    
+
     @State var show = true
     
-    @State var offsetY:CGFloat = 0
+    @GestureState var offsetY:CGFloat = 0
     
     var body: some View {
         Color.black.opacity(0.2)
@@ -45,56 +44,54 @@ struct GlazedSheetViewModle: GlazedViewModle {
         let radius = min(max(max(GeometryProxy.safeAreaInsets.top, GeometryProxy.safeAreaInsets.leading), max(GeometryProxy.safeAreaInsets.top, GeometryProxy.safeAreaInsets.trailing)), max(max(GeometryProxy.safeAreaInsets.bottom, GeometryProxy.safeAreaInsets.trailing), max(GeometryProxy.safeAreaInsets.bottom, GeometryProxy.safeAreaInsets.leading)))
         let shape = UnevenRoundedRectangle(cornerRadii: RectangleCornerRadii(
             topLeading: 26.5,
-            bottomLeading: min(max(radius, 26.5), 60),
-            bottomTrailing: min(max(radius, 26.5), 60),
+            bottomLeading: cneterORbottom ? min(max(radius, 26.5), 60) : 0,
+            bottomTrailing: cneterORbottom ? min(max(radius, 26.5), 60) : 0,
             topTrailing: 26.5
         ), style: .continuous)
         
         value.content.rootView
-            .background(.thinMaterial)
-            .clipShape(shape)
-            .ignoresSafeArea()
-        
-            .shadow(radius: 0.3)
-            .shadow(color: Color(.sRGBLinear, white: 0, opacity: 0.4), radius: 35)
+            .background(.background)
             .onFrameChange { Rect in
                 value.Viewframe.size =  Rect.size
             }
+            .clipShape(shape)
         
+            .shadow(radius: 0.3)
+            .shadow(color: Color(.sRGBLinear, white: 0, opacity: 0.4), radius: 35)
+
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: cneterORbottom ? .center : .bottom)
-            .padding(.top, (cneterORbottom ? 0 : 20 + GeometryProxy.safeAreaInsets.top))
+            .padding({
+                if cneterORbottom {
+                    return EdgeInsets(top:  GeometryProxy.safeAreaInsets.top + 20, leading: 0, bottom:  GeometryProxy.safeAreaInsets.bottom + 20, trailing: 0)
+                } else {
+                    return EdgeInsets(top:  GeometryProxy.safeAreaInsets.top + 20, leading: 0, bottom:  0, trailing: 0)
+                }
+            }())
             .offset(y: offsetY)
             .gesture(
                 DragGesture(minimumDistance: 30)
-                    .updating($isDrag) { Value, State, Transaction in
-                        State = true
-                        DispatchQueue.main.async {
-                            if Value.translation.height > 0 {
-                                offsetY = Value.translation.height
+                    .updating($offsetY) { Value, offsetY, Transaction in
+                        if Value.translation.height > 0 {
+                            offsetY = Value.translation.height
+                        } else {
+                            if cneterORbottom {
+                                offsetY = -sqrt(abs(Value.translation.height))
                             } else {
-                                if cneterORbottom {
-                                    offsetY = -sqrt(abs(Value.translation.height))
-                                } else {
-                                    offsetY = 0
-                                }
+                                offsetY = 0
                             }
                         }
                     }
-            )
-            .transition(.offset(y: GeometryProxy.size.height + GeometryProxy.safeAreaInsets.bottom).animation(.autoAnimation))
-            .onChange(of: isDrag) { v in
-                if !v {
-                    if offsetY > 130 {
-                        glazedDismiss()
-                    } else {
-                        withAnimation(.spring(dampingFraction: 1).speed(1.3)) {
-                            offsetY = 0
+                    .onEnded { Value in
+                        if Value.translation.height > 130 {
+                            glazedDismiss()
                         }
                     }
-                }
-            }
-            .environment(\.safeAreaInsets, EdgeInsets(top: 17, leading: 17, bottom: 17, trailing: 17))
+            )
+            .animation(.autoAnimation, value: offsetY)
+            .transition(.offset(y: GeometryProxy.size.height + GeometryProxy.safeAreaInsets.bottom + 50).animation(.autoAnimation))
+            .environment(\.safeAreaInsets, EdgeInsets(top: 8, leading: 8, bottom: 8, trailing: 8))
             .zIndex(Double(zindex + 1))
             .environment(\.gluzedSuper, nil)
+            .ignoresSafeArea()
     }
 }
