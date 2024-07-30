@@ -223,26 +223,42 @@ public extension View {
     
     @ViewBuilder
     func shadow(Ofset: CGPoint = .zero) -> some View {
-        @Environment(\.colorScheme) var colorScheme
-        if colorScheme == .dark {
-            self
-                .shadow(radius: 0.3)
-                .shadow(color: Color(.sRGBLinear, white: 1, opacity: 0.2), radius: 35, x: Ofset.x, y: Ofset.y)
-        } else {
-            self
-                .shadow(radius: 0.3)
-                .shadow(color: Color(.sRGBLinear, white: 0, opacity: 0.2), radius: 35, x: Ofset.x, y: Ofset.y)
-        }
+        self.modifier(shadowViewModle(size: 35))
     }
     
     @ViewBuilder
     func shadow(size: CGFloat, Ofset: CGPoint = .zero) -> some View {
         self
-            .shadow(radius: size, x: Ofset.x, y: Ofset.y)
+            .modifier(shadowViewModle(size: size, offset: Ofset))
     }
     @ViewBuilder
     func shadow(color: Color, size: CGFloat, Ofset: CGPoint = .zero) -> some View {
         self
-            .shadow(color: color, radius: size, x: Ofset.x, y: Ofset.y)
+            .modifier(shadowViewModle(color: color, size: size, offset: Ofset))
+    }
+    
+    @ViewBuilder
+    func shadow(color: Color? = nil, size: CGFloat, offset: CGPoint = .zero) -> some View {
+        self
+            .modifier(shadowViewModle(color: color, size: size, offset: offset))
+    }
+}
+
+struct shadowViewModle: ViewModifier {
+    @Environment(\.colorScheme) private var colorScheme
+    
+    var color: Color?
+    var size: CGFloat
+    var offset: CGPoint = .zero
+    func body(content: Content) -> some View {
+        if colorScheme == .dark {
+            content
+                .shadow(radius: 0.3)
+                .shadow(color: color ?? Color(.sRGBLinear, white: 1, opacity: 0.2), radius: size, x: offset.x, y: offset.y)
+        } else {
+            content
+                .shadow(radius: 0.3)
+                .shadow(color: color ?? Color(.sRGBLinear, white: 0, opacity: 0.2), radius: size, x: offset.x, y: offset.y)
+        }
     }
 }
