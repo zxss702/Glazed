@@ -223,7 +223,7 @@ public extension View {
     
     @ViewBuilder
     func shadow(Ofset: CGPoint = .zero) -> some View {
-        self.modifier(shadowViewModle(size: 35))
+        self.modifier(shadowViewModle(size: 0.3)).modifier(shadowViewModle(size: 35))
     }
     
     @ViewBuilder
@@ -237,10 +237,13 @@ public extension View {
             .modifier(shadowViewModle(color: color, size: size, offset: Ofset))
     }
     
-    @ViewBuilder
     func shadow(color: Color? = nil, size: CGFloat, offset: CGPoint = .zero) -> some View {
         self
             .modifier(shadowViewModle(color: color, size: size, offset: offset))
+    }
+    func shadow2(color: CGFloat? = nil, size: CGFloat, offset: CGPoint = .zero) -> some View {
+        self
+            .modifier(shadowViewModle2(color: color, size: size, offset: offset))
     }
 }
 
@@ -253,12 +256,26 @@ struct shadowViewModle: ViewModifier {
     func body(content: Content) -> some View {
         if colorScheme == .dark {
             content
-                .shadow(radius: 0.3)
                 .shadow(color: color ?? Color(.sRGBLinear, white: 1, opacity: 0.2), radius: size, x: offset.x, y: offset.y)
         } else {
             content
-                .shadow(radius: 0.3)
                 .shadow(color: color ?? Color(.sRGBLinear, white: 0, opacity: 0.2), radius: size, x: offset.x, y: offset.y)
+        }
+    }
+}
+struct shadowViewModle2: ViewModifier {
+    @Environment(\.colorScheme) private var colorScheme
+    
+    var color: CGFloat?
+    var size: CGFloat
+    var offset: CGPoint = .zero
+    func body(content: Content) -> some View {
+        if colorScheme == .dark {
+            content
+                .shadow(color: Color(.sRGBLinear, white: 1, opacity: color ?? 0.2), radius: size, x: offset.x, y: offset.y)
+        } else {
+            content
+                .shadow(color: Color(.sRGBLinear, white: 0, opacity: color ?? 0.2), radius: size, x: offset.x, y: offset.y)
         }
     }
 }
