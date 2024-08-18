@@ -166,9 +166,19 @@ struct GlazedInputView: View {
         }
     }
 }
+#if os(macOS)
+func animation(animation: @escaping () -> Void, completion: @escaping (Bool) -> Void = {_ in }) {
+    let animationn = NSViewAnimation(duration: 0.4, animationCurve: .linear)
+    animationn.start()
+    animation()
+    animationn.stop()
+    completion(true)
+}
+#else
 func animation(animation: @escaping () -> Void, completion: @escaping (Bool) -> Void = {_ in }) {
     UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.825, initialSpringVelocity: 0.6, options: UIView.AnimationOptions.allowUserInteraction, animations: animation, completion: completion)
 }
+#endif
 struct GlazedInputViewModle<Content1: View>: ViewModifier {
     
     let type:GlazedType
