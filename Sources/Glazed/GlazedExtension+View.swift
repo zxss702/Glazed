@@ -194,11 +194,8 @@ struct GlazedInputViewModle<Content1: View>: ViewModifier {
     func body(content: Content) -> some View {
         let _ = {
             if isPresented {
-                DispatchQueue.main.async {
-                    withAnimation(.autoAnimation) {
-                        glazedObserver.contentView[id]?.value.content.rootView = AnyView(content1())
-                    }
-                }
+                glazedObserver.contentView[id]?.value.content.rootView = AnyView(content1())
+                glazedObserver.contentView[id]?.value.objectWillChange.send()
             }
         }()
         

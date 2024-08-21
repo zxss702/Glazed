@@ -40,7 +40,7 @@ struct HostingViewModle: NSViewRepresentable {
 }
 
 final class GlazedHelperValue: ObservableObject {
-    @Published var content: NSHostingController<AnyView>
+    var content: NSHostingController<AnyView>
     @Published var buttonFrame:CGRect
     var Viewframe:CGRect = .zero
     
@@ -87,7 +87,7 @@ struct HostingViewModle: UIViewRepresentable {
 }
 
 final class GlazedHelperValue: ObservableObject {
-    @Published var content: UIHostingController<AnyView>
+    var content: UIHostingController<AnyView>
     @Published var buttonFrame:CGRect
     var Viewframe:CGRect = .zero
     
