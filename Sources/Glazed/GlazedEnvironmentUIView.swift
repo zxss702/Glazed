@@ -79,7 +79,7 @@ class GlazedEnvironmentHitTest<Content: View>: UIView {
     }
     
     override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
-        if event?.type != .hover {
+        if event?.type == .scroll || event?.type == .presses || event?.type == .touches {
             RootView.hitTest(point)
         }
         return nil
