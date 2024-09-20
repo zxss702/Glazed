@@ -6,45 +6,6 @@
 //
 
 import SwiftUI
-import AudioToolbox
-
-struct TapButtonStyle: ButtonStyle {
-    @State var scale:CGFloat = 1
-    @State var time:Date = Date()
-   
-    func makeBody(configuration: Self.Configuration) -> some View {
-        configuration.label
-            .scaleEffect(x: scale, y: scale)
-            .foregroundColor(.accentColor)
-            .contentShape(Rectangle())
-        #if !os(macOS)
-            .hoverEffect(.automatic)
-        #endif
-            .onChange(of: configuration.isPressed, perform: { newValue in
-                if newValue {
-                    AudioServicesPlaySystemSound(1519)
-                    time = Date()
-                    withAnimation(.autoAnimation.speed(2)) {
-                        scale = 0.9
-                    }
-                } else {
-                    if time.distance(to: Date()) > 0.15 {
-                        AudioServicesPlaySystemSound(1519)
-                        withAnimation(.autoAnimation.speed(1.5)) {
-                            scale = 1
-                        }
-                    } else {
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
-                            withAnimation(.autoAnimation.speed(1.5)) {
-                                scale = 1
-                            }
-                        }
-                    }
-                    
-                }
-            })
-    }
-}
 
 public extension View {
     func Sheet<Content: View>(isPresented: Binding<Bool>, @ViewBuilder content: @escaping () -> Content) -> some View {
@@ -56,7 +17,6 @@ public extension View {
     func Popover<Content: View>(isPresented: Binding<Bool>, ignorTouch:Bool = false, @ViewBuilder content: @escaping () -> Content) -> some View {
         self.modifier(GlazedInputViewModle(type: .Popover, isPresented: isPresented, content1: {
             content()
-                .buttonStyle(TapButtonStyle())
                 .background(.background)
                 .clipShape(RoundedRectangle(cornerRadius: 26.5, style: .continuous))
         }))
@@ -64,7 +24,6 @@ public extension View {
     func EditPopover<Content: View>(isPresented: Binding<Bool>, @ViewBuilder content: @escaping () -> Content) -> some View {
         self.modifier(GlazedInputViewModle(type: .EditPopover, isPresented: isPresented, content1: {
             content()
-                .buttonStyle(TapButtonStyle())
                 .background(.background)
                 .clipShape(RoundedRectangle(cornerRadius: 26.5, style: .continuous))
         }))
@@ -72,13 +31,11 @@ public extension View {
     func clearPopover<Content: View>(isPresented: Binding<Bool>, @ViewBuilder content: @escaping () -> Content) -> some View {
         self.modifier(GlazedInputViewModle(type: .Popover, isPresented: isPresented, content1: {
             content()
-                .buttonStyle(TapButtonStyle())
         }))
     }
     func PopoverWithOutButton<Content: View>(isPresented: Binding<Bool>, @ViewBuilder content: @escaping () -> Content) -> some View {
         self.modifier(GlazedInputViewModle(type: .PopoverWithOutButton, isPresented: isPresented, content1: {
             content()
-                .buttonStyle(TapButtonStyle())
                 .background(.background)
                 .clipShape(RoundedRectangle(cornerRadius: 26.5, style: .continuous))
                 
@@ -87,7 +44,6 @@ public extension View {
     func tipPopover<Content: View>(isPresented: Binding<Bool>, @ViewBuilder content: @escaping () -> Content) -> some View {
         self.modifier(GlazedInputViewModle(type: .tipPopover, isPresented: isPresented, content1: {
             content()
-                .buttonStyle(TapButtonStyle())
                 .background(.background)
                 .clipShape(Capsule(style: .continuous))
         }))
@@ -95,7 +51,6 @@ public extension View {
     func SharePopover<Content: View>(isPresented: Binding<Bool>, @ViewBuilder content: @escaping () -> Content) -> some View {
         self.modifier(GlazedInputViewModle(type: .SharePopover, isPresented: isPresented, content1: {
             content()
-                .buttonStyle(TapButtonStyle())
                 .clipShape(RoundedRectangle(cornerRadius: 26.5, style: .continuous))
         }))
     }
@@ -106,7 +61,6 @@ public extension View {
             .animation(.spring(), value: isPresented.wrappedValue)
             .modifier(GlazedInputViewModle(type: .centerPopover, isPresented: isPresented, content1: {
                 content()
-                    .buttonStyle(TapButtonStyle())
                     .background(.background)
                     .clipShape(RoundedRectangle(cornerRadius: 26.5, style: .continuous))
             }))
@@ -118,7 +72,6 @@ public extension View {
             .animation(.spring(), value: isPresented.wrappedValue)
             .modifier(GlazedInputViewModle(type: .centerPopover, isPresented: isPresented, content1: {
                 content()
-                    .buttonStyle(TapButtonStyle())
             }))
     }
     func fullPopover<Content: View>(isPresented: Binding<Bool>, ignorTouch:Bool = false, @ViewBuilder content: @escaping () -> Content) -> some View {
@@ -128,7 +81,6 @@ public extension View {
             .animation(.spring(), value: isPresented.wrappedValue)
             .modifier(GlazedInputViewModle(type: .fullPopover, isPresented: isPresented, content1: {
                 content()
-                    .buttonStyle(TapButtonStyle())
                     .background(.background)
                     .clipped()
             }))
