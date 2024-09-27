@@ -15,8 +15,8 @@ import SwiftUI
 
 import SwiftUI
 
-struct UIShaowd: UIViewControllerRepresentable {
-    typealias UIViewControllerType = UIShaowdViewController
+public struct UIShaowd: UIViewControllerRepresentable {
+    public typealias UIViewControllerType = UIShaowdViewController
     
     let radius: CGFloat
     let cornerRaduiu: CGFloat
@@ -24,20 +24,25 @@ struct UIShaowd: UIViewControllerRepresentable {
     
     @Environment(\.colorScheme) var colorScheme
     
-    func makeUIViewController(context: Context) -> UIShaowdViewController {
+    public init(radius: CGFloat, cornerRaduiu: CGFloat, color: Color? = nil) {
+        self.radius = radius
+        self.cornerRaduiu = cornerRaduiu
+        self.color = color
+    }
+    public func makeUIViewController(context: Context) -> UIShaowdViewController {
         return UIShaowdViewController(RootView: self)
     }
     
-    func updateUIViewController(_ uiViewController: UIShaowdViewController, context: Context) {
+    public func updateUIViewController(_ uiViewController: UIShaowdViewController, context: Context) {
         uiViewController.RootView = self
         uiViewController.SetShadow()
     }
 }
 
-class UIShaowdViewController: UIViewController {
+public class UIShaowdViewController: UIViewController {
     var RootView: UIShaowd
     
-    init(RootView: UIShaowd) {
+    public init(RootView: UIShaowd) {
         self.RootView = RootView
         super.init(nibName: nil, bundle: nil)
     }
@@ -46,7 +51,7 @@ class UIShaowdViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
-    override func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
         SetShadow()
     }
@@ -66,13 +71,13 @@ class UIShaowdViewController: UIViewController {
         view.layer.shadowPath = UIBezierPath(roundedRect: view.bounds, cornerRadius: RootView.cornerRaduiu).cgPath
     }
     
-    override func viewDidLayoutSubviews() {
+    override public func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         SetShadow()
     }
 }
-struct UIPathShaowd: UIViewControllerRepresentable {
-    typealias UIViewControllerType = UIPathShaowdViewController
+public struct UIPathShaowd: UIViewControllerRepresentable {
+    public typealias UIViewControllerType = UIPathShaowdViewController
     
     let radius: CGFloat
     let path: CGPath
@@ -80,17 +85,23 @@ struct UIPathShaowd: UIViewControllerRepresentable {
     
     @Environment(\.colorScheme) var colorScheme
     
-    func makeUIViewController(context: Context) -> UIPathShaowdViewController {
+    public init(radius: CGFloat, path: CGPath, color: Color? = nil) {
+        self.radius = radius
+        self.path = path
+        self.color = color
+    }
+    
+    public func makeUIViewController(context: Context) -> UIPathShaowdViewController {
         return UIPathShaowdViewController(RootView: self)
     }
     
-    func updateUIViewController(_ uiViewController: UIPathShaowdViewController, context: Context) {
+    public func updateUIViewController(_ uiViewController: UIPathShaowdViewController, context: Context) {
         uiViewController.RootView = self
         uiViewController.SetShadow()
     }
 }
 
-class UIPathShaowdViewController: UIViewController {
+public class UIPathShaowdViewController: UIViewController {
     var RootView: UIPathShaowd
     
     init(RootView: UIPathShaowd) {
@@ -102,7 +113,7 @@ class UIPathShaowdViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
-    override func viewDidLoad() {
+    override public func viewDidLoad() {
         super.viewDidLoad()
         SetShadow()
     }
@@ -122,7 +133,7 @@ class UIPathShaowdViewController: UIViewController {
         view.layer.shadowPath = RootView.path
     }
     
-    override func viewDidLayoutSubviews() {
+    override public func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         SetShadow()
     }
