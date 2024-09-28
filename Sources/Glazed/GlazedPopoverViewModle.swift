@@ -232,7 +232,7 @@ struct GlazedFullPopoverViewModle: GlazedViewModle {
     
     var body: some View {
         HostingViewModle(hosting: value.content, value: value)
-            .shadow(color: Color(.sRGBLinear, white: 0, opacity: 0.4), radius: 35)
+            .shadow(radius: 35)
             .clipShape(RoundedRectangle(cornerRadius: canSet ? 0 : 12, style: .continuous))
             .blur(radius: 10 * (1 - showProgres))
             .opacity(showProgres)

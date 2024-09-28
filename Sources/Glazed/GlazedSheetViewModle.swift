@@ -57,7 +57,7 @@ struct GlazedSheetViewModle: GlazedViewModle {
             .clipShape(shape)
         
             .shadow(radius: 0.3)
-            .shadow(color: Color(.sRGBLinear, white: 0, opacity: 0.4), radius: 35)
+            .shadow(radius: 35)
 
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: cneterORbottom ? .center : .bottom)
             .padding({

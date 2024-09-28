@@ -20,14 +20,12 @@ public struct UIShaowd: UIViewControllerRepresentable {
     
     let radius: CGFloat
     let cornerRaduiu: CGFloat
-    var color: Color? = nil
     
     @Environment(\.colorScheme) var colorScheme
     
-    public init(radius: CGFloat, cornerRaduiu: CGFloat, color: Color? = nil) {
+    public init(radius: CGFloat, cornerRaduiu: CGFloat) {
         self.radius = radius
         self.cornerRaduiu = cornerRaduiu
-        self.color = color
     }
     public func makeUIViewController(context: Context) -> UIShaowdViewController {
         return UIShaowdViewController(RootView: self)
@@ -59,7 +57,7 @@ public class UIShaowdViewController: UIViewController {
     func SetShadow() {
         switch RootView.colorScheme {
         case .dark:
-            view.layer.shadowColor = UIColor.gray.withAlphaComponent(0.7).cgColor
+            view.layer.shadowColor = UIColor.gray.withAlphaComponent(0.6).cgColor
         case .light:
             view.layer.shadowColor = UIColor.gray.withAlphaComponent(0.3).cgColor
         @unknown default:
@@ -81,14 +79,12 @@ public struct UIPathShaowd: UIViewControllerRepresentable {
     
     let radius: CGFloat
     let path: CGPath
-    var color: Color? = nil
     
     @Environment(\.colorScheme) var colorScheme
     
-    public init(radius: CGFloat, path: CGPath, color: Color? = nil) {
+    public init(radius: CGFloat, path: CGPath) {
         self.radius = radius
         self.path = path
-        self.color = color
     }
     
     public func makeUIViewController(context: Context) -> UIPathShaowdViewController {
@@ -121,11 +117,11 @@ public class UIPathShaowdViewController: UIViewController {
     func SetShadow() {
         switch RootView.colorScheme {
         case .dark:
-            view.layer.shadowColor = Color(.sRGBLinear, white: 0, opacity: 0.2).cgColor
+            view.layer.shadowColor = UIColor.gray.withAlphaComponent(0.6).cgColor
         case .light:
-            view.layer.shadowColor = Color(.sRGBLinear, white: 1, opacity: 0.2).cgColor
+            view.layer.shadowColor = UIColor.gray.withAlphaComponent(0.3).cgColor
         @unknown default:
-            view.layer.shadowColor = Color(.sRGBLinear, white: 0, opacity: 0.2).cgColor
+            view.layer.shadowColor = UIColor.gray.withAlphaComponent(0.3).cgColor
         }
         view.layer.shadowOffset = CGSize(width: 0,height: 0)
         view.layer.shadowRadius = RootView.radius
