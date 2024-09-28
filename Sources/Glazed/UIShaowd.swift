@@ -57,7 +57,14 @@ public class UIShaowdViewController: UIViewController {
     }
     
     func SetShadow() {
-        view.layer.shadowColor = UIColor.gray.withAlphaComponent(0.3).cgColor
+        switch RootView.colorScheme {
+        case .dark:
+            view.layer.shadowColor = UIColor.gray.withAlphaComponent(0.7).cgColor
+        case .light:
+            view.layer.shadowColor = UIColor.gray.withAlphaComponent(0.3).cgColor
+        @unknown default:
+            view.layer.shadowColor = UIColor.gray.withAlphaComponent(0.3).cgColor
+        }
         view.layer.shadowOffset = CGSize(width: 0, height: 0)
         view.layer.shadowRadius = RootView.radius
         view.layer.shadowOpacity = 1
