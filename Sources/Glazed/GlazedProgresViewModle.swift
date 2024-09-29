@@ -40,7 +40,7 @@ struct GlazedProgresViewModle: GlazedViewModle {
                 .drawingGroup()
                 .scaleEffect(x: size + 1, y: size + 1)
                 .modifier(Drag3DModifier())
-                .shadow(radius: 8)
+                .background(UIShaowd(radius: 8, cornerRaduiu: 50))
                 .transition(.scale(scale: 0.8).combined(with: .blur))
                 .zIndex(2)
             }

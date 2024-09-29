@@ -56,8 +56,7 @@ struct GlazedSheetViewModle: GlazedViewModle {
             }
             .clipShape(shape)
         
-            .shadow(radius: 0.3)
-            .shadow(radius: 35)
+            .background(UIPathShaowd(radius: 35, path: shape.path(in: CGRect(origin: .zero, size: value.Viewframe.size)).cgPath))
 
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: cneterORbottom ? .center : .bottom)
             .padding({

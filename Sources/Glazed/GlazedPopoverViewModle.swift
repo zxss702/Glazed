@@ -232,11 +232,13 @@ struct GlazedFullPopoverViewModle: GlazedViewModle {
     
     var body: some View {
         HostingViewModle(hosting: value.content, value: value)
-            .shadow(radius: 35)
             .clipShape(RoundedRectangle(cornerRadius: canSet ? 0 : 12, style: .continuous))
             .blur(radius: 10 * (1 - showProgres))
             .opacity(showProgres)
             .scaleEffect(x: showProgresX, y: showProgresY)
+            .compositingGroup()
+            .background(UIShaowd(radius: 35, cornerRaduiu: canSet ? 0 : 12))
+        
             .offset(x: scaleX, y: scaleY)
             .onFrameChange(closure: { CGRec in
                 if canSet {
