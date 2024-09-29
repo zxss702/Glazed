@@ -40,9 +40,10 @@ struct GlazedPopoverViewModle: GlazedViewModle {
             .onFrameChange { size in
                 value.Viewframe = size
             }
+            .background(UIShaowd(radius: 35, cornerRaduiu: 26.5))
             .scaleEffect(x: showProgres, y: showProgres, anchor: UnitPoint(x: scaleX, y: scaleY))
             .blur(radius: 5 - showProgres * 5)
-            .background(UIShaowd(radius: 35, cornerRaduiu: 26.5))
+           
         
             .onSizeChange { size in
                 makePositionRect.size = size
