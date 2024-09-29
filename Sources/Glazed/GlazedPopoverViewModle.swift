@@ -37,15 +37,13 @@ struct GlazedPopoverViewModle: GlazedViewModle {
     
     var body: some View {
         HostingViewModle(hosting: value.content, value: value)
-            .shadow(radius: 0.3)
-            .shadow(color: Color(.sRGBLinear, white: 0, opacity: 0.4), radius: 35 * showProgres)
-        
             .onFrameChange { size in
                 value.Viewframe = size
             }
             .scaleEffect(x: showProgres, y: showProgres, anchor: UnitPoint(x: scaleX, y: scaleY))
-        
             .blur(radius: 5 - showProgres * 5)
+            .background(UIShaowd(radius: 35, cornerRaduiu: 26.5))
+        
             .onSizeChange { size in
                 makePositionRect.size = size
             }
