@@ -44,7 +44,7 @@ struct GlazedPopoverViewModle: GlazedViewModle {
         
             .scaleEffect(x: edit ? max(0.8, showProgres) : showProgres, y: edit ? max(0.8, showProgres) : showProgres, anchor: UnitPoint(x: scaleX, y: scaleY))
             .blur(radius: 5 - showProgres * 5)
-           
+            .opacity(showProgres)
         
             .onSizeChange { size in
                 makePositionRect.size = size
