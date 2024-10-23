@@ -44,12 +44,12 @@ struct GlazedPopoverViewModle: GlazedViewModle {
         
             .scaleEffect(x: edit ? max(0.8, showProgres) : showProgres, y: edit ? max(0.8, showProgres) : showProgres, anchor: UnitPoint(x: scaleX, y: scaleY))
             .blur(radius: 5 - showProgres * 5)
+            .compositingGroup()
             .opacity(showProgres)
         
             .onSizeChange { size in
                 makePositionRect.size = size
             }
-        
         
             .position(x: offsetX, y: offsetY)
             .environment(\.safeAreaInsets, EdgeInsets(top: 8, leading: 8, bottom: 8, trailing: 8))
@@ -70,9 +70,7 @@ struct GlazedPopoverViewModle: GlazedViewModle {
             }
             .onChange(of: makePositionRect) { newValue in
                 if showProgres == 1 {
-//                    withAnimation(.autoAnimation) {
-                        setValue(GeometryProxy: GeometryProxy)
-//                    }
+                    setValue(GeometryProxy: GeometryProxy)
                 } else if !isDissmis {
                     setValue(onAppear: true, GeometryProxy: GeometryProxy)
                 }
