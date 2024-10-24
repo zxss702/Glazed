@@ -32,8 +32,8 @@ extension NSImage {
 #endif
 
 
-public struct GlazedDismissKey: EnvironmentKey {
-    public static var defaultValue: () -> Void = {}
+public struct GlazedDismissKey: @preconcurrency EnvironmentKey {
+    @MainActor public static var defaultValue: () -> Void = {}
 }
 public extension EnvironmentValues {
     var glazedDismiss:() -> Void {
@@ -46,30 +46,30 @@ public extension EnvironmentValues {
         set { self[WindowKey.self] = newValue }
     }
     #endif
-    var glazedDoAction:(_ action: @escaping () -> Void) -> Void {
+    var glazedDoAction:(_ action: @escaping @Sendable () -> Void) -> Void {
         get { self[GlazedDoActionKey.self] }
         set { self[GlazedDoActionKey.self] = newValue }
     }
-    var glazedAsyncAction:(_ action: @escaping () async -> Void) -> Void {
+    var glazedAsyncAction:(_ action: @escaping @Sendable () async -> Void) -> Void {
         get { self[GlazedAsyncActionKey.self] }
         set { self[GlazedAsyncActionKey.self] = newValue }
     }
 }
 #if !os(macOS)
-public struct WindowKey: EnvironmentKey {
-    public static var defaultValue: UIWindow? = nil
+public struct WindowKey: @preconcurrency EnvironmentKey {
+    @MainActor public static var defaultValue: UIWindow? = nil
 }
 #endif
-public struct GlazedDoActionKey: EnvironmentKey {
-    public static var defaultValue: (_ action: @escaping () -> Void) -> Void = { action in
+public struct GlazedDoActionKey: @preconcurrency EnvironmentKey {
+    @MainActor public static var defaultValue: (_ action: @escaping @Sendable () -> Void) -> Void = { action in
         DispatchQueue.global().async {
             action()
         }
     }
 }
-public struct GlazedAsyncActionKey: EnvironmentKey {
-    public static var defaultValue: (_ action: @escaping () async -> Void) -> Void = { action in
-        Task {
+public struct GlazedAsyncActionKey: @preconcurrency EnvironmentKey {
+    @MainActor public static var defaultValue: (_ action: @escaping @Sendable () async -> Void) -> Void = { action in
+        Task.detached {
             await action()
         }
     }
@@ -82,8 +82,8 @@ public extension EnvironmentValues {
     }
 }
 
-public struct safeAreaInsetsKey: EnvironmentKey {
-    public static var defaultValue: EdgeInsets = .init(top: 20, leading: 0, bottom: 20, trailing: 0)
+public struct safeAreaInsetsKey: @preconcurrency EnvironmentKey {
+    @MainActor public static var defaultValue: EdgeInsets = .init(top: 20, leading: 0, bottom: 20, trailing: 0)
 }
 
 public struct safeAreaPaddingHelper:ViewModifier {

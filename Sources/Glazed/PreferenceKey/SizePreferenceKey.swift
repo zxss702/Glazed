@@ -7,10 +7,10 @@
 
 import SwiftUI
 
-struct SizePreferenceKey: PreferenceKey {
+struct SizePreferenceKey: @preconcurrency PreferenceKey {
     typealias Value = CGSize
 
-    static var defaultValue: CGSize = .zero
+    @MainActor static var defaultValue: CGSize = .zero
 
     static func reduce(value: inout CGSize, nextValue: () -> CGSize) {
         value = nextValue()

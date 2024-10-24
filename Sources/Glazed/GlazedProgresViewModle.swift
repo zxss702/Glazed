@@ -55,17 +55,21 @@ struct GlazedProgresViewModle: GlazedViewModle {
                 }
             }
             Timer.scheduledTimer(withTimeInterval: 3, repeats: true) { Timer in
-                withAnimation(.linear(duration: 3)) {
-                    size = size == 0.1 ? 0 : 0.1
-                    for (index, _) in colors.enumerated() {
-                        colors[index] = Color(red: Double.random(in: 0.4...0.9), green: Double.random(in: 0.4...0.9), blue: Double.random(in: 0.5...0.9))
+                Task {
+                    await MainActor.run {
+                        withAnimation(.linear(duration: 3)) {
+                            size = size == 0.1 ? 0 : 0.1
+                            for (index, _) in colors.enumerated() {
+                                colors[index] = Color(red: Double.random(in: 0.4...0.9), green: Double.random(in: 0.4...0.9), blue: Double.random(in: 0.5...0.9))
+                            }
+                        }
                     }
                 }
             }
-            DispatchQueue.global().async {
-                value.progessDoAction()
-                Task {
-                    await value.progessAsyncAction()
+            Task.detached {
+                await value.progessDoAction()
+                await value.progessAsyncAction()
+                await MainActor.run {
                     withAnimation(.autoAnimation) {
                         show = false
                     }
@@ -125,8 +129,12 @@ struct WaveView: View {
             .onAppear {
                 let d = Double.random(in: 0.15...0.25)
                 Timer.scheduledTimer(withTimeInterval: d, repeats: true) { Timer in
-                    withAnimation(.linear(duration: d)) {
-                        self.waveOffset.degrees += Double.random(in: 15...25)
+                    Task {
+                        await MainActor.run {
+                            withAnimation(.linear(duration: d)) {
+                                self.waveOffset.degrees += Double.random(in: 15...25)
+                            }
+                        }
                     }
                 }
             }

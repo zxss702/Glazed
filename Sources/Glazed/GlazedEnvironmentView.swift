@@ -32,7 +32,7 @@ public class GlazedObserver: ObservableObject {
     @Published var contentViewList:[UUID] = []
     @Published var geometry: GeometryProxy?
     
-    func dismissLast(last: UUID) {
+    @MainActor func dismissLast(last: UUID) {
         if let lastContent = contentView[last], !lastContent.isDismiss {
             switch lastContent.type {
             case .Sheet, .FullCover:
@@ -62,7 +62,7 @@ public class GlazedObserver: ObservableObject {
         }
     }
     
-    func dismiss(helper: UUID) {
+    @MainActor func dismiss(helper: UUID) {
         dismissLast(last: helper)
     }
 }
@@ -184,28 +184,87 @@ public extension View{
     }
 }
 
-public extension DispatchQueue {
-    func async(_ name: String = "async", Action: @escaping () throws -> Void) {
-        self.async(execute: DispatchWorkItem(block: {
-            do {
-                try Action()
-            } catch {
-                print(error)
+extension DispatchQueue {
+    func async(_ name: String = "async", Action: @escaping  () throws -> Void) {
+        if self == DispatchQueue.main {
+            if Thread.isMainThread {
+                do {
+                    try Action()
+                } catch {
+                    print(error)
+                }
+            } else {
+                self.async(execute: DispatchWorkItem(block: {
+                    do {
+                        try Action()
+                    } catch {
+                        print(error)
+                    }
+                }))
             }
-//            print(name)
-        }))
+        } else {
+            if Thread.isMainThread {
+                self.async(execute: DispatchWorkItem(block: {
+                    do {
+                        try Action()
+                    } catch {
+                        print(error)
+                    }
+                }))
+            } else {
+                do {
+                    try Action()
+                } catch {
+                    print(error)
+                }
+            }
+        }
     }
-    func async(_ wate: Double = 0, name: String = "async", Action: @escaping () throws -> Void) {
-        self.asyncAfter(deadline: .now() + wate) {
-            do {
-                try Action()
-            } catch {
-                print(error)
+    func async(_ wate: Double = 0, name: String = "async", Action: @escaping @Sendable () throws -> Void) {
+        if wate != 0 {
+            self.asyncAfter(deadline: .now() + wate) {
+                do {
+                    try Action()
+                } catch {
+                    print(error)
+                }
             }
-//            print(name)
+        } else if self == DispatchQueue.main {
+                if Thread.isMainThread {
+                    do {
+                        try Action()
+                    } catch {
+                        print(error)
+                    }
+                } else {
+                    self.asyncAfter(deadline: .now() + wate) {
+                        do {
+                            try Action()
+                        } catch {
+                            print(error)
+                        }
+                    }
+                }
+        } else {
+            if Thread.isMainThread {
+                self.asyncAfter(deadline: .now() + wate) {
+                    do {
+                        try Action()
+                    } catch {
+                        print(error)
+                    }
+                }
+            } else {
+                do {
+                    try Action()
+                } catch {
+                    print(error)
+                }
+            }
         }
     }
 }
+
 
 public extension View {
     func ifMode(@ViewBuilder ifAction: (AnyView) -> some View) -> some View {

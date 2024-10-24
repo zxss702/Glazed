@@ -7,8 +7,8 @@
 
 import SwiftUI
 
-public struct gluzedSuperKey: EnvironmentKey {
-    public static var defaultValue: UUID? = nil
+public struct gluzedSuperKey: @preconcurrency EnvironmentKey {
+    @MainActor public static var defaultValue: UUID? = nil
 }
 
 extension EnvironmentValues {
@@ -86,19 +86,20 @@ struct HostingViewModle: UIViewRepresentable {
     }
 }
 
-final class GlazedHelperValue: ObservableObject {
-    var content: UIHostingController<AnyView>
+@MainActor
+final class GlazedHelperValue: ObservableObject, @unchecked Sendable {
+    let content: UIHostingController<AnyView>
     @Published var buttonFrame:CGRect
     var Viewframe:CGRect = .zero
     
     let gluazedSuper:Bool
     
-    var typeDismissAction:() -> Void = {}
-    var isPrisentDismissAction:() -> Void
-    var progessDoAction:() -> Void = {}
-    var progessAsyncAction:() async -> Void = {}
+    var typeDismissAction: () -> Void = {}
+    var isPrisentDismissAction: () -> Void
+    var progessDoAction:@Sendable () -> Void = {}
+    var progessAsyncAction:@Sendable () async -> Void = {}
     
-    init(buttonFrame: CGRect, Viewframe: CGRect = .zero, gluazedSuper: Bool, content: AnyView, typeDismissAction: @escaping () -> Void = {}, isPrisentDismissAction: @escaping () -> Void, progessDoAction: @escaping () -> Void = {}, progessAsyncAction: @escaping () async -> Void = {}) {
+    init(buttonFrame: CGRect, Viewframe: CGRect = .zero, gluazedSuper: Bool, content: AnyView, typeDismissAction: @escaping () -> Void = {}, isPrisentDismissAction: @escaping () -> Void, progessDoAction: @escaping @Sendable () -> Void = {}, progessAsyncAction: @escaping @Sendable () async -> Void = {}) {
         self.buttonFrame = buttonFrame
         self.Viewframe = Viewframe
         self.gluazedSuper = gluazedSuper

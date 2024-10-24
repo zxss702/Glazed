@@ -7,10 +7,10 @@
 
 import SwiftUI
 
-struct RectPreferenceKey: PreferenceKey {
+struct RectPreferenceKey: @preconcurrency PreferenceKey {
     typealias Value = CGRect
 
-    static var defaultValue: CGRect = .zero
+    @MainActor static var defaultValue: CGRect = .zero
 
     static func reduce(value: inout CGRect, nextValue: () -> CGRect) {
         value = nextValue()

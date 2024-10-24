@@ -127,7 +127,7 @@ func animation(animation: @escaping () -> Void, completion: @escaping (Bool) -> 
     completion(true)
 }
 #else
-func animation(animation: @escaping () -> Void, completion: @escaping (Bool) -> Void = {_ in }) {
+@MainActor func animation(animation: @escaping () -> Void, completion: @escaping (Bool) -> Void = {_ in }) {
     UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.825, initialSpringVelocity: 0.6, options: UIView.AnimationOptions.allowUserInteraction, animations: animation, completion: completion)
 }
 #endif
@@ -219,7 +219,7 @@ struct GlazedInputViewModle<Content1: View>: ViewModifier {
 
 
 extension Animation {
-    public static var autoAnimation = autoAnimation(speed: 1)
+    public static let autoAnimation = autoAnimation(speed: 1)
     
     public static func autoAnimation(speed: CGFloat = 1) -> Animation {
         if #available(iOS 17.0, *) {

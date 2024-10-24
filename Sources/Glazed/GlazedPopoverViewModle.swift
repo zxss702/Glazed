@@ -79,7 +79,7 @@ struct GlazedPopoverViewModle: GlazedViewModle {
     enum PopoverEdge {
         case top, bottom, leading, trailing, center
     }
-    func setValue(onAppear:Bool = false, GeometryProxy: GeometryProxy) {
+    @MainActor func setValue(onAppear:Bool = false, GeometryProxy: GeometryProxy) {
         
         let buttonFrame = CGRect(x: value.buttonFrame.minX - GeometryProxy.safeAreaInsets.leading, y: value.buttonFrame.minY - GeometryProxy.safeAreaInsets.top, width: value.buttonFrame.width, height: value.buttonFrame.height)
         
