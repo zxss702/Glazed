@@ -33,10 +33,10 @@ extension NSImage {
 
 
 public struct GlazedDismissKey: @preconcurrency EnvironmentKey {
-    @MainActor public static var defaultValue: () -> Void = {}
+    @MainActor public static var defaultValue:@MainActor @Sendable () -> Void = {}
 }
 public extension EnvironmentValues {
-    var glazedDismiss:() -> Void {
+    var glazedDismiss:@MainActor @Sendable () -> Void {
         get { self[GlazedDismissKey.self] }
         set { self[GlazedDismissKey.self] = newValue }
     }
