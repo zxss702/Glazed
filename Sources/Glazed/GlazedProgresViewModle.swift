@@ -66,8 +66,12 @@ struct GlazedProgresViewModle: GlazedViewModle {
                     }
                 }
             }
+            
+            let p = value.progessDoAction
+            DispatchQueue.global().async {
+                p()
+            }
             Task.detached {
-                await value.progessDoAction()
                 await value.progessAsyncAction()
                 await MainActor.run {
                     withAnimation(.autoAnimation) {

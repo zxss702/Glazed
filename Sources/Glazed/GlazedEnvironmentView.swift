@@ -71,7 +71,6 @@ struct GlazedEnvironmentViewModle: ViewModifier {
     @ObservedObject var glazedObserver:GlazedObserver
     
     func body(content: Content) -> some View {
-        
         content
             .environment(\.glazedDoAction) { [self] action in
                 let Helper = GlazedHelperType(

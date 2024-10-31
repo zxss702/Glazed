@@ -55,9 +55,8 @@ struct GlazedSheetViewModle: GlazedViewModle {
                 value.Viewframe.size =  Rect.size
             }
             .clipShape(shape)
+            .compositingGroup()
         
-            .background(UIPathShaowd(radius: 35, path: shape.path(in: CGRect(origin: .zero, size: value.Viewframe.size)).cgPath))
-
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: cneterORbottom ? .center : .bottom)
             .padding({
                 if cneterORbottom {
