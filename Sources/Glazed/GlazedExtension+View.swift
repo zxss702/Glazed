@@ -9,7 +9,9 @@ import SwiftUI
 
 public extension View {
     func Sheet<Content: View>(isPresented: Binding<Bool>, @ViewBuilder content: @escaping () -> Content) -> some View {
-        self.modifier(GlazedInputViewModle(type: .Sheet, isPresented: isPresented, content1: content))
+        self
+            .sheet(isPresented: isPresented, content: content)
+//            .modifier(GlazedInputViewModle(type: .Sheet, isPresented: isPresented, content1: content))
     }
     func FullCover<Content: View>(isPresented: Binding<Bool>, @ViewBuilder content: @escaping () -> Content) -> some View {
         self.modifier(GlazedInputViewModle(type: .FullCover, isPresented: isPresented, content1: content))
