@@ -57,6 +57,8 @@ struct GlazedSheetViewModle: GlazedViewModle {
             .clipShape(shape)
             .compositingGroup()
         
+            .transition(.offset(y: GeometryProxy.size.height + GeometryProxy.safeAreaInsets.bottom + 50).animation(.autoAnimation))
+        
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: cneterORbottom ? .center : .bottom)
             .padding({
                 if cneterORbottom {
@@ -86,7 +88,7 @@ struct GlazedSheetViewModle: GlazedViewModle {
                     }
             )
             .animation(.autoAnimation, value: offsetY)
-            .transition(.offset(y: GeometryProxy.size.height + GeometryProxy.safeAreaInsets.bottom + 50).animation(.autoAnimation))
+           
             .environment(\.safeAreaInsets, EdgeInsets(top: 8, leading: 8, bottom: 8, trailing: 8))
             .zIndex(Double(zindex + 1))
             .environment(\.gluzedSuper, nil)
