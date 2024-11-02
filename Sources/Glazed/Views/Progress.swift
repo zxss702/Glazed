@@ -1,17 +1,48 @@
 //
-//  GlazedProgresViewModle.swift
-//  noteE
+//  Progress.swift
+//  Glazed
 //
-//  Created by 张旭晟 on 2023/11/25.
+//  Created by 知阳 on 2024/11/2.
 //
 
 import SwiftUI
 
-struct GlazedProgresViewModle: GlazedViewModle {
-    @ObservedObject var value: GlazedHelperValue
+@MainActor
+class ProgressShowPageViewWindow: UIView {
     
-    @Environment(\.glazedDismiss) var glazedDismiss
+    let hosting:UIHostingController<AnyView>
+    var isOpen = true
+    init(content: AnyView) {
+        self.hosting = UIHostingController(rootView: content)
+        super.init(frame: .zero)
+        self.translatesAutoresizingMaskIntoConstraints = false
+        self.backgroundColor = .clear
+        self.hosting.view.backgroundColor = .clear
+        self.hosting.sizingOptions = .intrinsicContentSize
+        self.hosting.view.insetsLayoutMarginsFromSafeArea = false
+        if #available(iOS 16.4, *) {
+            self.hosting.safeAreaRegions = SafeAreaRegions()
+        } else {
+            if let window = self.window {
+                self.hosting.additionalSafeAreaInsets = UIEdgeInsets(top: -window.safeAreaInsets.top, left: -window.safeAreaInsets.left, bottom: -window.safeAreaInsets.bottom, right: -window.safeAreaInsets.right)
+            } else {
+                self.hosting._disableSafeArea = true
+            }
+        }
+        self.insetsLayoutMarginsFromSafeArea = false
+        self.addSubview(hosting.view)
+    }
     
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+        return isOpen ? super.hitTest(point, with: event) : nil
+    }
+}
+
+struct GlazedProgresView: View {
     @State var show = false
     @State var size:Double = 0.1
     @State var colors:[Color] = []
@@ -19,11 +50,6 @@ struct GlazedProgresViewModle: GlazedViewModle {
     var body: some View {
         ZStack {
             if show {
-                Color.black.opacity(0.2 - size)
-                    .ignoresSafeArea()
-                    .transition(.blur)
-                    .zIndex(1)
-                
                 ZStack {
                     ForEach(Array(colors.enumerated()), id: \.offset) { index, color in
                         WaveView(waveColor: color,
@@ -33,14 +59,14 @@ struct GlazedProgresViewModle: GlazedViewModle {
                         .zIndex(Double(colors.count - index))
                     }
                 }
+                .frame(width: 100, height: 100)
                 .background(.background)
                 .clipShape(Circle())
-                .frame(width: 100, height: 100)
                 .compositingGroup()
                 .drawingGroup()
+                .background(UIShaowd(radius: 8, cornerRaduiu: 50))
                 .scaleEffect(x: size + 1, y: size + 1)
                 .modifier(Drag3DModifier())
-                .background(UIShaowd(radius: 8, cornerRaduiu: 50))
                 .transition(.scale(scale: 0.8).combined(with: .blur))
                 .zIndex(2)
             }
@@ -64,20 +90,6 @@ struct GlazedProgresViewModle: GlazedViewModle {
                             }
                         }
                     }
-                }
-            }
-            
-            let p = value.progessDoAction
-            DispatchQueue.global().async {
-                p()
-            }
-            Task.detached {
-                await value.progessAsyncAction()
-                await MainActor.run {
-                    withAnimation(.autoAnimation) {
-                        show = false
-                    }
-                    glazedDismiss()
                 }
             }
         }
@@ -189,5 +201,22 @@ public extension View {
     func Drag3D() -> some View {
         self
             .modifier(Drag3DModifier())
+    }
+}
+
+struct blurModifier: ViewModifier {
+    let state:Bool
+    func body(content: Content) -> some View {
+        content
+            .blur(radius: state ? 20 : 0)
+    }
+}
+
+extension AnyTransition {
+    static var blur: AnyTransition {
+        .modifier(
+            active: blurModifier(state: true),
+            identity: blurModifier(state: false)
+        ).combined(with: .opacity)
     }
 }

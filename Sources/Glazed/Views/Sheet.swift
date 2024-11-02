@@ -1,0 +1,283 @@
+//
+//  Sheet.swift
+//  Glazed
+//
+//  Created by 知阳 on 2024/11/2.
+//
+
+import SwiftUI
+
+public struct sheetType {
+    let backGround: AnyShapeStyle
+    
+    public init<ShapeS: ShapeStyle>(
+        backGround: ShapeS
+    ) {
+        self.backGround = AnyShapeStyle(backGround)
+    }
+}
+
+public extension View {
+    
+    @ViewBuilder
+    func Sheet<Content: View>(
+        isPresented: Binding<Bool>,
+        type: sheetType = .init(backGround: .background),
+        @ViewBuilder content: @escaping () -> Content
+    ) -> some View {
+        self
+            .modifier(SheetViewModle(isPresented: isPresented, type: type, content: content))
+    }
+}
+
+@MainActor
+struct SheetViewModle<Content2: View>: ViewModifier {
+    @Binding var isPresented: Bool
+    let type: sheetType
+    @ViewBuilder var content: () -> Content2
+    
+    @Environment(\.window) var window
+    @State var showThisPage: SheetShowPageViewWindow? = nil
+    @State var isOpen = false
+    
+    @Environment(\.colorScheme) var colorScheme
+    @State var bottomC: Bool = true
+    
+    func body(content: Content) -> some View {
+        content
+            .overlay {
+                GeometryReader { GeometryProxy in
+                    let _ = showThisPage?.isOpen = isOpen
+                    if isPresented, let window {
+                        let _ = showThisPage?.hosting.rootView = AnyView(pageStyle())
+                        let _ = {
+                            if let showThisPage, isPresented, showThisPage.gesture.state != .changed {
+                                let idealSize = showThisPage.hosting.sizeThatFits(in: window.frame.size)
+                                let frame = {
+                                    if idealSize.width < window.frame.size.width {
+                                        if window.frame.size.height <= idealSize.height {
+                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
+                                                bottomC = false
+                                            }
+                                            return CGRect(
+                                                origin: CGPoint(
+                                                    x: window.frame.width / 2 - idealSize.width / 2,
+                                                    y: window.safeAreaInsets.top + 20
+                                                ), size: CGSize(
+                                                    width: idealSize.width,
+                                                    height: window.frame.size.height - window.safeAreaInsets.top - 20
+                                                )
+                                            )
+                                        } else {
+                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
+                                                bottomC = true
+                                            }
+                                            return CGRect(center: CGPoint(x: window.frame.midX, y: window.frame.midY) , size: idealSize)
+                                        }
+                                    } else {
+                                        let fitSize = CGSize(
+                                            width: window.frame.size.width,
+                                            height: min(window.frame.size.height - window.safeAreaInsets.top - 20, idealSize.height))
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
+                                            bottomC = false
+                                        }
+                                        return CGRect(
+                                            origin: CGPoint(
+                                                x: 0,
+                                                y: window.frame.size.height - fitSize.height
+                                            ), size: fitSize
+                                        )
+                                    }
+                                }()
+                                if showThisPage.hosting.view.frame != frame {
+                                    Animation {
+                                        showThisPage.hosting.view.frame = frame
+                                    }
+                                }
+                            }
+                        }()
+                        
+                    }
+                }
+                .onChange(of: isPresented) { newValue in
+                    isOpen = newValue
+                    showThisPage?.isOpen = isOpen
+                    if newValue, let window {
+                        if showThisPage == nil {
+                            showThisPage = SheetShowPageViewWindow(windowScene: window.windowScene!, content: AnyView(pageStyle()), isOpen: isOpen, dismiss: {
+                                self.isPresented = false
+                            })
+                            if let showThisPage, let superController = window.rootViewController {
+                                superController.view.addSubview(showThisPage)
+                                NSLayoutConstraint.activate([
+                                    showThisPage.topAnchor.constraint(equalTo: superController.view.topAnchor),
+                                    showThisPage.bottomAnchor.constraint(equalTo: superController.view.bottomAnchor),
+                                    showThisPage.leadingAnchor.constraint(equalTo: superController.view.leadingAnchor),
+                                    showThisPage.trailingAnchor.constraint(equalTo: superController.view.trailingAnchor)
+                                ])
+                                
+                                let idealSize = showThisPage.hosting.sizeThatFits(in: window.frame.size)
+                                
+                                if idealSize.width < window.frame.size.width {
+                                    if window.frame.size.height <= idealSize.height {
+                                        showThisPage.hosting.view.frame = CGRect(
+                                            origin: CGPoint(
+                                                x: window.frame.width / 2 - idealSize.width / 2,
+                                                y: window.safeAreaInsets.top + 20
+                                            ), size: CGSize(
+                                                width: idealSize.width,
+                                                height: window.frame.size.height - window.safeAreaInsets.top - 20
+                                            )
+                                        )
+                                        showThisPage.hosting.view.transform = CGAffineTransform(translationX: 0, y: window.frame.size.height - window.safeAreaInsets.top - 10)
+                                        bottomC = false
+                                    } else {
+                                        showThisPage.hosting.view.frame = CGRect(center: CGPoint(x: window.frame.midX, y: window.frame.midY) , size: idealSize)
+                                        showThisPage.hosting.view.transform = CGAffineTransform(translationX: 0, y: window.frame.height / 2 + idealSize.height / 2 + 10)
+                                        bottomC = true
+                                    }
+                                } else {
+                                    let fitSize = CGSize(
+                                        width: window.frame.size.width,
+                                        height: min(window.frame.size.height - window.safeAreaInsets.top - 20, idealSize.height))
+                                    showThisPage.hosting.view.frame = CGRect(
+                                        origin: CGPoint(
+                                            x: 0,
+                                            y: window.frame.size.height - fitSize.height
+                                        ), size: fitSize)
+                                    showThisPage.hosting.view.transform = CGAffineTransform(translationX: 0, y: fitSize.height + 10)
+                                    bottomC = false
+                                }
+                            }
+                        }
+                        Animation {
+                            showThisPage?.backgroundColor = .black.withAlphaComponent(0.3)
+                            showThisPage?.hosting.view.transform = CGAffineTransform(translationX: 0, y: 0)
+                        }
+                    } else {
+                        if let window, let showThisPage {
+                            let idealSize = showThisPage.hosting.sizeThatFits(in: window.frame.size)
+                            
+                            Animation {
+                                showThisPage.backgroundColor = .clear
+                                if idealSize.width < window.frame.size.width {
+                                    if window.frame.size.height < idealSize.height {
+                                        showThisPage.hosting.view.transform = CGAffineTransform(translationX: 0, y: window.frame.size.height - window.safeAreaInsets.top - 10)
+                                    } else {
+                                        showThisPage.hosting.view.transform = CGAffineTransform(translationX: 0, y: window.frame.height / 2 + idealSize.height / 2 + 10)
+                                    }
+                                } else {
+                                    let fitSize = CGSize(
+                                        width: window.frame.size.width,
+                                        height: min(window.frame.size.height - window.safeAreaInsets.top - 20, idealSize.height))
+                                    showThisPage.hosting.view.transform = CGAffineTransform(translationX: 0, y: fitSize.height + 10)
+                                }
+                            } completion: { Bool in
+                                if !isOpen {
+                                    showThisPage.removeFromSuperview()
+                                    self.showThisPage = nil
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+    }
+    
+    @ViewBuilder
+    func pageStyle() -> some View {
+        content()
+            .background(type.backGround)
+            .clipShape(UnevenRoundedRectangle(cornerRadii: RectangleCornerRadii(
+                topLeading: 26.5,
+                bottomLeading: bottomC ? 26.5 : 0,
+                bottomTrailing: bottomC ? 26.5 : 0,
+                topTrailing: 26.5
+            ), style: .continuous))
+            .environment(\.glazedDismiss, {
+                self.isPresented = false
+            })
+            .environment(\.glazedSuper, nil)
+            .environment(\.window, window)
+            .environment(\.safeAreaInsets, EdgeInsets(top: 16, leading: 0, bottom: 16, trailing: 0))
+    }
+}
+
+
+@MainActor
+class SheetShowPageViewWindow: UIView {
+    
+    let hosting:UIHostingController<AnyView>
+    let dismiss: () -> Void
+    var isOpen: Bool
+    
+    lazy var gesture = UIPanGestureRecognizer(target: self, action: #selector(action(ges: )))
+    init(windowScene: UIWindowScene, content: AnyView, isOpen: Bool, dismiss: @escaping () -> Void) {
+        self.dismiss = dismiss
+        self.hosting = UIHostingController(rootView: content)
+        self.isOpen = isOpen
+        super.init(frame: .zero)
+        self.translatesAutoresizingMaskIntoConstraints = false
+        self.backgroundColor = .clear
+        self.hosting.view.backgroundColor = .clear
+        self.hosting.sizingOptions = .intrinsicContentSize
+        self.hosting.view.insetsLayoutMarginsFromSafeArea = false
+        if #available(iOS 16.4, *) {
+            self.hosting.safeAreaRegions = SafeAreaRegions()
+        } else {
+            if let window = self.window {
+                self.hosting.additionalSafeAreaInsets = UIEdgeInsets(top: -window.safeAreaInsets.top, left: -window.safeAreaInsets.left, bottom: -window.safeAreaInsets.bottom, right: -window.safeAreaInsets.right)
+            } else {
+                self.hosting._disableSafeArea = true
+            }
+        }
+        self.insetsLayoutMarginsFromSafeArea = false
+        self.addSubview(hosting.view)
+        
+        gesture.delaysTouchesBegan = false
+        self.addGestureRecognizer(gesture)
+    }
+    
+    var defTr = CGAffineTransform(translationX: 0, y: 0)
+    
+    @objc func action(ges: UIPanGestureRecognizer) {
+        switch ges.state {
+        case .possible:
+            defTr = self.hosting.view.transform
+        case .began:
+            defTr = self.hosting.view.transform
+        case .changed:
+            let translation = ges.translation(in: self)
+            let newT = defTr.translatedBy(x: 0, y: translation.y)
+                if newT.ty > 0 {
+                    self.hosting.view.transform = newT
+                } else {
+                    let sc = 2 - 1 / pow((abs(newT.ty) + 1.0), 1 / pow(2.718, 5.5))
+                    self.hosting.view.transform = CGAffineTransform(scaleX: 1, y: sc).translatedBy(x: 0, y: -(self.hosting.view.frame.height * sc - self.hosting.view.frame.height) / 2)
+                }
+        default:
+            if self.hosting.view.transform.ty < 100 {
+                Animation {
+                    self.hosting.view.transform = CGAffineTransform(translationX: 0, y: 0)
+                }
+            } else {
+                dismiss()
+            }
+        }
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+        if isOpen {
+            if !self.hosting.view.frame.contains(point) {
+                dismiss()
+            }
+            return super.hitTest(point, with: event)
+        } else {
+            return nil
+        }
+    }
+}
