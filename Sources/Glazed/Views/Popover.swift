@@ -263,13 +263,25 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
         
         switch edge {
         case .top:
-            return CGRect(center: CGPoint(x: buttonRect.midX, y: buttonRect.minY - defaultSize.height / 2 - leftSpace), size: defaultSize)
+            return CGRect(center: CGPoint(
+                x: buttonRect.midX,
+                y: min(max(buttonRect.minY - defaultSize.height / 2 - leftSpace, defaultSize.height / 2 + window.safeAreaInsets.top + leftSpace), windowSize.height - defaultSize.height / 2 - leftSpace)
+            ), size: defaultSize)
         case .bottom:
-            return CGRect(center: CGPoint(x: buttonRect.midX, y: buttonRect.maxY + defaultSize.height / 2 + leftSpace), size: defaultSize)
+            return CGRect(center: CGPoint(
+                x: buttonRect.midX,
+                y: min(max(buttonRect.maxY + defaultSize.height / 2 + leftSpace, defaultSize.height / 2 + window.safeAreaInsets.top + leftSpace), windowSize.height - defaultSize.height / 2 - leftSpace)
+            ), size: defaultSize)
         case .leading:
-            return CGRect(center: CGPoint(x: buttonRect.minX - leftSpace - defaultSize.width / 2, y: buttonRect.midY), size: defaultSize)
+            return CGRect(center: CGPoint(
+                x: max(min(buttonRect.minX - leftSpace - defaultSize.width / 2, windowSize.width - leftSpace - defaultSize.width / 2), leftSpace + defaultSize.width / 2),
+                y: buttonRect.midY), size: defaultSize
+            )
         case .trailing:
-            return CGRect(center: CGPoint(x: buttonRect.maxX + leftSpace + defaultSize.width / 2, y: buttonRect.midY), size: defaultSize)
+            return CGRect(center: CGPoint(
+                x: max(min(buttonRect.maxX + leftSpace + defaultSize.width / 2, windowSize.width - leftSpace - defaultSize.width / 2), leftSpace + defaultSize.width / 2),
+                y: buttonRect.midY
+            ), size: defaultSize)
         case .center:
             return CGRect(center: CGPoint(
                 x: max(min(buttonRect.midX, windowSize.width - leftSpace - defaultSize.width / 2), leftSpace + defaultSize.width / 2),

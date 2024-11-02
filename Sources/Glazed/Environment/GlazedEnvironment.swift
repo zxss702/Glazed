@@ -65,11 +65,11 @@ func Animation(animation: @escaping () -> Void, completion: @escaping (Bool) -> 
 #else
 @MainActor func Animation(animation: @escaping () -> Void, completion: @escaping (Bool) -> Void = {_ in }) {
     if #available(iOS 18.0, *) {
-        UIView.animate(.spring(duration: 0.5, bounce: 0.1, blendDuration: 0), changes: animation, completion: {
+        UIView.animate(.spring(duration: 0.4, bounce: 0.1, blendDuration: 0), changes: animation, completion: {
             completion(true)
         })
     } else {
-        UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.825, initialSpringVelocity: 0.6, options: UIView.AnimationOptions.allowUserInteraction, animations: animation, completion: completion)
+        UIView.animate(withDuration: 0.4, delay: 0, usingSpringWithDamping: 0.825, initialSpringVelocity: 0.6, options: UIView.AnimationOptions.allowUserInteraction, animations: animation, completion: completion)
     }
 }
 #endif
