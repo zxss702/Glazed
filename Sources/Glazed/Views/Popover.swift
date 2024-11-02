@@ -289,6 +289,7 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
             ), size: defaultSize)
         }
     }
+    
     func setUnOpenTransform(window: UIWindow, showThisPage: PopoverShowPageViewWindow, buttonRect: CGRect) -> CGAffineTransform {
         let windowSize = window.bounds.size
         
@@ -301,15 +302,15 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
         
         switch edge {
         case .top:
-            return CGAffineTransform(translationX: 0, y: defaultSize.height / 2).scaledBy(x: 0.00000001, y: 0.00000001)
+            return CGAffineTransform(translationX: showThisPage.hosting.view.frame.midX - buttonRect.midX, y: defaultSize.height / 2).scaledBy(x: 0.00000001, y: 0.00000001)
         case .bottom:
-            return CGAffineTransform(translationX: 0, y: -defaultSize.height / 2).scaledBy(x: 0.00000001, y: 0.00000001)
+            return CGAffineTransform(translationX: showThisPage.hosting.view.frame.midX - buttonRect.midX, y: -defaultSize.height / 2).scaledBy(x: 0.00000001, y: 0.00000001)
         case .leading:
-            return CGAffineTransform(translationX: defaultSize.width / 2, y: 0).scaledBy(x: 0.00000001, y: 0.00000001)
+            return CGAffineTransform(translationX: defaultSize.width / 2, y: showThisPage.hosting.view.frame.midY - buttonRect.midY).scaledBy(x: 0.00000001, y: 0.00000001)
         case .trailing:
-            return CGAffineTransform(translationX: -defaultSize.width / 2, y: 0).scaledBy(x: 0.00000001, y: 0.00000001)
+            return CGAffineTransform(translationX: -defaultSize.width / 2, y: showThisPage.hosting.view.frame.midY - buttonRect.midY).scaledBy(x: 0.00000001, y: 0.00000001)
         case .center:
-            return CGAffineTransform(scaleX: buttonRect.width / defaultSize.width, y: buttonRect.height / defaultSize.height)
+            return CGAffineTransform(scaleX: buttonRect.width / defaultSize.width + showThisPage.hosting.view.frame.midX - buttonRect.midX, y: buttonRect.height / defaultSize.height + showThisPage.hosting.view.frame.midY - buttonRect.midY)
         }
     }
     
