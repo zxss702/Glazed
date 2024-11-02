@@ -36,7 +36,7 @@ extension EnvironmentValues {
     }
     
     #if !os(macOS)
-    var window:UIWindow? {
+    public var window:UIWindow? {
         get { self[WindowKey.self] }
         set { self[WindowKey.self] = newValue }
     }
