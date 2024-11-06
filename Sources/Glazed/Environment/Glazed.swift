@@ -71,6 +71,7 @@ public struct Glazed<Content: View>: View {
                     }
                 })
                 .allowsHitTesting(!isOpen)
+                .buttonStyle(TapButtonStyle())
         }
     }
     

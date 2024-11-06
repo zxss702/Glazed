@@ -176,3 +176,104 @@ struct shadowViewModle2: ViewModifier {
         }
     }
 }
+
+public struct TapButtonStyle: ButtonStyle {
+    @State var scale:CGFloat = 1
+    @State var time:Date = Date()
+   
+    @State var sc: Double = 1.02
+    @State var sc2: Double = 0.98
+    
+    @State var paly: UUID = UUID()
+    
+    public init() {}
+    
+    public func makeBody(configuration: Self.Configuration) -> some View {
+        configuration.label
+            .scaleEffect(x: scale, y: scale)
+            .foregroundColor(.accent)
+            .contentShape(Rectangle())
+            .compositingGroup()
+            .shadow(radius: 40 * max(scale - 1, 0))
+            .onHover(perform: { Bool in
+                if Bool {
+                    withAnimation(.autoAnimation.speed(2)) {
+                        scale = sc
+                    }
+                } else {
+                    withAnimation(.autoAnimation.speed(2)) {
+                        scale = 1
+                    }
+                }
+            })
+            .onChange(of: configuration.isPressed, perform: { newValue in
+                if newValue {
+                    if #available(iOS 17.0, *) {
+                        paly = UUID()
+                    } else {
+                        AudioServicesPlaySystemSound(1519)
+                    }
+                    time = Date()
+                    withAnimation(.autoAnimation.speed(2)) {
+                        scale = sc2
+                    }
+                } else {
+                    if time.distance(to: Date()) > 0.15 {
+                        if #available(iOS 17.0, *) {
+                            paly = UUID()
+                        } else {
+                            AudioServicesPlaySystemSound(1519)
+                        }
+                        withAnimation(.autoAnimation.speed(1.5)) {
+                            scale = 1
+                        }
+                    } else {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                            withAnimation(.autoAnimation.speed(1.5)) {
+                                scale = 1
+                            }
+                        }
+                    }
+                    
+                }
+            })
+            .background {
+                GeometryReader(content: { geometry in
+                    
+                    if #available(iOS 17.0, *) {
+                        Color.clear
+                            .sensoryFeedback(
+                                {
+                                    if #available(iOS 17.5, *) {
+                                        SensoryFeedback.pathComplete
+                                    } else {
+                                        SensoryFeedback.alignment
+                                    }
+                                }(), trigger: paly)
+                            .onChange(of: geometry.size) { _ in
+                                let av = avg(geometry.size.width, geometry.size.height)
+                                sc = (av + 2) / av
+                                sc2 = (av - 4) / av
+                            }
+                            .onAppear {
+                                let av = avg(geometry.size.width, geometry.size.height)
+                                sc = (av + 2) / av
+                                sc2 = (av - 4) / av
+                            }
+                    } else {
+                        Color.clear
+                            .onChange(of: geometry.size) { _ in
+                                let av = avg(geometry.size.width, geometry.size.height)
+                                sc = (av + 2) / av
+                                sc2 = (av - 4) / av
+                            }
+                            .onAppear {
+                                let av = avg(geometry.size.width, geometry.size.height)
+                                sc = (av + 2) / av
+                                sc2 = (av - 4) / av
+                            }
+                    }
+                })
+            }
+    }
+}
