@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import AudioToolbox
 
 public struct GlazedDismissKey: @preconcurrency EnvironmentKey {
     @MainActor public static var defaultValue:@MainActor @Sendable () -> Void = {}
@@ -191,7 +192,7 @@ public struct TapButtonStyle: ButtonStyle {
     public func makeBody(configuration: Self.Configuration) -> some View {
         configuration.label
             .scaleEffect(x: scale, y: scale)
-            .foregroundColor(.accent)
+            .foregroundColor(.accentColor)
             .contentShape(Rectangle())
             .compositingGroup()
             .shadow(radius: 40 * max(scale - 1, 0))
@@ -276,4 +277,21 @@ public struct TapButtonStyle: ButtonStyle {
                 })
             }
     }
+}
+// 计算平均值的函数
+func avg(_ Element: CGFloat...) -> CGFloat {
+    var counts: CGFloat = 0
+    for i in Element {
+        counts += i
+    }
+    return counts / CGFloat(Element.count)
+}
+
+// 计算平均值的函数（数组版本）
+func avg(_ Element: [CGFloat]) -> CGFloat {
+    var counts: CGFloat = 0
+    for i in Element {
+        counts += i
+    }
+    return counts / CGFloat(Element.count)
 }
