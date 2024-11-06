@@ -182,6 +182,9 @@ struct SheetViewModle<Content2: View>: ViewModifier {
                     }
                 }
             }
+            .onDisappear {
+                isPresented = false
+            }
     }
     
     @ViewBuilder
