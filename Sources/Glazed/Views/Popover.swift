@@ -339,6 +339,7 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
             .environment(\.glazedSuper, UUID())
             .environment(\.window, window)
             .environment(\.safeAreaInsets, EdgeInsets(top: 16, leading: 0, bottom: 16, trailing: 0))
+            .buttonStyle(TapButtonStyle())
     }
 }
 

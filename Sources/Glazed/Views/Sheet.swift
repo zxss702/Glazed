@@ -191,6 +191,7 @@ struct SheetViewModle<Content2: View>: ViewModifier {
     func pageStyle() -> some View {
         content()
             .background(type.backGround)
+            .buttonStyle(TapButtonStyle())
             .clipShape(UnevenRoundedRectangle(cornerRadii: RectangleCornerRadii(
                 topLeading: 26.5,
                 bottomLeading: bottomC ? 26.5 : 0,
