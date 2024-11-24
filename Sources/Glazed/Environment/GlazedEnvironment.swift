@@ -183,6 +183,7 @@ public struct TapButtonStyle: ButtonStyle {
     @State var time:Date = Date()
    
     @State var sc2: Double = 1.02
+    @State var sc: Double = 1.02
     
     @State var paly: UUID = UUID()
     
@@ -194,7 +195,17 @@ public struct TapButtonStyle: ButtonStyle {
             .foregroundColor(.accentColor)
             .contentShape(Rectangle())
             .compositingGroup()
-            .hoverEffect(.automatic)
+                       .onHover(perform: { Bool in
+                           if Bool {
+                               withAnimation(.autoAnimation.speed(2)) {
+                                   scale = sc
+                               }
+                           } else {
+                               withAnimation(.autoAnimation.speed(2)) {
+                                   scale = 1
+                               }
+                           }
+                       })
             .onChange(of: configuration.isPressed, perform: { newValue in
                 if newValue {
                     if #available(iOS 17.0, *) {
@@ -242,20 +253,24 @@ public struct TapButtonStyle: ButtonStyle {
                             .onChange(of: geometry.size) { _ in
                                 let av = avg(geometry.size.width, geometry.size.height)
                                 sc2 = (av - 4) / av
+                                sc = (av + 4) / av
                             }
                             .onAppear {
                                 let av = avg(geometry.size.width, geometry.size.height)
                                 sc2 = (av - 4) / av
+                                sc = (av + 4) / av
                             }
                     } else {
                         Color.clear
                             .onChange(of: geometry.size) { _ in
                                 let av = avg(geometry.size.width, geometry.size.height)
                                 sc2 = (av - 4) / av
+                                sc = (av + 4) / av
                             }
                             .onAppear {
                                 let av = avg(geometry.size.width, geometry.size.height)
                                 sc2 = (av - 4) / av
+                                sc = (av + 4) / av
                             }
                     }
                 })
