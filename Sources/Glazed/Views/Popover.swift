@@ -273,14 +273,40 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
                 y: min(max(buttonRect.maxY + defaultSize.height / 2 + leftSpace, defaultSize.height / 2 + window.safeAreaInsets.top + leftSpace), windowSize.height - defaultSize.height / 2 - leftSpace - window.safeAreaInsets.bottom)
             ), size: defaultSize)
         case .leading:
+            let fuck = leftSpace + window.safeAreaInsets.bottom
             return CGRect(center: CGPoint(
-                x: max(min(buttonRect.minX - leftSpace - defaultSize.width / 2, windowSize.width - leftSpace - defaultSize.width / 2), leftSpace + defaultSize.width / 2),
-                y: max(min(buttonRect.midY, windowSize.height - leftSpace - defaultSize.height / 2 - window.safeAreaInsets.bottom), leftSpace + defaultSize.height / 2 + window.safeAreaInsets.top)
+                x: max(
+                    min(
+                        buttonRect.minX - leftSpace - defaultSize.width / 2,
+                        windowSize.width - leftSpace - defaultSize.width / 2
+                    ),
+                    leftSpace + defaultSize.width / 2
+                ),
+                y: max(
+                    min(
+                        buttonRect.midY,
+                        windowSize.height - fuck - defaultSize.height / 2
+                    ),
+                    leftSpace + window.safeAreaInsets.top + defaultSize.height / 2
+                )
             ), size: defaultSize)
         case .trailing:
+            let fuck = leftSpace + window.safeAreaInsets.bottom
             return CGRect(center: CGPoint(
-                x: max(min(buttonRect.maxX + leftSpace + defaultSize.width / 2, windowSize.width - leftSpace - defaultSize.width / 2), leftSpace + defaultSize.width / 2),
-                y: max(min(buttonRect.midY, windowSize.height - leftSpace - defaultSize.height / 2 - window.safeAreaInsets.bottom), leftSpace + defaultSize.height / 2 + window.safeAreaInsets.top)
+                x: max(
+                    min(
+                        buttonRect.maxX + leftSpace + defaultSize.width / 2,
+                        windowSize.width - leftSpace - defaultSize.width / 2
+                    ),
+                    leftSpace + defaultSize.width / 2
+                ),
+                y: max(
+                    min(
+                        buttonRect.midY,
+                        windowSize.height - fuck - defaultSize.height / 2
+                    ),
+                    leftSpace + window.safeAreaInsets.top + defaultSize.height / 2
+                )
             ), size: defaultSize)
         case .center:
             return CGRect(center: CGPoint(
