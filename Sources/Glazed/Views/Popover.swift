@@ -265,27 +265,27 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
         case .top:
             return CGRect(center: CGPoint(
                 x: max(min(buttonRect.midX, windowSize.width - leftSpace - defaultSize.width / 2), leftSpace + defaultSize.width / 2),
-                y: min(max(buttonRect.minY - defaultSize.height / 2 - leftSpace, defaultSize.height / 2 + window.safeAreaInsets.top + leftSpace), windowSize.height - defaultSize.height / 2 - leftSpace)
+                y: min(max(buttonRect.minY - defaultSize.height / 2 - leftSpace, defaultSize.height / 2 + window.safeAreaInsets.top + leftSpace), windowSize.height - defaultSize.height / 2 - leftSpace - window.safeAreaInsets.bottom)
             ), size: defaultSize)
         case .bottom:
             return CGRect(center: CGPoint(
                 x: max(min(buttonRect.midX, windowSize.width - leftSpace - defaultSize.width / 2), leftSpace + defaultSize.width / 2),
-                y: min(max(buttonRect.maxY + defaultSize.height / 2 + leftSpace, defaultSize.height / 2 + window.safeAreaInsets.top + leftSpace), windowSize.height - defaultSize.height / 2 - leftSpace)
+                y: min(max(buttonRect.maxY + defaultSize.height / 2 + leftSpace, defaultSize.height / 2 + window.safeAreaInsets.top + leftSpace), windowSize.height - defaultSize.height / 2 - leftSpace - window.safeAreaInsets.bottom)
             ), size: defaultSize)
         case .leading:
             return CGRect(center: CGPoint(
                 x: max(min(buttonRect.minX - leftSpace - defaultSize.width / 2, windowSize.width - leftSpace - defaultSize.width / 2), leftSpace + defaultSize.width / 2),
-                y: max(min(buttonRect.midY, windowSize.height - leftSpace - defaultSize.height / 2), leftSpace + defaultSize.height / 2)
+                y: max(min(buttonRect.midY, windowSize.height - leftSpace - defaultSize.height / 2 - window.safeAreaInsets.bottom), leftSpace + defaultSize.height / 2 + window.safeAreaInsets.top)
             ), size: defaultSize)
         case .trailing:
             return CGRect(center: CGPoint(
                 x: max(min(buttonRect.maxX + leftSpace + defaultSize.width / 2, windowSize.width - leftSpace - defaultSize.width / 2), leftSpace + defaultSize.width / 2),
-                y: max(min(buttonRect.midY, windowSize.height - leftSpace - defaultSize.height / 2), leftSpace + defaultSize.height / 2)
+                y: max(min(buttonRect.midY, windowSize.height - leftSpace - defaultSize.height / 2 - window.safeAreaInsets.bottom), leftSpace + defaultSize.height / 2 + window.safeAreaInsets.top)
             ), size: defaultSize)
         case .center:
             return CGRect(center: CGPoint(
                 x: max(min(buttonRect.midX, windowSize.width - leftSpace - defaultSize.width / 2), leftSpace + defaultSize.width / 2),
-                y: max(min(buttonRect.midY, windowSize.height - leftSpace - defaultSize.height / 2), leftSpace + defaultSize.height / 2)
+                y: max(min(buttonRect.midY, windowSize.height - leftSpace - defaultSize.height / 2 - window.safeAreaInsets.bottom), leftSpace + defaultSize.height / 2 + window.safeAreaInsets.top)
             ), size: defaultSize)
         }
     }
