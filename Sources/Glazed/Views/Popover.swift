@@ -108,6 +108,7 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
     
     @Environment(\.glazedSuper) var glazedSuper
     @Environment(\.colorScheme) var colorScheme
+    @Environment(\.safeAreaInsets2) var safeAreaInsets2
     
     func body(content: Content) -> some View {
 
@@ -365,6 +366,7 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
             .environment(\.glazedSuper, UUID())
             .environment(\.window, window)
             .environment(\.safeAreaInsets, EdgeInsets(top: 16, leading: 0, bottom: 16, trailing: 0))
+            .environment(\.safeAreaInsets2, safeAreaInsets2)
             .buttonStyle(TapButtonStyle())
     }
 }

@@ -54,6 +54,10 @@ extension EnvironmentValues {
         get { self[safeAreaInsetsKey.self] }
         set { self[safeAreaInsetsKey.self] = newValue }
     }
+    var safeAreaInsets2:EdgeInsets {
+        get { self[safeAreaInsetsKey.self] }
+        set { self[safeAreaInsetsKey.self] = newValue }
+    }
 }
 #if os(macOS)
 func Animation(animation: @escaping () -> Void, completion: @escaping (Bool) -> Void = {_ in }) {

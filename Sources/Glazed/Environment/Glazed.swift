@@ -28,6 +28,7 @@ public struct Glazed<Content: View>: View {
                     WindowHandlerRepresentable(windowViewModel: windowViewModel)
                 )
                 .environment(\.safeAreaInsets, geometry.safeAreaInsets)
+                .environment(\.safeAreaInsets2, geometry.safeAreaInsets)
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
                 .environment(\.glazedAsyncAction, { action in
                     showThisPage?.isOpen = true

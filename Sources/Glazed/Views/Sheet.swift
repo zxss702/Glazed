@@ -42,6 +42,7 @@ struct SheetViewModle<Content2: View>: ViewModifier {
     
     @Environment(\.colorScheme) var colorScheme
     @State var bottomC: Bool = true
+    @Environment(\.safeAreaInsets2) var safeAreaInsets2
     
     func body(content: Content) -> some View {
         content
@@ -203,6 +204,7 @@ struct SheetViewModle<Content2: View>: ViewModifier {
             })
             .environment(\.glazedSuper, nil)
             .environment(\.window, window)
+            .environment(\.safeAreaInsets2, safeAreaInsets2)
             .environment(\.safeAreaInsets, EdgeInsets(top: 16, leading: 0, bottom: 16, trailing: 0))
     }
 }
