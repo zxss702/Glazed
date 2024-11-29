@@ -136,6 +136,19 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
                             }
                         }()
                         Color.clear
+                            .onChange(of: safeAreaInsets2, perform: { newValue in
+                                if let showThisPage {
+                                    let frame = setFrame(window: window, showThisPage: showThisPage, buttonRect: buttonRect)
+                                    if showThisPage.hosting.view.frame != frame {
+                                        Animation {
+                                            if type.isShadow {
+                                                showThisPage.hosting.view.layer.shadowPath = type.clipedShape.path(in: CGRect(origin: .zero, size: frame.size)).cgPath
+                                            }
+                                            showThisPage.hosting.view.frame = frame
+                                        }
+                                    }
+                                }
+                            })
                             .onAppear {
                                 if showThisPage == nil {
                                     showThisPage = PopoverShowPageViewWindow(windowScene: window.windowScene!, content: AnyView(pageStyle()), buttonFrame: buttonRect, glazedSuper: glazedSuper, isOpen: isOpen, isTip: type.isTip, dismiss: {
