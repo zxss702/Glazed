@@ -185,7 +185,7 @@ struct shadowViewModle2: ViewModifier {
 public struct TapButtonStyle: ButtonStyle {
     @State var scale:CGFloat = 1
     @State var time:Date = Date()
-   
+    
     @State var sc2: Double = 1.02
     @State var sc: Double = 1.02
     
@@ -199,17 +199,17 @@ public struct TapButtonStyle: ButtonStyle {
             .foregroundColor(.accentColor)
             .contentShape(Rectangle())
             .compositingGroup()
-                       .onHover(perform: { Bool in
-                           if Bool {
-                               withAnimation(.autoAnimation.speed(2)) {
-                                   scale = sc
-                               }
-                           } else {
-                               withAnimation(.autoAnimation.speed(2)) {
-                                   scale = 1
-                               }
-                           }
-                       })
+            .onHover(perform: { Bool in
+                if Bool {
+                    withAnimation(.autoAnimation.speed(2)) {
+                        scale = sc
+                    }
+                } else {
+                    withAnimation(.autoAnimation.speed(2)) {
+                        scale = 1
+                    }
+                }
+            })
             .onChange(of: configuration.isPressed, perform: { newValue in
                 if newValue {
                     if #available(iOS 17.0, *) {
@@ -281,6 +281,7 @@ public struct TapButtonStyle: ButtonStyle {
             }
     }
 }
+
 // 计算平均值的函数
 func avg(_ Element: CGFloat...) -> CGFloat {
     var counts: CGFloat = 0

@@ -147,7 +147,7 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
                                         superController.view.addSubview(showThisPage)
                                         NSLayoutConstraint.activate([
                                             showThisPage.topAnchor.constraint(equalTo: superController.view.topAnchor),
-                                            showThisPage.bottomAnchor.constraint(equalTo: superController.view.bottomAnchor),
+                                            showThisPage.bottomAnchor.constraint(equalTo: superController.view.safeAreaLayoutGuide.bottomAnchor),
                                             showThisPage.leadingAnchor.constraint(equalTo: superController.view.leadingAnchor),
                                             showThisPage.trailingAnchor.constraint(equalTo: superController.view.trailingAnchor)
                                         ])
@@ -270,8 +270,20 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
             ), size: defaultSize)
         case .bottom:
             return CGRect(center: CGPoint(
-                x: max(min(buttonRect.midX, windowSize.width - leftSpace - defaultSize.width / 2), leftSpace + defaultSize.width / 2),
-                y: min(max(buttonRect.maxY + defaultSize.height / 2 + leftSpace, defaultSize.height / 2 + window.safeAreaInsets.top + leftSpace), windowSize.height - defaultSize.height / 2 - leftSpace - window.safeAreaInsets.bottom)
+                x: max(
+                    min(
+                        buttonRect.midX,
+                        windowSize.width - leftSpace - defaultSize.width / 2
+                    ),
+                    leftSpace + defaultSize.width / 2
+                ),
+                y: min(
+                    max(
+                        buttonRect.maxY + defaultSize.height / 2 + leftSpace,
+                        defaultSize.height / 2 + window.safeAreaInsets.top + leftSpace
+                    ),
+                    windowSize.height - leftSpace - window.safeAreaInsets.bottom - defaultSize.height / 2
+                )
             ), size: defaultSize)
         case .leading:
             let fuck = leftSpace + window.safeAreaInsets.bottom

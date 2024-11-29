@@ -112,7 +112,7 @@ struct SheetViewModle<Content2: View>: ViewModifier {
                                 superController.view.addSubview(showThisPage)
                                 NSLayoutConstraint.activate([
                                     showThisPage.topAnchor.constraint(equalTo: superController.view.topAnchor),
-                                    showThisPage.bottomAnchor.constraint(equalTo: superController.view.bottomAnchor),
+                                    showThisPage.bottomAnchor.constraint(equalTo: superController.view.safeAreaLayoutGuide.bottomAnchor),
                                     showThisPage.leadingAnchor.constraint(equalTo: superController.view.leadingAnchor),
                                     showThisPage.trailingAnchor.constraint(equalTo: superController.view.trailingAnchor)
                                 ])
