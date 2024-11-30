@@ -136,7 +136,7 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
                             }
                         }()
                         Color.clear
-                            .onChange(of: safeAreaInsets2, perform: { newValue in
+                            .onChange(of: GeometryProxy.safeAreaInsets, perform: { newValue in
                                 if let showThisPage {
                                     let frame = setFrame(window: window, showThisPage: showThisPage, buttonRect: buttonRect)
                                     if showThisPage.hosting.view.frame != frame {
@@ -160,7 +160,7 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
                                         superController.view.addSubview(showThisPage)
                                         NSLayoutConstraint.activate([
                                             showThisPage.topAnchor.constraint(equalTo: superController.view.topAnchor),
-                                            showThisPage.bottomAnchor.constraint(equalTo: superController.view.safeAreaLayoutGuide.bottomAnchor),
+                                            showThisPage.bottomAnchor.constraint(equalTo: superController.view.bottomAnchor),
                                             showThisPage.leadingAnchor.constraint(equalTo: superController.view.leadingAnchor),
                                             showThisPage.trailingAnchor.constraint(equalTo: superController.view.trailingAnchor)
                                         ])
@@ -269,17 +269,16 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
         let windowSize = window.frame.size
         
         let defaultSize = showThisPage.hosting.sizeThatFits(in: CGSize(
-            width: window.frame.size.width - leftSpace * 2 - window.safeAreaInsets.left - window.safeAreaInsets.right,
-            height: window.frame.size.height - leftSpace * 2 - window.safeAreaInsets.top - window.safeAreaInsets.bottom
+            width: window.frame.size.width - leftSpace * 2 - safeAreaInsets2.leading - safeAreaInsets2.trailing,
+            height: window.frame.size.height - leftSpace * 2 - safeAreaInsets2.top - safeAreaInsets2.bottom
         ))
         
         let edge:PopoverEdge = getEdge(buttonRect: buttonRect, defaultSize: defaultSize, windowSize: windowSize)
-        
         switch edge {
         case .top:
             return CGRect(center: CGPoint(
                 x: max(min(buttonRect.midX, windowSize.width - leftSpace - defaultSize.width / 2), leftSpace + defaultSize.width / 2),
-                y: min(max(buttonRect.minY - defaultSize.height / 2 - leftSpace, defaultSize.height / 2 + window.safeAreaInsets.top + leftSpace), windowSize.height - defaultSize.height / 2 - leftSpace - window.safeAreaInsets.bottom)
+                y: min(max(buttonRect.minY - defaultSize.height / 2 - leftSpace, defaultSize.height / 2 + safeAreaInsets2.top + leftSpace), windowSize.height - defaultSize.height / 2 - leftSpace - safeAreaInsets2.bottom)
             ), size: defaultSize)
         case .bottom:
             return CGRect(center: CGPoint(
@@ -293,13 +292,13 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
                 y: min(
                     max(
                         buttonRect.maxY + defaultSize.height / 2 + leftSpace,
-                        defaultSize.height / 2 + window.safeAreaInsets.top + leftSpace
+                        defaultSize.height / 2 + safeAreaInsets2.top + leftSpace
                     ),
-                    windowSize.height - leftSpace - window.safeAreaInsets.bottom - defaultSize.height / 2
+                    windowSize.height - leftSpace - safeAreaInsets2.bottom - defaultSize.height / 2
                 )
             ), size: defaultSize)
         case .leading:
-            let fuck = leftSpace + window.safeAreaInsets.bottom
+            let fuck = leftSpace + safeAreaInsets2.bottom
             return CGRect(center: CGPoint(
                 x: max(
                     min(
@@ -313,11 +312,11 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
                         buttonRect.midY,
                         windowSize.height - fuck - defaultSize.height / 2
                     ),
-                    leftSpace + window.safeAreaInsets.top + defaultSize.height / 2
+                    leftSpace + safeAreaInsets2.top + defaultSize.height / 2
                 )
             ), size: defaultSize)
         case .trailing:
-            let fuck = leftSpace + window.safeAreaInsets.bottom
+            let fuck = leftSpace + safeAreaInsets2.bottom
             return CGRect(center: CGPoint(
                 x: max(
                     min(
@@ -331,13 +330,13 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
                         buttonRect.midY,
                         windowSize.height - fuck - defaultSize.height / 2
                     ),
-                    leftSpace + window.safeAreaInsets.top + defaultSize.height / 2
+                    leftSpace + safeAreaInsets2.top + defaultSize.height / 2
                 )
             ), size: defaultSize)
         case .center:
             return CGRect(center: CGPoint(
                 x: max(min(buttonRect.midX, windowSize.width - leftSpace - defaultSize.width / 2), leftSpace + defaultSize.width / 2),
-                y: max(min(buttonRect.midY, windowSize.height - leftSpace - defaultSize.height / 2 - window.safeAreaInsets.bottom), leftSpace + defaultSize.height / 2 + window.safeAreaInsets.top)
+                y: max(min(buttonRect.midY, windowSize.height - leftSpace - defaultSize.height / 2 - safeAreaInsets2.bottom), leftSpace + defaultSize.height / 2 + safeAreaInsets2.top)
             ), size: defaultSize)
         }
     }
@@ -346,8 +345,8 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
         let windowSize = window.bounds.size
         
         let defaultSize = showThisPage.hosting.sizeThatFits(in: CGSize(
-            width: window.frame.size.width - leftSpace * 2 - window.safeAreaInsets.left - window.safeAreaInsets.right,
-            height: window.frame.size.height - leftSpace * 2 - window.safeAreaInsets.top - window.safeAreaInsets.bottom
+            width: window.frame.size.width - leftSpace * 2 - safeAreaInsets2.leading - safeAreaInsets2.trailing,
+            height: window.frame.size.height - leftSpace * 2 - safeAreaInsets2.top - safeAreaInsets2.bottom
         ))
         
         let edge:PopoverEdge = getEdge(buttonRect: buttonRect, defaultSize: defaultSize, windowSize: windowSize)
