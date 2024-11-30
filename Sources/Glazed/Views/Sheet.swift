@@ -53,7 +53,7 @@ struct SheetViewModle<Content2: View>: ViewModifier {
                         let _ = showThisPage?.hosting.rootView = AnyView(pageStyle())
                         let _ = {
                             if let showThisPage, isPresented, showThisPage.gesture.state != .changed {
-                                let idealSize = showThisPage.hosting.sizeThatFits(in: window.frame.size)
+                                let idealSize = showThisPage.hosting.sizeThatFits(in: CGSize(width: window.frame.size.width, height: window.frame.size.height - safeAreaInsets2.top - safeAreaInsets2.bottom))
                                 let frame = {
                                     if idealSize.width < window.frame.size.width {
                                         if window.frame.size.height <= idealSize.height {
@@ -63,29 +63,30 @@ struct SheetViewModle<Content2: View>: ViewModifier {
                                             return CGRect(
                                                 origin: CGPoint(
                                                     x: window.frame.width / 2 - idealSize.width / 2,
-                                                    y: window.safeAreaInsets.top + 20
+                                                    y: safeAreaInsets2.top + 20
                                                 ), size: CGSize(
                                                     width: idealSize.width,
-                                                    height: window.frame.size.height - window.safeAreaInsets.top - 20
+                                                    height: window.frame.size.height - safeAreaInsets2.top - safeAreaInsets2.bottom - 20
                                                 )
                                             )
                                         } else {
                                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
                                                 bottomC = true
                                             }
-                                            return CGRect(center: CGPoint(x: window.frame.midX, y: window.frame.midY) , size: idealSize)
+                                            return CGRect(center: CGPoint(x: window.frame.midX, y: window.frame.midY - (safeAreaInsets2.bottom - window.safeAreaInsets.bottom) / 2) , size: idealSize)
                                         }
                                     } else {
                                         let fitSize = CGSize(
                                             width: window.frame.size.width,
-                                            height: min(window.frame.size.height - window.safeAreaInsets.top - 20, idealSize.height))
+                                            height: min(window.frame.size.height - safeAreaInsets2.top - safeAreaInsets2.bottom - 20, idealSize.height)
+                                        )
                                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
                                             bottomC = false
                                         }
                                         return CGRect(
                                             origin: CGPoint(
                                                 x: 0,
-                                                y: window.frame.size.height - fitSize.height
+                                                y: window.frame.size.height - safeAreaInsets2.bottom + window.safeAreaInsets.bottom - fitSize.height
                                             ), size: fitSize
                                         )
                                     }
@@ -97,7 +98,6 @@ struct SheetViewModle<Content2: View>: ViewModifier {
                                 }
                             }
                         }()
-                        
                     }
                 }
                 .onChange(of: isPresented) { newValue in
@@ -112,39 +112,39 @@ struct SheetViewModle<Content2: View>: ViewModifier {
                                 superController.view.addSubview(showThisPage)
                                 NSLayoutConstraint.activate([
                                     showThisPage.topAnchor.constraint(equalTo: superController.view.topAnchor),
-                                    showThisPage.bottomAnchor.constraint(equalTo: superController.view.safeAreaLayoutGuide.bottomAnchor),
+                                    showThisPage.bottomAnchor.constraint(equalTo: superController.view.bottomAnchor),
                                     showThisPage.leadingAnchor.constraint(equalTo: superController.view.leadingAnchor),
                                     showThisPage.trailingAnchor.constraint(equalTo: superController.view.trailingAnchor)
                                 ])
                                 
-                                let idealSize = showThisPage.hosting.sizeThatFits(in: window.frame.size)
+                                let idealSize = showThisPage.hosting.sizeThatFits(in: CGSize(width: window.frame.size.width, height: window.frame.size.height - safeAreaInsets2.top - safeAreaInsets2.bottom))
                                 
                                 if idealSize.width < window.frame.size.width {
-                                    if window.frame.size.height <= idealSize.height {
+                                    if window.frame.size.height - safeAreaInsets2.top - safeAreaInsets2.bottom <= idealSize.height {
                                         showThisPage.hosting.view.frame = CGRect(
                                             origin: CGPoint(
                                                 x: window.frame.width / 2 - idealSize.width / 2,
-                                                y: window.safeAreaInsets.top + 20
+                                                y: safeAreaInsets2.top + 20
                                             ), size: CGSize(
                                                 width: idealSize.width,
-                                                height: window.frame.size.height - window.safeAreaInsets.top - 20
+                                                height: window.frame.size.height - safeAreaInsets2.top - safeAreaInsets2.bottom - 20
                                             )
                                         )
-                                        showThisPage.hosting.view.transform = CGAffineTransform(translationX: 0, y: window.frame.size.height - window.safeAreaInsets.top - 10)
+                                        showThisPage.hosting.view.transform = CGAffineTransform(translationX: 0, y: window.frame.size.height - safeAreaInsets2.top - safeAreaInsets2.bottom - 10)
                                         bottomC = false
                                     } else {
-                                        showThisPage.hosting.view.frame = CGRect(center: CGPoint(x: window.frame.midX, y: window.frame.midY) , size: idealSize)
+                                        showThisPage.hosting.view.frame = CGRect(center: CGPoint(x: window.frame.midX, y: window.frame.midY - (safeAreaInsets2.bottom - window.safeAreaInsets.bottom) / 2) , size: idealSize)
                                         showThisPage.hosting.view.transform = CGAffineTransform(translationX: 0, y: window.frame.height / 2 + idealSize.height / 2 + 10)
                                         bottomC = true
                                     }
                                 } else {
                                     let fitSize = CGSize(
                                         width: window.frame.size.width,
-                                        height: min(window.frame.size.height - window.safeAreaInsets.top - 20, idealSize.height))
+                                        height: min(window.frame.size.height - safeAreaInsets2.top - safeAreaInsets2.bottom  - 20, idealSize.height))
                                     showThisPage.hosting.view.frame = CGRect(
                                         origin: CGPoint(
                                             x: 0,
-                                            y: window.frame.size.height - fitSize.height
+                                            y: window.frame.size.height - safeAreaInsets2.bottom + window.safeAreaInsets.bottom - fitSize.height
                                         ), size: fitSize)
                                     showThisPage.hosting.view.transform = CGAffineTransform(translationX: 0, y: fitSize.height + 10)
                                     bottomC = false
@@ -162,15 +162,15 @@ struct SheetViewModle<Content2: View>: ViewModifier {
                             Animation {
                                 showThisPage.backgroundColor = .clear
                                 if idealSize.width < window.frame.size.width {
-                                    if window.frame.size.height < idealSize.height {
-                                        showThisPage.hosting.view.transform = CGAffineTransform(translationX: 0, y: window.frame.size.height - window.safeAreaInsets.top - 10)
+                                    if window.frame.size.height - safeAreaInsets2.top - safeAreaInsets2.bottom < idealSize.height {
+                                        showThisPage.hosting.view.transform = CGAffineTransform(translationX: 0, y: window.frame.size.height - safeAreaInsets2.top - safeAreaInsets2.bottom - 10)
                                     } else {
                                         showThisPage.hosting.view.transform = CGAffineTransform(translationX: 0, y: window.frame.height / 2 + idealSize.height / 2 + 10)
                                     }
                                 } else {
                                     let fitSize = CGSize(
                                         width: window.frame.size.width,
-                                        height: min(window.frame.size.height - window.safeAreaInsets.top - 20, idealSize.height))
+                                        height: min(window.frame.size.height - safeAreaInsets2.top - safeAreaInsets2.bottom - 20, idealSize.height))
                                     showThisPage.hosting.view.transform = CGAffineTransform(translationX: 0, y: fitSize.height + 10)
                                 }
                             } completion: { Bool in
