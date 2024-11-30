@@ -392,6 +392,7 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
             .environment(\.safeAreaInsets, EdgeInsets(top: 16, leading: 0, bottom: 16, trailing: 0))
             .environment(\.safeAreaInsets2, safeAreaInsets2)
             .buttonStyle(TapButtonStyle())
+            .font(.custom("Songti SC", fixedSize: 16))
     }
 }
 
