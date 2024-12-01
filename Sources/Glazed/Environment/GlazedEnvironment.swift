@@ -244,7 +244,6 @@ public struct TapButtonStyle: ButtonStyle {
             })
             .background {
                 GeometryReader(content: { geometry in
-                    
                     if #available(iOS 17.0, *) {
                         Color.clear
                             .sensoryFeedback(

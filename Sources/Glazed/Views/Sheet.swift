@@ -106,7 +106,7 @@ struct SheetViewModle<Content2: View>: ViewModifier {
                     if newValue, let window {
                         if showThisPage == nil {
                             showThisPage = SheetShowPageViewWindow(windowScene: window.windowScene!, content: AnyView(pageStyle()), isOpen: isOpen, dismiss: {
-                                self.isPresented = false
+                                dismiss()
                             })
                             if let showThisPage, let superController = window.rootViewController {
                                 superController.view.addSubview(showThisPage)
@@ -156,36 +156,44 @@ struct SheetViewModle<Content2: View>: ViewModifier {
                             showThisPage?.hosting.view.transform = CGAffineTransform(translationX: 0, y: 0)
                         }
                     } else {
-                        if let window, let showThisPage {
-                            let idealSize = showThisPage.hosting.sizeThatFits(in: window.frame.size)
-                            
-                            Animation {
-                                showThisPage.backgroundColor = .clear
-                                if idealSize.width < window.frame.size.width {
-                                    if window.frame.size.height - safeAreaInsets2.top - safeAreaInsets2.bottom < idealSize.height {
-                                        showThisPage.hosting.view.transform = CGAffineTransform(translationX: 0, y: window.frame.size.height - safeAreaInsets2.top - safeAreaInsets2.bottom - 10)
-                                    } else {
-                                        showThisPage.hosting.view.transform = CGAffineTransform(translationX: 0, y: window.frame.height / 2 + idealSize.height / 2 + 10)
-                                    }
-                                } else {
-                                    let fitSize = CGSize(
-                                        width: window.frame.size.width,
-                                        height: min(window.frame.size.height - safeAreaInsets2.top - safeAreaInsets2.bottom - 20, idealSize.height))
-                                    showThisPage.hosting.view.transform = CGAffineTransform(translationX: 0, y: fitSize.height + 10)
-                                }
-                            } completion: { Bool in
-                                if !isOpen {
-                                    showThisPage.removeFromSuperview()
-                                    self.showThisPage = nil
-                                }
-                            }
-                        }
+                        dismiss()
                     }
                 }
             }
             .onDisappear {
                 isPresented = false
+                isOpen = false
+                showThisPage?.isOpen = isOpen
+                dismiss()
             }
+    }
+    
+    func dismiss() {
+        if let window, let showThisPage {
+            let idealSize = showThisPage.hosting.sizeThatFits(in: window.frame.size)
+            
+            Animation {
+                showThisPage.backgroundColor = .clear
+                if idealSize.width < window.frame.size.width {
+                    if window.frame.size.height - safeAreaInsets2.top - safeAreaInsets2.bottom < idealSize.height {
+                        showThisPage.hosting.view.transform = CGAffineTransform(translationX: 0, y: window.frame.size.height - safeAreaInsets2.top - safeAreaInsets2.bottom - 10)
+                    } else {
+                        showThisPage.hosting.view.transform = CGAffineTransform(translationX: 0, y: window.frame.height / 2 + idealSize.height / 2 + 10)
+                    }
+                } else {
+                    let fitSize = CGSize(
+                        width: window.frame.size.width,
+                        height: min(window.frame.size.height - safeAreaInsets2.top - safeAreaInsets2.bottom - 20, idealSize.height))
+                    showThisPage.hosting.view.transform = CGAffineTransform(translationX: 0, y: fitSize.height + 10)
+                }
+            } completion: { Bool in
+                if !isOpen {
+                    showThisPage.removeFromSuperview()
+                    self.showThisPage = nil
+                }
+            }
+        }
+        self.isPresented = false
     }
     
     @ViewBuilder
