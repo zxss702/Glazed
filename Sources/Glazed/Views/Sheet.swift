@@ -170,7 +170,7 @@ struct SheetViewModle<Content2: View>: ViewModifier {
     }
     
     func dismiss() {
-        if let window, let showThisPage {
+        if let window, let showThisPage, self.isPresented {
             let idealSize = showThisPage.hosting.sizeThatFits(in: window.frame.size)
             
             Animation {
