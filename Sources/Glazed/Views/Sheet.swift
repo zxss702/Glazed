@@ -189,7 +189,7 @@ struct SheetViewModle<Content2: View>: ViewModifier {
                     showThisPage.hosting.view.transform = CGAffineTransform(translationX: 0, y: fitSize.height + 10)
                 }
             } completion: { Bool in
-                if !isOpen {
+                if !showThisPage.isOpen {
                     showThisPage.removeFromSuperview()
                     self.showThisPage = nil
                 }
