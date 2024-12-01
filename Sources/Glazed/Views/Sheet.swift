@@ -165,7 +165,8 @@ struct SheetViewModle<Content2: View>: ViewModifier {
             }
             .onDisappear {
                 isPresented = false
-                
+                isOpen = false
+                showThisPage?.isOpen = false
                 dismiss()
             }
     }
