@@ -153,6 +153,7 @@ struct SheetViewModle<Content2: View>: ViewModifier {
                                 }
                             }
                         }
+                        showThisPage?.isAnimationed = false
                         Animation {
                             showThisPage?.backgroundColor = .black.withAlphaComponent(0.3)
                             showThisPage?.hosting.view.transform = CGAffineTransform(translationX: 0, y: 0)
@@ -170,9 +171,9 @@ struct SheetViewModle<Content2: View>: ViewModifier {
     }
     
     func dismiss() {
-        if let window, let showThisPage, self.isPresented {
+        if let window, let showThisPage, !showThisPage.isAnimationed {
             let idealSize = showThisPage.hosting.sizeThatFits(in: window.frame.size)
-            
+            showThisPage.isAnimationed = true
             Animation {
                 showThisPage.backgroundColor = .clear
                 if idealSize.width < window.frame.size.width {
@@ -226,6 +227,7 @@ class SheetShowPageViewWindow: UIView {
     let hosting:UIHostingController<AnyView>
     let dismiss: () -> Void
     var isOpen: Bool
+    var isAnimationed = false
     
     lazy var gesture = UIPanGestureRecognizer(target: self, action: #selector(action(ges: )))
     init(windowScene: UIWindowScene, content: AnyView, isOpen: Bool, dismiss: @escaping () -> Void) {
