@@ -106,7 +106,9 @@ struct SheetViewModle<Content2: View>: ViewModifier {
                     if newValue, let window {
                         if showThisPage == nil {
                             showThisPage = SheetShowPageViewWindow(windowScene: window.windowScene!, content: AnyView(pageStyle()), isOpen: isOpen, dismiss: {
-                                dismiss()
+                                DispatchQueue.main.async {
+                                    dismiss()
+                                }
                             })
                             if let showThisPage, let superController = window.rootViewController {
                                 superController.view.addSubview(showThisPage)
@@ -162,8 +164,7 @@ struct SheetViewModle<Content2: View>: ViewModifier {
             }
             .onDisappear {
                 isPresented = false
-                isOpen = false
-                showThisPage?.isOpen = isOpen
+                
                 dismiss()
             }
     }
