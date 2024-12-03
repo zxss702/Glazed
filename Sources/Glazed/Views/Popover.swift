@@ -69,7 +69,8 @@ public struct popoverType {
         isShadow: Bool = true,
         autoDimiss: Bool = true,
         isCenter: Bool = false,
-        isTip: Bool = false
+        isTip: Bool = false,
+        isOnlyTop: Bool = false
     ) {
         self.backGround = AnyShapeStyle(.background)
         self.clipedShape = AnyShape(RoundedRectangle(cornerRadius: 26.5, style: .continuous))
@@ -77,6 +78,7 @@ public struct popoverType {
         self.autoDimiss = autoDimiss
         self.isCenter = isCenter
         self.isTip = isTip
+        self.isOnlyTop = isOnlyTop
     }
 }
 
