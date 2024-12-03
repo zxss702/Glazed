@@ -14,6 +14,7 @@ public struct popoverType {
     let autoDimiss: Bool
     let isCenter: Bool
     let isTip: Bool
+    let isOnlyTop: Bool
     
     public init<ShapeS: ShapeStyle, ClipShape: Shape>(
         backGround: ShapeS,
@@ -21,7 +22,8 @@ public struct popoverType {
         isShadow: Bool = true,
         autoDimiss: Bool = true,
         isCenter: Bool = false,
-        isTip: Bool = false
+        isTip: Bool = false,
+        isOnlyTop: Bool = false
     ) {
         self.backGround = AnyShapeStyle(backGround)
         self.clipedShape = AnyShape(clipedShape)
@@ -29,13 +31,15 @@ public struct popoverType {
         self.autoDimiss = autoDimiss
         self.isCenter = isCenter
         self.isTip = isTip
+        self.isOnlyTop = isOnlyTop
     }
     public init<ShapeS: ShapeStyle>(
         backGround: ShapeS,
         isShadow: Bool = true,
         autoDimiss: Bool = true,
         isCenter: Bool = false,
-        isTip: Bool = false
+        isTip: Bool = false,
+        isOnlyTop: Bool = false
     ) {
         self.backGround = AnyShapeStyle(backGround)
         self.clipedShape = AnyShape(RoundedRectangle(cornerRadius: 26.5, style: .continuous))
@@ -43,13 +47,15 @@ public struct popoverType {
         self.autoDimiss = autoDimiss
         self.isCenter = isCenter
         self.isTip = isTip
+        self.isOnlyTop = isOnlyTop
     }
     public init<ClipShape: Shape>(
         clipedShape: ClipShape,
         isShadow: Bool = true,
         autoDimiss: Bool = true,
         isCenter: Bool = false,
-        isTip: Bool = false
+        isTip: Bool = false,
+        isOnlyTop: Bool = false
     ) {
         self.backGround = AnyShapeStyle(.background)
         self.clipedShape = AnyShape(clipedShape)
@@ -57,6 +63,7 @@ public struct popoverType {
         self.autoDimiss = autoDimiss
         self.isCenter = isCenter
         self.isTip = isTip
+        self.isOnlyTop = isOnlyTop
     }
     public init(
         isShadow: Bool = true,
@@ -229,7 +236,9 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
     }
     
     func getEdge(buttonRect: CGRect, defaultSize: CGSize, windowSize: CGSize) -> PopoverEdge {
-        if type.isCenter {
+        if type.isOnlyTop {
+            return .top
+        } else if type.isCenter {
             return .center
         } else if type.isTip {
             return .top
