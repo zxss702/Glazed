@@ -26,6 +26,7 @@ public struct Glazed<Content: View>: View {
                 .environment(\.window, windowViewModel.window)
                 .background(
                     WindowHandlerRepresentable(windowViewModel: windowViewModel)
+                        .allowsHitTesting(false)
                 )
                 .environment(\.safeAreaInsets, geometry.safeAreaInsets)
                 .environment(\.safeAreaInsets2, geometry.safeAreaInsets)
