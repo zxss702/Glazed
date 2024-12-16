@@ -118,6 +118,7 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
     @Environment(\.glazedSuper) var glazedSuper
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.safeAreaInsets2) var safeAreaInsets2
+    @Environment(\.glazedAsyncAction) var glazedAsyncAction
     
     func body(content: Content) -> some View {
 
@@ -402,6 +403,7 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
             .environment(\.window, window)
             .environment(\.safeAreaInsets, EdgeInsets(top: 16, leading: 0, bottom: 16, trailing: 0))
             .environment(\.safeAreaInsets2, safeAreaInsets2)
+            .environment(\.glazedAsyncAction, glazedAsyncAction)
             .buttonStyle(TapButtonStyle())
             .font(.custom("Songti SC", fixedSize: 16))
     }

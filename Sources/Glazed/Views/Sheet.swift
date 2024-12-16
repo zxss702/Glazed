@@ -43,6 +43,7 @@ struct SheetViewModle<Content2: View>: ViewModifier {
     @Environment(\.colorScheme) var colorScheme
     @State var bottomC: Bool = true
     @Environment(\.safeAreaInsets2) var safeAreaInsets2
+    @Environment(\.glazedAsyncAction) var glazedAsyncAction
     
     func body(content: Content) -> some View {
         content
@@ -217,6 +218,7 @@ struct SheetViewModle<Content2: View>: ViewModifier {
             .environment(\.window, window)
             .environment(\.safeAreaInsets2, safeAreaInsets2)
             .environment(\.safeAreaInsets, EdgeInsets(top: 16, leading: 0, bottom: 16, trailing: 0))
+            .environment(\.glazedAsyncAction, glazedAsyncAction)
             .font(.custom("Songti SC", fixedSize: 16))
     }
 }
