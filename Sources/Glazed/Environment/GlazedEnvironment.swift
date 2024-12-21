@@ -199,7 +199,7 @@ public struct TapButtonStyle: ButtonStyle {
             .foregroundColor(.accentColor)
             .contentShape(Rectangle())
             .compositingGroup()
-//            .font(.custom("Songti SC", fixedSize: 16))
+//               .font(.custom("Source Han Serif SC VF", size: 17))
             .onHover(perform: { Bool in
                 if Bool {
                     withAnimation(.autoAnimation.speed(2)) {

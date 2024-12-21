@@ -219,7 +219,7 @@ struct SheetViewModle<Content2: View>: ViewModifier {
             .environment(\.safeAreaInsets2, safeAreaInsets2)
             .environment(\.safeAreaInsets, EdgeInsets(top: 16, leading: 0, bottom: 16, trailing: 0))
             .environment(\.glazedAsyncAction, glazedAsyncAction)
-            .font(.custom("Songti SC", fixedSize: 16))
+               .font(.custom("Source Han Serif SC VF", size: 17))
     }
 }
 

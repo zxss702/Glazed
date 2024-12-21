@@ -405,7 +405,7 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
             .environment(\.safeAreaInsets2, safeAreaInsets2)
             .environment(\.glazedAsyncAction, glazedAsyncAction)
             .buttonStyle(TapButtonStyle())
-            .font(.custom("Songti SC", fixedSize: 16))
+            .font(.custom("Source Han Serif SC VF", size: 17))
     }
 }
 
