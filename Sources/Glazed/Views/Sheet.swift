@@ -211,12 +211,7 @@ struct SheetViewModle<Content2: View>: ViewModifier {
     @ViewBuilder
     func pageStyle() -> some View {
         content()
-            .safeAreaInset(edge: .bottom, content: {
-                if isBottom {
-                    Spacer()
-                        .frame(height: safeAreaInsets2.bottom)
-                }
-            })
+            .padding(.bottom, isBottom ? safeAreaInsets2.bottom : 0)
             .background(type.backGround)
             .buttonStyle(TapButtonStyle())
             .clipShape(UnevenRoundedRectangle(cornerRadii: RectangleCornerRadii(
@@ -231,7 +226,7 @@ struct SheetViewModle<Content2: View>: ViewModifier {
             .environment(\.glazedSuper, nil)
             .environment(\.window, window)
             .environment(\.safeAreaInsets2, safeAreaInsets2)
-            .environment(\.safeAreaInsets, EdgeInsets(top: 16, leading: 0, bottom: 16, trailing: 0))
+            .environment(\.safeAreaInsets, EdgeInsets(top: 16, leading: 0, bottom: max(safeAreaInsets2.bottom, 16), trailing: 0))
             .environment(\.glazedAsyncAction, glazedAsyncAction)
                .font(.custom("Source Han Serif SC VF", size: 17))
     }
