@@ -76,7 +76,7 @@ struct SheetViewModle<Content2: View>: ViewModifier {
                                         } else {
                                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
                                                 isBottom = false
-                                                bottomC = false
+                                                bottomC = true
                                             }
                                             return CGRect(center: CGPoint(x: window.frame.midX, y: window.frame.midY - (safeAreaInsets2.bottom - window.safeAreaInsets.bottom) / 2) , size: idealSize)
                                         }
@@ -87,8 +87,8 @@ struct SheetViewModle<Content2: View>: ViewModifier {
                                             height: min(window.frame.size.height - safeAreaInsets2.top - safeAreaInsets2.bottom - 20, idealSize.height)
                                         )
                                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
-                                            bottomC = true
-                                            isBottom = false
+                                            bottomC = false
+                                            isBottom = true
                                         }
                                         return CGRect(
                                             origin: CGPoint(
