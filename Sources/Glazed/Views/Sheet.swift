@@ -61,7 +61,7 @@ struct SheetViewModle<Content2: View>: ViewModifier {
                                         
                                         if window.frame.size.height <= idealSize.height {
                                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
-                                                isBottom = true
+                                                isBottom = false
                                                 bottomC = false
                                             }
                                             return CGRect(
@@ -76,7 +76,7 @@ struct SheetViewModle<Content2: View>: ViewModifier {
                                         } else {
                                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
                                                 isBottom = true
-                                                bottomC = true
+                                                bottomC = false
                                             }
                                             return CGRect(center: CGPoint(x: window.frame.midX, y: window.frame.midY - (safeAreaInsets2.bottom - window.safeAreaInsets.bottom) / 2) , size: idealSize)
                                         }
@@ -87,7 +87,7 @@ struct SheetViewModle<Content2: View>: ViewModifier {
                                             height: min(window.frame.size.height - safeAreaInsets2.top - safeAreaInsets2.bottom - 20, idealSize.height)
                                         )
                                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
-                                            bottomC = false
+                                            bottomC = true
                                             isBottom = false
                                         }
                                         return CGRect(
@@ -129,7 +129,7 @@ struct SheetViewModle<Content2: View>: ViewModifier {
                                 let idealSize = showThisPage.hosting.sizeThatFits(in: CGSize(width: window.frame.size.width, height: window.frame.size.height - safeAreaInsets2.top - safeAreaInsets2.bottom))
                                 
                                 if idealSize.width < window.frame.size.width {
-                                    isBottom = true
+                                    isBottom = false
                                     if window.frame.size.height - safeAreaInsets2.top - safeAreaInsets2.bottom <= idealSize.height {
                                         showThisPage.hosting.view.frame = CGRect(
                                             origin: CGPoint(
@@ -148,7 +148,7 @@ struct SheetViewModle<Content2: View>: ViewModifier {
                                         bottomC = true
                                     }
                                 } else {
-                                    isBottom = false
+                                    isBottom = true
                                     let fitSize = CGSize(
                                         width: window.frame.size.width,
                                         height: min(window.frame.size.height - safeAreaInsets2.top - safeAreaInsets2.bottom  - 20, idealSize.height))
@@ -211,7 +211,12 @@ struct SheetViewModle<Content2: View>: ViewModifier {
     @ViewBuilder
     func pageStyle() -> some View {
         content()
-            .padding(.bottom, isBottom ? safeAreaInsets2.bottom : 0)
+            .safeAreaInset(edge: .bottom, content: {
+                if isBottom {
+                    Spacer()
+                        .frame(height: safeAreaInsets2.bottom)
+                }
+            })
             .background(type.backGround)
             .buttonStyle(TapButtonStyle())
             .clipShape(UnevenRoundedRectangle(cornerRadii: RectangleCornerRadii(
