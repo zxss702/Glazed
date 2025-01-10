@@ -161,7 +161,7 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
                             })
                             .onAppear {
                                 if showThisPage == nil {
-                                    showThisPage = PopoverShowPageViewWindow(windowScene: window.windowScene!, content: AnyView(pageStyle()), buttonFrame: buttonRect, glazedSuper: glazedSuper, isOpen: isOpen, isTip: type.isTip, dismiss: {
+                                    showThisPage = PopoverShowPageViewWindow(windowScene: window.windowScene!, content: AnyView(pageStyle()), buttonFrame: buttonRect, glazedSuper: glazedSuper, isOpen: isOpen, isTip: type.isTip, isCenter: type.isCenter, dismiss: {
                                         if type.autoDimiss {
                                             self.isPresented = false
                                         }
@@ -195,7 +195,7 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
                                 }
                                 if let showThisPage {
                                     Animation {
-                                        if glazedSuper != nil {
+                                        if glazedSuper != nil || type.isCenter {
                                             showThisPage.backgroundColor = .black.withAlphaComponent(0.1)
                                         }
                                         showThisPage.hosting.view.alpha = 1
@@ -418,14 +418,16 @@ class PopoverShowPageViewWindow: UIView {
     let glazedSuper: UUID?
     var isOpen: Bool
     let isTip: Bool
+    let isCenter: Bool
     
-    init(windowScene: UIWindowScene, content: AnyView, buttonFrame: CGRect, glazedSuper: UUID?, isOpen: Bool, isTip: Bool, dismiss: @escaping () -> Void) {
+    init(windowScene: UIWindowScene, content: AnyView, buttonFrame: CGRect, glazedSuper: UUID?, isOpen: Bool, isTip: Bool, isCenter: Bool, dismiss: @escaping () -> Void) {
         self.dismiss = dismiss
         self.buttonFrame = buttonFrame
         self.hosting = UIHostingController(rootView: content)
         self.glazedSuper = glazedSuper
         self.isOpen = isOpen
         self.isTip = isTip
+        self.isCenter = isCenter
         
         super.init(frame: .zero)
         self.translatesAutoresizingMaskIntoConstraints = false
@@ -460,7 +462,7 @@ class PopoverShowPageViewWindow: UIView {
             if self.hosting.view.frame.contains(point) {
                 return super.hitTest(point, with: event)
             } else {
-                if glazedSuper == nil {
+                if glazedSuper == nil && !isCenter {
                     if !self.buttonFrame.contains(point) {
                         dismiss()
                     }
