@@ -195,7 +195,7 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
                                 }
                                 if let showThisPage {
                                     Animation {
-                                        if glazedSuper != nil || type.isCenter {
+                                        if (glazedSuper != nil || type.isCenter) && !type.isTip {
                                             showThisPage.backgroundColor = .black.withAlphaComponent(0.1)
                                         }
                                         showThisPage.hosting.view.alpha = 1
