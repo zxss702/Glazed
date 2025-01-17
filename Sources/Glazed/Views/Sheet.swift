@@ -103,11 +103,10 @@ struct SheetViewModle<Content2: View>: ViewModifier {
                         }()
                         
                         Color.clear
-                            .transition(.identity)
                             .onAppear {
                                 isOpen = true
                                 showThisPage?.isOpen = isOpen
-                                if let window {
+                                if let window = self.window {
                                     if showThisPage == nil {
                                         showThisPage = SheetShowPageViewWindow(windowScene: window.windowScene!, content: AnyView(pageStyle()), isOpen: isOpen, dismiss: {
                                             DispatchQueue.main.async {
@@ -125,7 +124,9 @@ struct SheetViewModle<Content2: View>: ViewModifier {
                                             ])
                                         }
                                     }
+                                    
                                     guard let showThisPage else { return }
+                                    
                                     let idealSize = showThisPage.hosting.sizeThatFits(in: CGSize(width: window.frame.size.width, height: window.frame.size.height - safeAreaInsets2.top - safeAreaInsets2.bottom))
                                     
                                     if idealSize.width < window.frame.size.width {
@@ -158,10 +159,10 @@ struct SheetViewModle<Content2: View>: ViewModifier {
                                         showThisPage.hosting.view.transform = CGAffineTransform(translationX: 0, y: fitSize.height + 10)
                                         bottomC = false
                                     }
-                                    showThisPage?.isAnimationed = false
+                                    showThisPage.isAnimationed = false
                                     Animation {
-                                        showThisPage?.backgroundColor = .black.withAlphaComponent(0.3)
-                                        showThisPage?.hosting.view.transform = CGAffineTransform(translationX: 0, y: 0)
+                                        showThisPage.backgroundColor = .black.withAlphaComponent(0.3)
+                                        showThisPage.hosting.view.transform = CGAffineTransform(translationX: 0, y: 0)
                                     }
                                 }
                             }
@@ -171,6 +172,7 @@ struct SheetViewModle<Content2: View>: ViewModifier {
                                 showThisPage?.isOpen = false
                                 dismiss()
                             }
+                            .transition(.identity)
                     }
                 }
             }
