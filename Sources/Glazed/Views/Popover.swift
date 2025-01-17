@@ -455,7 +455,7 @@ class PopoverShowPageViewWindow: UIView {
     
     override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
         if event?.type != .touches {
-            return self
+            return self.hosting.view
         }
         
         if isOpen && !isTip {
@@ -466,13 +466,13 @@ class PopoverShowPageViewWindow: UIView {
                     if !self.buttonFrame.contains(point) {
                         dismiss()
                     }
-                    return nil
+                    return self.hosting.view
                 } else {
                     if self.buttonFrame.contains(point) {
-                        return nil
+                        return self.hosting.view
                     } else {
                         dismiss()
-                        return self
+                        return self.hosting.view
                     }
                 }
             }
