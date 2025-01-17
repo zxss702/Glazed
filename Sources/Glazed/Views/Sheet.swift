@@ -309,6 +309,8 @@ class SheetShowPageViewWindow: UIView {
         if event?.type != .touches {
             return self.hosting.view
         }
+        print(isOpen)
+        print(self.hosting.view.frame.contains(point))
         if isOpen {
             if !self.hosting.view.frame.contains(point) {
                 dismiss()

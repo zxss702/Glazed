@@ -460,7 +460,7 @@ class PopoverShowPageViewWindow: UIView {
         
         if isOpen && !isTip {
             if self.hosting.view.frame.contains(point) {
-                return self
+                return self.hosting.view
             } else {
                 if glazedSuper == nil && !isCenter {
                     if !self.buttonFrame.contains(point) {
