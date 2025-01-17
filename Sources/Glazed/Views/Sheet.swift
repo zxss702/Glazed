@@ -122,39 +122,39 @@ struct SheetViewModle<Content2: View>: ViewModifier {
                                     showThisPage.leadingAnchor.constraint(equalTo: superController.view.leadingAnchor),
                                     showThisPage.trailingAnchor.constraint(equalTo: superController.view.trailingAnchor)
                                 ])
-                                
-                                let idealSize = showThisPage.hosting.sizeThatFits(in: CGSize(width: window.frame.size.width, height: window.frame.size.height - safeAreaInsets2.top - safeAreaInsets2.bottom))
-                                
-                                if idealSize.width < window.frame.size.width {
-                                    if window.frame.size.height - safeAreaInsets2.top - safeAreaInsets2.bottom <= idealSize.height {
-                                        showThisPage.hosting.view.frame = CGRect(
-                                            origin: CGPoint(
-                                                x: window.frame.width / 2 - idealSize.width / 2,
-                                                y: safeAreaInsets2.top + 20
-                                            ), size: CGSize(
-                                                width: idealSize.width,
-                                                height: window.frame.size.height - safeAreaInsets2.top - safeAreaInsets2.bottom - 20
-                                            )
-                                        )
-                                        showThisPage.hosting.view.transform = CGAffineTransform(translationX: 0, y: window.frame.size.height - safeAreaInsets2.top - safeAreaInsets2.bottom - 10)
-                                        bottomC = false
-                                    } else {
-                                        showThisPage.hosting.view.frame = CGRect(center: CGPoint(x: window.frame.midX, y: window.frame.midY - (safeAreaInsets2.bottom - window.safeAreaInsets.bottom) / 2) , size: idealSize)
-                                        showThisPage.hosting.view.transform = CGAffineTransform(translationX: 0, y: window.frame.height / 2 + idealSize.height / 2 + 10)
-                                        bottomC = true
-                                    }
-                                } else {
-                                    let fitSize = CGSize(
-                                        width: window.frame.size.width,
-                                        height: min(window.frame.size.height - safeAreaInsets2.top - safeAreaInsets2.bottom  - 20, idealSize.height))
+                            }
+                            guard let showThisPage else { return }
+                            let idealSize = showThisPage.hosting.sizeThatFits(in: CGSize(width: window.frame.size.width, height: window.frame.size.height - safeAreaInsets2.top - safeAreaInsets2.bottom))
+                            
+                            if idealSize.width < window.frame.size.width {
+                                if window.frame.size.height - safeAreaInsets2.top - safeAreaInsets2.bottom <= idealSize.height {
                                     showThisPage.hosting.view.frame = CGRect(
                                         origin: CGPoint(
-                                            x: 0,
-                                            y: window.frame.size.height - safeAreaInsets2.bottom + window.safeAreaInsets.bottom - fitSize.height
-                                        ), size: fitSize)
-                                    showThisPage.hosting.view.transform = CGAffineTransform(translationX: 0, y: fitSize.height + 10)
+                                            x: window.frame.width / 2 - idealSize.width / 2,
+                                            y: safeAreaInsets2.top + 20
+                                        ), size: CGSize(
+                                            width: idealSize.width,
+                                            height: window.frame.size.height - safeAreaInsets2.top - safeAreaInsets2.bottom - 20
+                                        )
+                                    )
+                                    showThisPage.hosting.view.transform = CGAffineTransform(translationX: 0, y: window.frame.size.height - safeAreaInsets2.top - safeAreaInsets2.bottom - 10)
                                     bottomC = false
+                                } else {
+                                    showThisPage.hosting.view.frame = CGRect(center: CGPoint(x: window.frame.midX, y: window.frame.midY - (safeAreaInsets2.bottom - window.safeAreaInsets.bottom) / 2) , size: idealSize)
+                                    showThisPage.hosting.view.transform = CGAffineTransform(translationX: 0, y: window.frame.height / 2 + idealSize.height / 2 + 10)
+                                    bottomC = true
                                 }
+                            } else {
+                                let fitSize = CGSize(
+                                    width: window.frame.size.width,
+                                    height: min(window.frame.size.height - safeAreaInsets2.top - safeAreaInsets2.bottom  - 20, idealSize.height))
+                                showThisPage.hosting.view.frame = CGRect(
+                                    origin: CGPoint(
+                                        x: 0,
+                                        y: window.frame.size.height - safeAreaInsets2.bottom + window.safeAreaInsets.bottom - fitSize.height
+                                    ), size: fitSize)
+                                showThisPage.hosting.view.transform = CGAffineTransform(translationX: 0, y: fitSize.height + 10)
+                                bottomC = false
                             }
                         }
                         showThisPage?.isAnimationed = false
