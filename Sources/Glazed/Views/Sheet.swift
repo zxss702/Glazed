@@ -269,6 +269,8 @@ class SheetShowPageViewWindow: UIView {
         self.insetsLayoutMarginsFromSafeArea = false
         self.addSubview(hosting.view)
         
+        self.hosting.view.becomeFirstResponder()
+        
         gesture.delaysTouchesBegan = false
         self.addGestureRecognizer(gesture)
     }

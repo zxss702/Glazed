@@ -435,6 +435,7 @@ class PopoverShowPageViewWindow: UIView {
         self.hosting.view.backgroundColor = .clear
         self.hosting.sizingOptions = .intrinsicContentSize
         self.hosting.view.insetsLayoutMarginsFromSafeArea = false
+        
         if #available(iOS 17.0, *) {
             self.hosting.safeAreaRegions = SafeAreaRegions()
         } else {
@@ -447,6 +448,8 @@ class PopoverShowPageViewWindow: UIView {
         self.insetsLayoutMarginsFromSafeArea = false
         hosting.view.alpha = 0
         self.addSubview(hosting.view)
+        
+        self.hosting.view.becomeFirstResponder()
     }
     
     required init?(coder: NSCoder) {
@@ -455,24 +458,24 @@ class PopoverShowPageViewWindow: UIView {
     
     override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
         if event?.type != .touches {
-            return self.hosting.view
+            return super.hitTest(point, with: event)
         }
         
         if isOpen && !isTip {
             if self.hosting.view.frame.contains(point) {
-                return self.hosting.view
+                return super.hitTest(point, with: event)
             } else {
                 if glazedSuper == nil && !isCenter {
                     if !self.buttonFrame.contains(point) {
                         dismiss()
                     }
-                    return self.hosting.view
+                    return super.hitTest(point, with: event)
                 } else {
                     if self.buttonFrame.contains(point) {
-                        return self.hosting.view
+                        return super.hitTest(point, with: event)
                     } else {
                         dismiss()
-                        return self.hosting.view
+                        return super.hitTest(point, with: event)
                     }
                 }
             }
