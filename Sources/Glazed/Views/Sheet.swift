@@ -307,13 +307,13 @@ class SheetShowPageViewWindow: UIView {
     
     override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
         if event?.type != .touches {
-            return super.hitTest(point, with: event)
+            return self
         }
         if isOpen {
             if !self.hosting.view.frame.contains(point) {
                 dismiss()
             }
-            return super.hitTest(point, with: event)
+            return self
         } else {
             return nil
         }
