@@ -78,7 +78,7 @@ struct SheetViewModle<Content2: View>: ViewModifier {
                                             return CGRect(center: CGPoint(x: window.frame.midX, y: window.frame.midY - (safeAreaInsets2.bottom - window.safeAreaInsets.bottom) / 2) , size: idealSize)
                                         }
                                     } else {
-                                       
+                                        
                                         let fitSize = CGSize(
                                             width: window.frame.size.width,
                                             height: min(window.frame.size.height - safeAreaInsets2.top - safeAreaInsets2.bottom - 20, idealSize.height)
@@ -101,77 +101,78 @@ struct SheetViewModle<Content2: View>: ViewModifier {
                                 }
                             }
                         }()
+                        
+                        Color.clear
+                            .transition(.identity)
+                            .onAppear {
+                                isOpen = true
+                                showThisPage?.isOpen = isOpen
+                                if let window {
+                                    if showThisPage == nil {
+                                        showThisPage = SheetShowPageViewWindow(windowScene: window.windowScene!, content: AnyView(pageStyle()), isOpen: isOpen, dismiss: {
+                                            DispatchQueue.main.async {
+                                                dismiss()
+                                            }
+                                        })
+                                        if let showThisPage, let superController = window.rootViewController {
+                                            superController.view.addSubview(showThisPage)
+                                            superController.view.bringSubviewToFront(showThisPage)
+                                            NSLayoutConstraint.activate([
+                                                showThisPage.topAnchor.constraint(equalTo: superController.view.topAnchor),
+                                                showThisPage.bottomAnchor.constraint(equalTo: superController.view.bottomAnchor),
+                                                showThisPage.leadingAnchor.constraint(equalTo: superController.view.leadingAnchor),
+                                                showThisPage.trailingAnchor.constraint(equalTo: superController.view.trailingAnchor)
+                                            ])
+                                        }
+                                    }
+                                    guard let showThisPage else { return }
+                                    let idealSize = showThisPage.hosting.sizeThatFits(in: CGSize(width: window.frame.size.width, height: window.frame.size.height - safeAreaInsets2.top - safeAreaInsets2.bottom))
+                                    
+                                    if idealSize.width < window.frame.size.width {
+                                        if window.frame.size.height - safeAreaInsets2.top - safeAreaInsets2.bottom <= idealSize.height {
+                                            showThisPage.hosting.view.frame = CGRect(
+                                                origin: CGPoint(
+                                                    x: window.frame.width / 2 - idealSize.width / 2,
+                                                    y: safeAreaInsets2.top + 20
+                                                ), size: CGSize(
+                                                    width: idealSize.width,
+                                                    height: window.frame.size.height - safeAreaInsets2.top - safeAreaInsets2.bottom - 20
+                                                )
+                                            )
+                                            showThisPage.hosting.view.transform = CGAffineTransform(translationX: 0, y: window.frame.size.height - safeAreaInsets2.top - safeAreaInsets2.bottom - 10)
+                                            bottomC = false
+                                        } else {
+                                            showThisPage.hosting.view.frame = CGRect(center: CGPoint(x: window.frame.midX, y: window.frame.midY - (safeAreaInsets2.bottom - window.safeAreaInsets.bottom) / 2) , size: idealSize)
+                                            showThisPage.hosting.view.transform = CGAffineTransform(translationX: 0, y: window.frame.height / 2 + idealSize.height / 2 + 10)
+                                            bottomC = true
+                                        }
+                                    } else {
+                                        let fitSize = CGSize(
+                                            width: window.frame.size.width,
+                                            height: min(window.frame.size.height - safeAreaInsets2.top - safeAreaInsets2.bottom  - 20, idealSize.height))
+                                        showThisPage.hosting.view.frame = CGRect(
+                                            origin: CGPoint(
+                                                x: 0,
+                                                y: window.frame.size.height - safeAreaInsets2.bottom + window.safeAreaInsets.bottom - fitSize.height
+                                            ), size: fitSize)
+                                        showThisPage.hosting.view.transform = CGAffineTransform(translationX: 0, y: fitSize.height + 10)
+                                        bottomC = false
+                                    }
+                                    showThisPage?.isAnimationed = false
+                                    Animation {
+                                        showThisPage?.backgroundColor = .black.withAlphaComponent(0.3)
+                                        showThisPage?.hosting.view.transform = CGAffineTransform(translationX: 0, y: 0)
+                                    }
+                                }
+                            }
+                            .onDisappear {
+                                isPresented = false
+                                isOpen = false
+                                showThisPage?.isOpen = false
+                                dismiss()
+                            }
                     }
                 }
-                .onChange(of: isPresented) { newValue in
-                    isOpen = newValue
-                    showThisPage?.isOpen = isOpen
-                    if newValue, let window {
-                        if showThisPage == nil {
-                            showThisPage = SheetShowPageViewWindow(windowScene: window.windowScene!, content: AnyView(pageStyle()), isOpen: isOpen, dismiss: {
-                                DispatchQueue.main.async {
-                                    dismiss()
-                                }
-                            })
-                            if let showThisPage, let superController = window.rootViewController {
-                                superController.view.addSubview(showThisPage)
-                                superController.view.bringSubviewToFront(showThisPage)
-                                NSLayoutConstraint.activate([
-                                    showThisPage.topAnchor.constraint(equalTo: superController.view.topAnchor),
-                                    showThisPage.bottomAnchor.constraint(equalTo: superController.view.bottomAnchor),
-                                    showThisPage.leadingAnchor.constraint(equalTo: superController.view.leadingAnchor),
-                                    showThisPage.trailingAnchor.constraint(equalTo: superController.view.trailingAnchor)
-                                ])
-                            }
-                            guard let showThisPage else { return }
-                            let idealSize = showThisPage.hosting.sizeThatFits(in: CGSize(width: window.frame.size.width, height: window.frame.size.height - safeAreaInsets2.top - safeAreaInsets2.bottom))
-                            
-                            if idealSize.width < window.frame.size.width {
-                                if window.frame.size.height - safeAreaInsets2.top - safeAreaInsets2.bottom <= idealSize.height {
-                                    showThisPage.hosting.view.frame = CGRect(
-                                        origin: CGPoint(
-                                            x: window.frame.width / 2 - idealSize.width / 2,
-                                            y: safeAreaInsets2.top + 20
-                                        ), size: CGSize(
-                                            width: idealSize.width,
-                                            height: window.frame.size.height - safeAreaInsets2.top - safeAreaInsets2.bottom - 20
-                                        )
-                                    )
-                                    showThisPage.hosting.view.transform = CGAffineTransform(translationX: 0, y: window.frame.size.height - safeAreaInsets2.top - safeAreaInsets2.bottom - 10)
-                                    bottomC = false
-                                } else {
-                                    showThisPage.hosting.view.frame = CGRect(center: CGPoint(x: window.frame.midX, y: window.frame.midY - (safeAreaInsets2.bottom - window.safeAreaInsets.bottom) / 2) , size: idealSize)
-                                    showThisPage.hosting.view.transform = CGAffineTransform(translationX: 0, y: window.frame.height / 2 + idealSize.height / 2 + 10)
-                                    bottomC = true
-                                }
-                            } else {
-                                let fitSize = CGSize(
-                                    width: window.frame.size.width,
-                                    height: min(window.frame.size.height - safeAreaInsets2.top - safeAreaInsets2.bottom  - 20, idealSize.height))
-                                showThisPage.hosting.view.frame = CGRect(
-                                    origin: CGPoint(
-                                        x: 0,
-                                        y: window.frame.size.height - safeAreaInsets2.bottom + window.safeAreaInsets.bottom - fitSize.height
-                                    ), size: fitSize)
-                                showThisPage.hosting.view.transform = CGAffineTransform(translationX: 0, y: fitSize.height + 10)
-                                bottomC = false
-                            }
-                        }
-                        showThisPage?.isAnimationed = false
-                        Animation {
-                            showThisPage?.backgroundColor = .black.withAlphaComponent(0.3)
-                            showThisPage?.hosting.view.transform = CGAffineTransform(translationX: 0, y: 0)
-                        }
-                    } else {
-                        dismiss()
-                    }
-                }
-            }
-            .onDisappear {
-                isPresented = false
-                isOpen = false
-                showThisPage?.isOpen = false
-                dismiss()
             }
     }
     
@@ -304,8 +305,6 @@ class SheetShowPageViewWindow: UIView {
         if event?.type != .touches {
             return self.hosting.view
         }
-        print(isOpen)
-        print(self.hosting.view.frame.contains(point))
         if isOpen {
             if !self.hosting.view.frame.contains(point) {
                 dismiss()
