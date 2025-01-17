@@ -39,7 +39,6 @@ struct SheetViewModle<Content2: View>: ViewModifier {
     @Environment(\.window) var window
     @State var showThisPage: SheetShowPageViewWindow? = nil
     @State var isOpen = false
-    @State var isBottom = false
     
     @Environment(\.colorScheme) var colorScheme
     @State var bottomC: Bool = true
@@ -61,7 +60,6 @@ struct SheetViewModle<Content2: View>: ViewModifier {
                                         
                                         if window.frame.size.height <= idealSize.height {
                                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
-                                                isBottom = false
                                                 bottomC = false
                                             }
                                             return CGRect(
@@ -75,7 +73,6 @@ struct SheetViewModle<Content2: View>: ViewModifier {
                                             )
                                         } else {
                                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
-                                                isBottom = false
                                                 bottomC = true
                                             }
                                             return CGRect(center: CGPoint(x: window.frame.midX, y: window.frame.midY - (safeAreaInsets2.bottom - window.safeAreaInsets.bottom) / 2) , size: idealSize)
@@ -88,7 +85,6 @@ struct SheetViewModle<Content2: View>: ViewModifier {
                                         )
                                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
                                             bottomC = false
-                                            isBottom = true
                                         }
                                         return CGRect(
                                             origin: CGPoint(
@@ -119,6 +115,7 @@ struct SheetViewModle<Content2: View>: ViewModifier {
                             })
                             if let showThisPage, let superController = window.rootViewController {
                                 superController.view.addSubview(showThisPage)
+                                superController.view.bringSubviewToFront(showThisPage)
                                 NSLayoutConstraint.activate([
                                     showThisPage.topAnchor.constraint(equalTo: superController.view.topAnchor),
                                     showThisPage.bottomAnchor.constraint(equalTo: superController.view.bottomAnchor),
@@ -129,7 +126,6 @@ struct SheetViewModle<Content2: View>: ViewModifier {
                                 let idealSize = showThisPage.hosting.sizeThatFits(in: CGSize(width: window.frame.size.width, height: window.frame.size.height - safeAreaInsets2.top - safeAreaInsets2.bottom))
                                 
                                 if idealSize.width < window.frame.size.width {
-                                    isBottom = false
                                     if window.frame.size.height - safeAreaInsets2.top - safeAreaInsets2.bottom <= idealSize.height {
                                         showThisPage.hosting.view.frame = CGRect(
                                             origin: CGPoint(
@@ -148,7 +144,6 @@ struct SheetViewModle<Content2: View>: ViewModifier {
                                         bottomC = true
                                     }
                                 } else {
-                                    isBottom = true
                                     let fitSize = CGSize(
                                         width: window.frame.size.width,
                                         height: min(window.frame.size.height - safeAreaInsets2.top - safeAreaInsets2.bottom  - 20, idealSize.height))
@@ -212,7 +207,7 @@ struct SheetViewModle<Content2: View>: ViewModifier {
     func pageStyle() -> some View {
         content()
             .safeAreaInset(edge: .bottom, content: {
-                if isBottom {
+                if !bottomC {
                     Spacer()
                         .frame(height: safeAreaInsets2.bottom)
                 }
