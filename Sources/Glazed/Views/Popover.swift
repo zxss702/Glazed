@@ -470,18 +470,15 @@ class PopoverShowPageViewWindow: UIView {
                             dismiss()
                         }
                         return nil
+                    } else if self.buttonFrame.contains(point) {
+                        return nil
                     } else {
-                        if self.buttonFrame.contains(point) {
-                            return nil
-                        } else {
-                            dismiss()
-                            return super.hitTest(point, with: event)
-                        }
+                        dismiss()
+                        return super.hitTest(point, with: event)
                     }
                 }
             }
-        } else {
-            return nil
         }
+        return nil
     }
 }
