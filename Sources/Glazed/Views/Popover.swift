@@ -457,25 +457,25 @@ class PopoverShowPageViewWindow: UIView {
     }
     
     override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
-        if event?.type != .touches {
-            return super.hitTest(point, with: event)
-        }
-        
         if isOpen && !isTip {
             if self.hosting.view.frame.contains(point) {
                 return super.hitTest(point, with: event)
             } else {
-                if glazedSuper == nil && !isCenter {
-                    if !self.buttonFrame.contains(point) {
+                if event?.type == .touches {
+                    if isCenter {
                         dismiss()
-                    }
-                    return super.hitTest(point, with: event)
-                } else {
-                    if self.buttonFrame.contains(point) {
-                        return super.hitTest(point, with: event)
+                    } else if glazedSuper == nil {
+                        if !self.buttonFrame.contains(point) {
+                            dismiss()
+                        }
+                        return nil
                     } else {
-                        dismiss()
-                        return super.hitTest(point, with: event)
+                        if self.buttonFrame.contains(point) {
+                            return nil
+                        } else {
+                            dismiss()
+                            return super.hitTest(point, with: event)
+                        }
                     }
                 }
             }
