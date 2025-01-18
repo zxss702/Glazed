@@ -464,6 +464,7 @@ class PopoverShowPageViewWindow: UIView {
                 if event?.type == .touches {
                     if isCenter {
                         dismiss()
+                        return super.hitTest(point, with: event)
                     } else if glazedSuper == nil {
                         if !self.buttonFrame.contains(point) {
                             dismiss()
