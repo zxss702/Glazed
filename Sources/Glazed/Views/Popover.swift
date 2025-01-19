@@ -166,7 +166,7 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
                                             self.isPresented = false
                                         }
                                     })
-                                    if let showThisPage, let superController = window.rootViewController {
+                                    if let showThisPage, let superController = window.rootViewController?.presentedViewController {
                                         superController.view.addSubview(showThisPage)
                                         NSLayoutConstraint.activate([
                                             showThisPage.topAnchor.constraint(equalTo: superController.view.topAnchor),
