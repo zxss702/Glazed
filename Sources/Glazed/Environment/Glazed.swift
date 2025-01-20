@@ -112,8 +112,8 @@ public struct Glazed<Content: View>: View {
     
     private struct GlazedViewHandlerRepresentable: UIViewRepresentable {
         @ObservedObject var windowViewModel: WindowViewModel
-        @ViewBuilder var content: () -> Content
         let hostingController:UIHostingController<Content>
+        let content: () -> Content
         
         init(windowViewModel: WindowViewModel, @ViewBuilder content: @escaping () -> Content) {
             self.windowViewModel = windowViewModel
