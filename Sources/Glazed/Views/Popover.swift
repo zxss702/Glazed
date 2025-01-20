@@ -110,7 +110,7 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
     let type: popoverType
     @ViewBuilder var content: () -> Content2
     
-    @Environment(\.window) var window
+    @Environment(\.glazedView) var glazedView
     
     @State var showThisPage: PopoverShowPageViewWindow? = nil
     @State var isOpen = false
@@ -129,12 +129,12 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
                     
                     let _ = showThisPage?.isOpen = isOpen
                     
-                    if isPresented, let window {
+                    if isPresented, let glazedView {
                         let _ = showThisPage?.hosting.rootView = AnyView(pageStyle())
                         let _ = showThisPage?.buttonFrame = buttonRect
                         let _ = {
                             if let showThisPage {
-                                let frame = setFrame(window: window, showThisPage: showThisPage, buttonRect: buttonRect)
+                                let frame = setFrame(window: glazedView, showThisPage: showThisPage, buttonRect: buttonRect)
                                 if showThisPage.hosting.view.frame != frame {
                                     Animation {
                                         if type.isShadow {
@@ -148,7 +148,7 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
                         Color.clear
                             .onChange(of: GeometryProxy.safeAreaInsets, perform: { newValue in
                                 if let showThisPage {
-                                    let frame = setFrame(window: window, showThisPage: showThisPage, buttonRect: buttonRect)
+                                    let frame = setFrame(window: glazedView, showThisPage: showThisPage, buttonRect: buttonRect)
                                     if showThisPage.hosting.view.frame != frame {
                                         Animation {
                                             if type.isShadow {
@@ -161,18 +161,18 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
                             })
                             .onAppear {
                                 if showThisPage == nil {
-                                    showThisPage = PopoverShowPageViewWindow(windowScene: window.windowScene!, content: AnyView(pageStyle()), buttonFrame: buttonRect, glazedSuper: glazedSuper, isOpen: isOpen, isTip: type.isTip, isCenter: type.isCenter, dismiss: {
+                                    showThisPage = PopoverShowPageViewWindow(content: AnyView(pageStyle()), buttonFrame: buttonRect, glazedSuper: glazedSuper, isOpen: isOpen, isTip: type.isTip, isCenter: type.isCenter, dismiss: {
                                         if type.autoDimiss {
                                             self.isPresented = false
                                         }
                                     })
-                                    if let showThisPage, let superController = window.rootViewController {
-                                        superController.view.addSubview(showThisPage)
+                                    if let showThisPage {
+                                        glazedView.addSubview(showThisPage)
                                         NSLayoutConstraint.activate([
-                                            showThisPage.topAnchor.constraint(equalTo: superController.view.topAnchor),
-                                            showThisPage.bottomAnchor.constraint(equalTo: superController.view.bottomAnchor),
-                                            showThisPage.leadingAnchor.constraint(equalTo: superController.view.leadingAnchor),
-                                            showThisPage.trailingAnchor.constraint(equalTo: superController.view.trailingAnchor)
+                                            showThisPage.topAnchor.constraint(equalTo: glazedView.topAnchor),
+                                            showThisPage.bottomAnchor.constraint(equalTo: glazedView.bottomAnchor),
+                                            showThisPage.leadingAnchor.constraint(equalTo: glazedView.leadingAnchor),
+                                            showThisPage.trailingAnchor.constraint(equalTo: glazedView.trailingAnchor)
                                         ])
                                         switch colorScheme {
                                         case .dark:
@@ -183,14 +183,14 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
                                             showThisPage.hosting.view.layer.shadowColor = UIColor.gray.withAlphaComponent(0.3).cgColor
                                         }
                                         
-                                        showThisPage.hosting.view.frame = setFrame(window: window, showThisPage: showThisPage, buttonRect: buttonRect)
+                                        glazedView.frame = setFrame(window: glazedView, showThisPage: showThisPage, buttonRect: buttonRect)
                                         if type.isShadow {
                                             showThisPage.hosting.view.layer.shadowOffset = CGSize(width: 0,height: 0)
                                             showThisPage.hosting.view.layer.shadowRadius = 35
                                             showThisPage.hosting.view.layer.shadowOpacity = 1
                                             showThisPage.hosting.view.layer.shadowPath = type.clipedShape.path(in: showThisPage.hosting.view.bounds).cgPath
                                         }
-                                        showThisPage.hosting.view.transform = setUnOpenTransform(window: window, showThisPage: showThisPage, buttonRect: buttonRect)
+                                        glazedView.transform = setUnOpenTransform(window: glazedView, showThisPage: showThisPage, buttonRect: buttonRect)
                                     }
                                 }
                                 if let showThisPage {
@@ -208,7 +208,7 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
                             .onDisappear {
                                 isPresented = false
                                 if let showThisPage {
-                                    let unOpenTransform = setUnOpenTransform(window: window, showThisPage: showThisPage, buttonRect: buttonRect)
+                                    let unOpenTransform = setUnOpenTransform(window: glazedView, showThisPage: showThisPage, buttonRect: buttonRect)
                                     
                                     Animation {
                                         showThisPage.hosting.view.transform = unOpenTransform
@@ -277,7 +277,7 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
         }
     }
     
-    func setFrame(window: UIWindow, showThisPage: PopoverShowPageViewWindow, buttonRect: CGRect) -> CGRect {
+    func setFrame(window: UIView, showThisPage: PopoverShowPageViewWindow, buttonRect: CGRect) -> CGRect {
         let windowSize = window.frame.size
         
         let defaultSize = showThisPage.hosting.sizeThatFits(in: CGSize(
@@ -353,7 +353,7 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
         }
     }
     
-    func setUnOpenTransform(window: UIWindow, showThisPage: PopoverShowPageViewWindow, buttonRect: CGRect) -> CGAffineTransform {
+    func setUnOpenTransform(window: UIView, showThisPage: PopoverShowPageViewWindow, buttonRect: CGRect) -> CGAffineTransform {
         let windowSize = window.bounds.size
         
         let defaultSize = showThisPage.hosting.sizeThatFits(in: CGSize(
@@ -400,7 +400,6 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
                 self.isPresented = false
             })
             .environment(\.glazedSuper, UUID())
-            .environment(\.window, window)
             .environment(\.safeAreaInsets, EdgeInsets(top: 16, leading: 0, bottom: 16, trailing: 0))
             .environment(\.safeAreaInsets2, safeAreaInsets2)
             .environment(\.glazedAsyncAction, glazedAsyncAction)
@@ -420,7 +419,7 @@ class PopoverShowPageViewWindow: UIView {
     let isTip: Bool
     let isCenter: Bool
     
-    init(windowScene: UIWindowScene, content: AnyView, buttonFrame: CGRect, glazedSuper: UUID?, isOpen: Bool, isTip: Bool, isCenter: Bool, dismiss: @escaping () -> Void) {
+    init(content: AnyView, buttonFrame: CGRect, glazedSuper: UUID?, isOpen: Bool, isTip: Bool, isCenter: Bool, dismiss: @escaping () -> Void) {
         self.dismiss = dismiss
         self.buttonFrame = buttonFrame
         self.hosting = UIHostingController(rootView: content)

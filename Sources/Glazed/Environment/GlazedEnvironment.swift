@@ -18,6 +18,9 @@ public struct glazedSuperKey: @preconcurrency EnvironmentKey {
 public struct WindowKey: @preconcurrency EnvironmentKey {
     @MainActor public static var defaultValue: UIWindow? = nil
 }
+public struct glazedViewKey: @preconcurrency EnvironmentKey {
+    @MainActor public static var defaultValue: UIView? = nil
+}
 #endif
 public struct GlazedAsyncActionKey: @preconcurrency EnvironmentKey {
     @MainActor public static var defaultValue: (_ action: @escaping @Sendable () async -> Void) -> Void = { action in
@@ -40,6 +43,10 @@ extension EnvironmentValues {
     public var window:UIWindow? {
         get { self[WindowKey.self] }
         set { self[WindowKey.self] = newValue }
+    }
+    public var glazedView:UIView? {
+        get { self[glazedViewKey.self] }
+        set { self[glazedViewKey.self] = newValue }
     }
     #endif
     public var glazedAsyncAction:(_ action: @escaping @Sendable () async -> Void) -> Void {
