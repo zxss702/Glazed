@@ -26,6 +26,7 @@ public struct Glazed<Content: View>: View {
                 .environment(\.safeAreaInsets, geometry.safeAreaInsets)
                 .environment(\.safeAreaInsets2, geometry.safeAreaInsets)
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+                .ignoresSafeArea()
         }
         .environment(\.window, windowViewModel.window)
         .environment(\.glazedView, windowViewModel.glazedView)
@@ -112,22 +113,38 @@ public struct Glazed<Content: View>: View {
     
     private struct GlazedViewHandlerRepresentable: UIViewRepresentable {
         @ObservedObject var windowViewModel: WindowViewModel
-        let hostingController:UIHostingController<Content>
         let content: () -> Content
         
         init(windowViewModel: WindowViewModel, @ViewBuilder content: @escaping () -> Content) {
             self.windowViewModel = windowViewModel
             self.content = content
-            self.hostingController = UIHostingController(rootView: content())
-            windowViewModel.glazedView = hostingController.view
         }
         
         func makeUIView(context: Context) -> UIView {
-            return hostingController.view
+            self.windowViewModel.hostingController = UIHostingController(rootView: AnyView(content().frame(maxWidth: .infinity, maxHeight: .infinity)))
+            let uiview = UIView(frame: .zero)
+            self.windowViewModel.hostingController!.view.translatesAutoresizingMaskIntoConstraints = false
+            uiview.addSubview(self.windowViewModel.hostingController!.view)
+            
+            NSLayoutConstraint.activate([
+                self.windowViewModel.hostingController!.view.topAnchor.constraint(equalTo: uiview.topAnchor),
+                self.windowViewModel.hostingController!.view.bottomAnchor.constraint(equalTo: uiview.bottomAnchor),
+                self.windowViewModel.hostingController!.view.leadingAnchor.constraint(equalTo: uiview.leadingAnchor),
+                self.windowViewModel.hostingController!.view.trailingAnchor.constraint(equalTo: uiview.trailingAnchor)
+            ])
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
+                windowViewModel.glazedView = uiview
+            }
+            
+            return uiview
         }
 
         func updateUIView(_: UIView, context: Context) {
-            hostingController.rootView = content()
+            self.windowViewModel.hostingController?.rootView = AnyView(content().frame(maxWidth: .infinity, maxHeight: .infinity))
+            if windowViewModel.glazedView == nil {
+                
+            }
         }
         
     }
@@ -136,4 +153,5 @@ public struct Glazed<Content: View>: View {
 class WindowViewModel: ObservableObject {
     @Published var window: UIWindow?
     @Published var glazedView: UIView?
+    var hostingController:UIHostingController<AnyView>?
 }
