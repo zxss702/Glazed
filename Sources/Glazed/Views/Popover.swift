@@ -116,14 +116,22 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
     
     @Environment(\.glazedSuper) var glazedSuper
     @Environment(\.colorScheme) var colorScheme
-    @Environment(\.safeAreaInsets2) var safeAreaInsets2
+    
+    @EnvironmentObject var windowViewModel:WindowViewModel
     
     func body(content: Content) -> some View {
         content
             .overlay {
                 GeometryReader { GeometryProxy in
                     if isPresented, let glazedView {
-                        let buttonRect = GeometryProxy.frame(in: .global)
+                        let buttonRectGlobal = GeometryProxy.frame(in: .global)
+                        let buttonRect = CGRect(
+                            x: buttonRectGlobal.minX - windowViewModel.windowSafeAreaInsets.leading ,
+                            y: buttonRectGlobal.minY - windowViewModel.windowSafeAreaInsets.top,
+                            width: buttonRectGlobal.width,
+                            height: buttonRectGlobal.height
+                        )
+                        
                         let _ = {
                             if let showThisPage, showThisPage.isOpen {
                                 showThisPage.hosting.rootView = AnyView(pageStyle())
@@ -172,7 +180,7 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
                                             showThisPage.hosting.view.layer.shadowOpacity = 1
                                             showThisPage.hosting.view.layer.shadowPath = type.clipedShape.path(in: showThisPage.hosting.view.bounds).cgPath
                                         }
-                                        showThisPage.hosting.view.transform = setUnOpenTransform(window: glazedView, showThisPage: showThisPage, buttonRect: buttonRect)
+                                        showThisPage.hosting.view.transform = setUnOpenTransform(window: glazedView, showThisPage: showThisPage, buttonRect: buttonRect, openFrame: showThisPage.hosting.view.frame)
                                         showThisPage.hosting.view.alpha = type.isCenter ? 0 : 1
                                     }
                                 }
@@ -190,7 +198,8 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
                                 isPresented = false
                                 if let showThisPage {
                                     showThisPage.isOpen = false
-                                    let unOpenTransform = setUnOpenTransform(window: glazedView, showThisPage: showThisPage, buttonRect: buttonRect)
+                                    showThisPage.hosting.view.transform = .identity
+                                    let unOpenTransform = setUnOpenTransform(window: glazedView, showThisPage: showThisPage, buttonRect: buttonRect, openFrame: showThisPage.hosting.view.frame)
                                     Animation {
                                         showThisPage.hosting.view.transform = unOpenTransform
                                         showThisPage.backgroundColor = .clear
@@ -215,7 +224,9 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
         case top, bottom, leading, trailing, center
     }
     
-    func getEdge(buttonRect: CGRect, defaultSize: CGSize, windowSize: CGSize) -> PopoverEdge {
+    func getEdge(buttonRect: CGRect, defaultSize: CGSize) -> PopoverEdge {
+        let windowSize = windowViewModel.windowFrame
+        
         if type.isOnlyTop {
             return .top
         } else if type.isCenter {
@@ -255,114 +266,110 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
     }
     
     func setFrame(window: UIView, showThisPage: PopoverShowPageViewWindow, buttonRect: CGRect) -> CGRect {
-        let windowSize = window.frame.size
+        let windowSize = windowViewModel.windowFrame
+        let defaultSize = showThisPage.hosting.sizeThatFits(in: windowSize)
+        let edge:PopoverEdge = getEdge(buttonRect: buttonRect, defaultSize: defaultSize)
         
-        let defaultSize = showThisPage.hosting.sizeThatFits(in: CGSize(
-            width: window.frame.size.width - leftSpace * 2 - safeAreaInsets2.leading - safeAreaInsets2.trailing,
-            height: window.frame.size.height - leftSpace * 2 - safeAreaInsets2.top - safeAreaInsets2.bottom
-        ))
+        func inWidth(_ value: CGFloat) -> CGFloat {
+            windowViewModel.windowSafeAreaInsets.leading + min(
+                windowSize.width - defaultSize.width / 2 - leftSpace,
+                max(
+                    leftSpace + defaultSize.width / 2,
+                    value
+                )
+            )
+        }
+        func inHeight(_ value: CGFloat) -> CGFloat {
+            windowViewModel.windowSafeAreaInsets.top + min(
+                windowSize.height - defaultSize.height / 2 - leftSpace,
+                max(
+                    leftSpace + defaultSize.height / 2,
+                    value
+                )
+            )
+        }
         
-        let edge:PopoverEdge = getEdge(buttonRect: buttonRect, defaultSize: defaultSize, windowSize: windowSize)
         switch edge {
         case .top:
-            return CGRect(center: CGPoint(
-                x: max(min(buttonRect.midX, windowSize.width - leftSpace - defaultSize.width / 2), leftSpace + defaultSize.width / 2),
-                y: min(max(buttonRect.minY - defaultSize.height / 2 - leftSpace, defaultSize.height / 2 + safeAreaInsets2.top + leftSpace), windowSize.height - defaultSize.height / 2 - leftSpace - safeAreaInsets2.bottom)
-            ), size: defaultSize)
+            return CGRect(
+                center: CGPoint(
+                    x: inWidth(buttonRect.midX),
+                    y: inHeight(buttonRect.minY - defaultSize.height / 2 - leftSpace)
+                ),
+                size: defaultSize
+            )
         case .bottom:
-            return CGRect(center: CGPoint(
-                x: max(
-                    min(
-                        buttonRect.midX,
-                        windowSize.width - leftSpace - defaultSize.width / 2
-                    ),
-                    leftSpace + defaultSize.width / 2
+            return CGRect(
+                center: CGPoint(
+                    x: inWidth(buttonRect.midX),
+                    y: inHeight(buttonRect.maxY + defaultSize.height / 2 +  leftSpace)
                 ),
-                y: min(
-                    max(
-                        buttonRect.maxY + defaultSize.height / 2 + leftSpace,
-                        defaultSize.height / 2 + safeAreaInsets2.top + leftSpace
-                    ),
-                    windowSize.height - leftSpace - safeAreaInsets2.bottom - defaultSize.height / 2
-                )
-            ), size: defaultSize)
+                size: defaultSize
+            )
         case .leading:
-            let fuck = leftSpace + safeAreaInsets2.bottom
-            return CGRect(center: CGPoint(
-                x: max(
-                    min(
-                        buttonRect.minX - leftSpace - defaultSize.width / 2,
-                        windowSize.width - leftSpace - defaultSize.width / 2
-                    ),
-                    leftSpace + defaultSize.width / 2
+            return CGRect(
+                center: CGPoint(
+                    x: inWidth(buttonRect.minX - defaultSize.width / 2 - leftSpace),
+                    y: inHeight(buttonRect.midY)
                 ),
-                y: max(
-                    min(
-                        buttonRect.midY,
-                        windowSize.height - fuck - defaultSize.height / 2
-                    ),
-                    leftSpace + safeAreaInsets2.top + defaultSize.height / 2
-                )
-            ), size: defaultSize)
+                size: defaultSize
+            )
         case .trailing:
-            let fuck = leftSpace + safeAreaInsets2.bottom
-            return CGRect(center: CGPoint(
-                x: max(
-                    min(
-                        buttonRect.maxX + leftSpace + defaultSize.width / 2,
-                        windowSize.width - leftSpace - defaultSize.width / 2
-                    ),
-                    leftSpace + defaultSize.width / 2
+            return CGRect(
+                center: CGPoint(
+                    x: inWidth(buttonRect.maxX + defaultSize.width / 2 + leftSpace),
+                    y: inHeight(buttonRect.midY)
                 ),
-                y: max(
-                    min(
-                        buttonRect.midY,
-                        windowSize.height - fuck - defaultSize.height / 2
-                    ),
-                    leftSpace + safeAreaInsets2.top + defaultSize.height / 2
-                )
-            ), size: defaultSize)
+                size: defaultSize
+            )
         case .center:
-            return CGRect(center: CGPoint(
-                x: max(min(buttonRect.midX, windowSize.width - leftSpace - defaultSize.width / 2), leftSpace + defaultSize.width / 2),
-                y: max(min(buttonRect.midY, windowSize.height - leftSpace - defaultSize.height / 2 - safeAreaInsets2.bottom), leftSpace + defaultSize.height / 2 + safeAreaInsets2.top)
-            ), size: defaultSize)
+            return CGRect(
+                center: CGPoint(
+                    x: inWidth(buttonRect.midX),
+                    y: inHeight(buttonRect.midY)
+                ),
+                size: defaultSize
+            )
         }
     }
     
-    func setUnOpenTransform(window: UIView, showThisPage: PopoverShowPageViewWindow, buttonRect: CGRect) -> CGAffineTransform {
-        let windowSize = window.frame.size
+    func setUnOpenTransform(window: UIView, showThisPage: PopoverShowPageViewWindow, buttonRect: CGRect, openFrame: CGRect) -> CGAffineTransform {
+        let windowSize = windowViewModel.windowFrame
         
-        let defaultSize = showThisPage.hosting.sizeThatFits(in: CGSize(
-            width: window.frame.size.width - leftSpace * 2 - safeAreaInsets2.leading - safeAreaInsets2.trailing,
-            height: window.frame.size.height - leftSpace * 2 - safeAreaInsets2.top - safeAreaInsets2.bottom
-        ))
-        
-        let edge:PopoverEdge = getEdge(buttonRect: buttonRect, defaultSize: defaultSize, windowSize: windowSize)
+        let defaultSize = showThisPage.hosting.sizeThatFits(in: windowSize)
+        let edge:PopoverEdge = getEdge(buttonRect: buttonRect, defaultSize: defaultSize)
+        let buttonRectGlobal = CGRect(
+            x: buttonRect.minX + windowViewModel.windowSafeAreaInsets.leading ,
+            y: buttonRect.minY + windowViewModel.windowSafeAreaInsets.top,
+            width: buttonRect.width,
+            height: buttonRect.height
+        )
         
         switch edge {
         case .top:
             return CGAffineTransform(
-                translationX: buttonRect.midX - showThisPage.hosting.view.frame.midX,
-                y: defaultSize.height / 2).scaledBy(x: 0.00000001, y: 0.00000001)
+                translationX: buttonRectGlobal.midX - openFrame.midX,
+                y: buttonRectGlobal.minY - openFrame.midY
+            ).scaledBy(x: 0.00000001, y: 0.00000001)
         case .bottom:
             return CGAffineTransform(
-                translationX: buttonRect.midX - showThisPage.hosting.view.frame.midX,
-                y: -defaultSize.height / 2).scaledBy(x: 0.00000001, y: 0.00000001)
+                translationX: buttonRectGlobal.midX - openFrame.midX,
+                y: buttonRectGlobal.maxY - openFrame.midY
+            ).scaledBy(x: 0.00000001, y: 0.00000001)
         case .leading:
             return CGAffineTransform(
-                translationX: defaultSize.width / 2,
-                y: buttonRect.midY - showThisPage.hosting.view.frame.midY
+                translationX: buttonRectGlobal.minX - openFrame.midX,
+                y: buttonRectGlobal.midY - openFrame.midY
             ).scaledBy(x: 0.00000001, y: 0.00000001)
         case .trailing:
             return CGAffineTransform(
-                translationX: -defaultSize.width / 2,
-                y: buttonRect.midY - showThisPage.hosting.view.frame.midY
+                translationX: buttonRectGlobal.maxX - openFrame.midX,
+                y: buttonRectGlobal.midY - openFrame.midY
             ).scaledBy(x: 0.00000001, y: 0.00000001)
         case .center:
             return CGAffineTransform(
-                translationX: buttonRect.midX - showThisPage.hosting.view.frame.midX,
-                y: buttonRect.midY - showThisPage.hosting.view.frame.midY
+                translationX: buttonRectGlobal.midX - openFrame.midX,
+                y: buttonRectGlobal.midY - openFrame.midY
             ).scaledBy(x: buttonRect.width / defaultSize.width, y: buttonRect.height / defaultSize.height)
         }
     }
@@ -408,18 +415,18 @@ class PopoverShowPageViewWindow: UIView {
         self.backgroundColor = .clear
         self.hosting.view.backgroundColor = .clear
         self.hosting.sizingOptions = .intrinsicContentSize
-        self.hosting.view.insetsLayoutMarginsFromSafeArea = false
+//        self.hosting.view.insetsLayoutMarginsFromSafeArea = false
         
-        if #available(iOS 17.0, *) {
-            self.hosting.safeAreaRegions = SafeAreaRegions()
-        } else {
-            if let window = self.window {
-                self.hosting.additionalSafeAreaInsets = UIEdgeInsets(top: -window.safeAreaInsets.top, left: -window.safeAreaInsets.left, bottom: -window.safeAreaInsets.bottom, right: -window.safeAreaInsets.right)
-            } else {
-                self.hosting._disableSafeArea = true
-            }
-        }
-        self.insetsLayoutMarginsFromSafeArea = false
+//        if #available(iOS 17.0, *) {
+//            self.hosting.safeAreaRegions = SafeAreaRegions()
+//        } else {
+//            if let window = self.window {
+//                self.hosting.additionalSafeAreaInsets = UIEdgeInsets(top: -window.safeAreaInsets.top, left: -window.safeAreaInsets.left, bottom: -window.safeAreaInsets.bottom, right: -window.safeAreaInsets.right)
+//            } else {
+//                self.hosting._disableSafeArea = true
+//            }
+//        }
+//        self.insetsLayoutMarginsFromSafeArea = false
         hosting.view.alpha = 0
         self.addSubview(hosting.view)
         
