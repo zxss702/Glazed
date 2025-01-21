@@ -135,7 +135,7 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
                         let _ = {
                             if let showThisPage, showThisPage.isOpen {
                                 showThisPage.hosting.rootView = AnyView(pageStyle())
-                                showThisPage.buttonFrame = buttonRect
+                                showThisPage.buttonFrame = buttonRectGlobal
                                 let frame = setFrame(window: glazedView, showThisPage: showThisPage, buttonRect: buttonRect)
                                 if showThisPage.hosting.view.frame != frame {
                                     Animation {
@@ -151,7 +151,7 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
                             .onAppear {
                                 showThisPage?.isOpen = true
                                 if showThisPage == nil {
-                                    showThisPage = PopoverShowPageViewWindow(content: AnyView(pageStyle()), buttonFrame: buttonRect, glazedSuper: glazedSuper, isOpen: true, isTip: type.isTip, isCenter: type.isCenter, dismiss: {
+                                    showThisPage = PopoverShowPageViewWindow(content: AnyView(pageStyle()), buttonFrame: buttonRectGlobal, glazedSuper: glazedSuper, isOpen: true, isTip: type.isTip, isCenter: type.isCenter, dismiss: {
                                         if type.autoDimiss {
                                             self.isPresented = false
                                         }
