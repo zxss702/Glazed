@@ -135,7 +135,8 @@ public struct Glazed<Content: View>: View {
             let uiview = UIView(frame: .zero)
             self.windowViewModel.hostingController!.view.translatesAutoresizingMaskIntoConstraints = false
             uiview.addSubview(self.windowViewModel.hostingController!.view)
-            
+            uiview.backgroundColor = .clear
+            self.windowViewModel.hostingController!.view.backgroundColor = .clear
             NSLayoutConstraint.activate([
                 self.windowViewModel.hostingController!.view.topAnchor.constraint(equalTo: uiview.topAnchor),
                 self.windowViewModel.hostingController!.view.bottomAnchor.constraint(equalTo: uiview.bottomAnchor),
