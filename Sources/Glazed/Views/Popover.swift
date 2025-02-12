@@ -153,7 +153,9 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
                                 if showThisPage == nil {
                                     showThisPage = PopoverShowPageViewWindow(content: AnyView(pageStyle()), buttonFrame: buttonRectGlobal, glazedSuper: glazedSuper, isOpen: true, isTip: type.isTip, isCenter: type.isCenter, dismiss: {
                                         if type.autoDimiss {
-                                            self.isPresented = false
+                                            DispatchQueue.main.async {
+                                                self.isPresented = false
+                                            }
                                         }
                                     })
                                     if let showThisPage {
