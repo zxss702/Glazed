@@ -200,16 +200,21 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
                                 isPresented = false
                                 if let showThisPage {
                                     showThisPage.isOpen = false
-                                    showThisPage.hosting.view.transform = .identity
+//                                    showThisPage.hosting.view.transform = .identity
                                     let unOpenTransform = setUnOpenTransform(window: glazedView, showThisPage: showThisPage, buttonRect: buttonRect, openFrame: showThisPage.hosting.view.frame)
                                     Animation {
                                         showThisPage.hosting.view.transform = unOpenTransform
                                         showThisPage.backgroundColor = .clear
                                         showThisPage.hosting.view.alpha = type.isCenter ? 0 : 1
                                     } completion: { Bool in
-                                        if !showThisPage.isOpen {
-                                            showThisPage.removeFromSuperview()
-                                            self.showThisPage = nil
+                                        Task {
+                                            try await Task.sleep(nanoseconds: 500_000_000)
+                                            await MainActor.run {
+                                                if !showThisPage.isOpen {
+                                                    showThisPage.removeFromSuperview()
+                                                    self.showThisPage = nil
+                                                }
+                                            }
                                         }
                                     }
                                 }
