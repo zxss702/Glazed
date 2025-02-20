@@ -207,14 +207,9 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
                                         showThisPage.backgroundColor = .clear
                                         showThisPage.hosting.view.alpha = type.isCenter ? 0 : 1
                                     } completion: { Bool in
-                                        Task {
-                                            try await Task.sleep(nanoseconds: 500_000_000)
-                                            await MainActor.run {
-                                                if !showThisPage.isOpen {
-                                                    showThisPage.removeFromSuperview()
-                                                    self.showThisPage = nil
-                                                }
-                                            }
+                                        if !showThisPage.isOpen && Bool {
+                                            showThisPage.removeFromSuperview()
+                                            self.showThisPage = nil
                                         }
                                     }
                                 }

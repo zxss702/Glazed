@@ -72,7 +72,7 @@ func Animation(animation: @escaping () -> Void, completion: @escaping (Bool) -> 
 }
 #else
 @MainActor func Animation(animation: @escaping () -> Void, completion: @escaping (Bool) -> Void = {_ in }) {
-    UIView.animate(withDuration: 0.4, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 0.6, options: UIView.AnimationOptions.allowUserInteraction, animations: animation, completion: completion)
+    UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 0.6, options: UIView.AnimationOptions.allowUserInteraction, animations: animation, completion: completion)
 }
 #endif
 
