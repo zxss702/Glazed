@@ -269,26 +269,23 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
     
     func setFrame(window: UIView, showThisPage: PopoverShowPageViewWindow, buttonRect: CGRect) -> CGRect {
         var windowSize = windowViewModel.windowFrame
-        windowSize.width -= leftSpace * 2
-        windowSize.height -= leftSpace * 2
-        
-        let defaultSize = showThisPage.hosting.sizeThatFits(in: windowSize)
+        let defaultSize = showThisPage.hosting.sizeThatFits(in: windowSize.padding(x: leftSpace, y: leftSpace))
         let edge:PopoverEdge = getEdge(buttonRect: buttonRect, defaultSize: defaultSize)
         
         func inWidth(_ value: CGFloat) -> CGFloat {
             windowViewModel.windowSafeAreaInsets.leading + min(
-                windowSize.width - defaultSize.width / 2,// - leftSpace,
+                windowSize.width - defaultSize.width / 2 - leftSpace,
                 max(
-                    /*leftSpace + */defaultSize.width / 2,
+                    leftSpace + defaultSize.width / 2,
                     value
                 )
             )
         }
         func inHeight(_ value: CGFloat) -> CGFloat {
             windowViewModel.windowSafeAreaInsets.top + min(
-                windowSize.height - defaultSize.height / 2/* - leftSpace*/,
+                windowSize.height - defaultSize.height / 2 - leftSpace,
                 max(
-                    /*leftSpace + */defaultSize.height / 2,
+                    leftSpace + defaultSize.height / 2,
                     value
                 )
             )
@@ -392,6 +389,12 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
             .environment(\.safeAreaInsets, EdgeInsets(top: 16, leading: 0, bottom: 16, trailing: 0))
             .buttonStyle(TapButtonStyle())
             .font(.custom("Source Han Serif SC VF", size: 17))
+    }
+}
+
+extension CGSize {
+    func padding(x: CGFloat, y: CGFloat) -> CGSize {
+        return .init(width: self.width - x * 2, height: self.height - y * 2)
     }
 }
 
