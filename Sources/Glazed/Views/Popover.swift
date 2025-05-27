@@ -277,18 +277,18 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
         
         func inWidth(_ value: CGFloat) -> CGFloat {
             windowViewModel.windowSafeAreaInsets.leading + min(
-                windowSize.width - defaultSize.width / 2 - leftSpace,
+                windowSize.width - defaultSize.width / 2,// - leftSpace,
                 max(
-                    leftSpace + defaultSize.width / 2,
+                    /*leftSpace + */defaultSize.width / 2,
                     value
                 )
             )
         }
         func inHeight(_ value: CGFloat) -> CGFloat {
             windowViewModel.windowSafeAreaInsets.top + min(
-                windowSize.height - defaultSize.height / 2 - leftSpace,
+                windowSize.height - defaultSize.height / 2/* - leftSpace*/,
                 max(
-                    leftSpace + defaultSize.height / 2,
+                    /*leftSpace + */defaultSize.height / 2,
                     value
                 )
             )
