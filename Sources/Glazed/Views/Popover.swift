@@ -268,7 +268,10 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
     }
     
     func setFrame(window: UIView, showThisPage: PopoverShowPageViewWindow, buttonRect: CGRect) -> CGRect {
-        let windowSize = windowViewModel.windowFrame
+        var windowSize = windowViewModel.windowFrame
+        windowSize.width -= leftSpace * 2
+        windowSize.height -= leftSpace * 2
+        
         let defaultSize = showThisPage.hosting.sizeThatFits(in: windowSize)
         let edge:PopoverEdge = getEdge(buttonRect: buttonRect, defaultSize: defaultSize)
         
