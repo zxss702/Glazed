@@ -328,7 +328,9 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
         case .center:
             let iW = inWidth(buttonRect.midX)
             let iH = inHeight(buttonRect.midY)
-            anchor = UnitPoint(x: iW / windowSize.width, y: iH / windowSize.height)
+            Task {
+                anchor = UnitPoint(x: iW / windowSize.width, y: iH / windowSize.height)
+            }
             return CGRect(
                 center: CGPoint(
                     x: iW,
