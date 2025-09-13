@@ -187,9 +187,12 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
                                     showThisPage.backgroundColor = .clear
                                     showThisPage.hosting.view.alpha = type.isCenter ? 0 : 1
                                 } completion: { Bool in
-                                    if !showThisPage.isOpen && Bool {
-                                        showThisPage.removeFromSuperview()
-                                        self.showThisPage = nil
+                                    Task {
+                                        try await Task.sleep(nanoseconds: 400_000_000)
+                                        if !showThisPage.isOpen && Bool {
+                                            showThisPage.removeFromSuperview()
+                                            self.showThisPage = nil
+                                        }
                                     }
                                 }
                             }
@@ -464,17 +467,15 @@ extension View {
     @ViewBuilder
     func glassRegularStyle(_ shape: some Shape, color: Color? = nil, interactive: Bool = false) -> some View {
         if #available(iOS 26, *) {
-            self.glassEffect(.regular.tint(color).interactive(interactive), in: shape)
+            glassEffect(.regular.tint(color).interactive(interactive), in: shape)
         } else {
             if let color {
                 background {
                     shape.foregroundStyle(color)
-                        .background(UIShaowd(radius: 16, cornerRaduiu: 100))
                 }
             } else {
                 background {
                     shape.foregroundStyle(.background)
-                        .background(UIShaowd(radius: 16, cornerRaduiu: 100))
                 }
             }
         }
