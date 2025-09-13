@@ -202,6 +202,7 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
                         showThisPage?.animator?.addAnimations {
                             showThisPage?.alpha = 1
                             showThisPage?.hosting.view.transform = .identity
+                            showThisPage?.hosting.view.blur(radius: 0)
                         }
                         showThisPage?.animator?.startAnimation()
                         
@@ -231,6 +232,7 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
             showThisPage.animator?.addAnimations {
                 showThisPage.hosting.view.transform = unOpenTransform
                 showThisPage.alpha = 0
+                showThisPage.hosting.view.blur(radius: 10)
             }
             showThisPage.animator?.addCompletion { position in
                 switch position {
@@ -414,8 +416,6 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
             .geometryGroup()
             .clipShape(type.clipedShape)
             .glassRegularStyle(type.clipedShape, interactive: true)
-            .blur(radius: isPresented ? 0 : 10)
-            .animation(.smooth, value: isPresented)
             .environment(\.glazedDismiss, {
                 self.isPresented = false
             })
@@ -516,5 +516,65 @@ extension View {
                 }
             }
         }
+    }
+}
+
+// 为关联对象定义一个键
+@MainActor private var animatorKey: UInt8 = 54
+
+extension UIView {
+    private var blurAnimator: UIViewPropertyAnimator? {
+        get {
+            return objc_getAssociatedObject(self, &animatorKey) as? UIViewPropertyAnimator
+        }
+        set {
+            objc_setAssociatedObject(self, &animatorKey, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+        }
+    }
+
+    /// 为视图添加一个可自定义“半径”的模糊效果。
+    /// - Parameter radius: 模糊半径，建议范围 0.0 到 1.0。值越大，模糊越强。
+    func blur(radius: CGFloat) {
+        // 确保视图是可见的
+        guard self.superview != nil else { return }
+        
+        // 移除旧的动画和效果，以防重复调用
+        removeBlur()
+        
+        // 关键步骤：创建一个 UIViewPropertyAnimator
+        // duration 和 curve 只是占位符，因为我们不会真正“运行”这个动画
+        let animator = UIViewPropertyAnimator(duration: 1.0, curve: .linear)
+        
+        // 创建一个模糊效果的容器
+        let blurView = UIVisualEffectView(effect: nil)
+        blurView.frame = self.bounds
+        blurView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        
+        // 将模糊视图添加到目标视图中
+        self.addSubview(blurView)
+        self.clipsToBounds = true // 确保模糊效果不会超出视图边界
+        
+        // 将模糊效果添加到 animator 中
+        animator.addAnimations {
+            blurView.effect = UIBlurEffect(style: .regular) // 可以选择 .light, .dark 等
+        }
+        
+        // 通过 fractionComplete 控制模糊的强度（半径）
+        // fractionComplete 的范围是 0.0 到 1.0
+        animator.fractionComplete = min(1.0, max(0.0, radius))
+        
+        // 保存 animator，以便之后可以移除效果
+        self.blurAnimator = animator
+    }
+
+    /// 移除通过 .blur(radius:) 添加的模糊效果
+    func removeBlur() {
+        // 停止动画并移除关联的视图
+        self.blurAnimator?.stopAnimation(true)
+        
+        // 遍历子视图，找到 UIVisualEffectView 并移除
+        self.subviews.filter { $0 is UIVisualEffectView }.forEach { $0.removeFromSuperview() }
+        
+        self.blurAnimator = nil
     }
 }
