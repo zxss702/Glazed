@@ -169,7 +169,6 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
                                 showThisPage.trailingAnchor.constraint(equalTo: glazedView.trailingAnchor)
                             ])
                             
-                            showThisPage.hosting.view.frame = setFrame(window: glazedView, showThisPage: showThisPage, buttonRect: buttonRect)
                             if type.isShadow {
                                 switch colorScheme {
                                 case .dark:
@@ -182,9 +181,7 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
                                 showThisPage.hosting.view.layer.shadowOffset = CGSize(width: 0,height: 0)
                                 showThisPage.hosting.view.layer.shadowRadius = 35
                                 showThisPage.hosting.view.layer.shadowOpacity = 1
-                                showThisPage.hosting.view.layer.shadowPath = type.clipedShape.path(in: showThisPage.hosting.view.bounds).cgPath
                             }
-                            showThisPage.hosting.view.transform = setUnOpenTransform(window: glazedView, showThisPage: showThisPage, buttonRect: buttonRect, openFrame: showThisPage.hosting.view.frame)
                             showThisPage.alpha = 0
                             
                             if (glazedSuper != nil || type.isCenter) && !type.isTip {
@@ -193,17 +190,24 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
                                 showThisPage.backgroundColor = .clear
                             }
                         }
+                        guard let showThisPage else { return }
+                        if showThisPage.animator?.isRunning ?? false {
+                            showThisPage.animator?.stopAnimation(true)
+                        }
+                        showThisPage.animator = UIViewPropertyAnimator(duration: 0.5, dampingRatio: 1)
                         
-                        if showThisPage?.animator?.isRunning ?? false {
-                            showThisPage?.animator?.stopAnimation(true)
+                        showThisPage.hosting.view.transform = .identity
+                        showThisPage.hosting.view.frame = setFrame(window: glazedView, showThisPage: showThisPage, buttonRect: buttonRect)
+                        if type.isShadow {
+                            showThisPage.hosting.view.layer.shadowPath = type.clipedShape.path(in: showThisPage.hosting.view.bounds).cgPath
                         }
-                        showThisPage?.animator = UIViewPropertyAnimator(duration: 0.5, dampingRatio: 1)
-                        // 2. 添加动画闭包
-                        showThisPage?.animator?.addAnimations {
-                            showThisPage?.alpha = 1
-                            showThisPage?.hosting.view.transform = .identity
+                        showThisPage.hosting.view.transform = setUnOpenTransform(window: glazedView, showThisPage: showThisPage, buttonRect: buttonRect, openFrame: showThisPage.hosting.view.frame)
+                        
+                        showThisPage.animator?.addAnimations {
+                            showThisPage.alpha = 1
+                            showThisPage.hosting.view.transform = .identity
                         }
-                        showThisPage?.animator?.startAnimation()
+                        showThisPage.animator?.startAnimation()
                         
                     } else {
                         dismissPopover(buttonRect: buttonRect, glazedView: glazedView)
