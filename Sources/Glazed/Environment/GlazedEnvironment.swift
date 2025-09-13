@@ -71,8 +71,12 @@ func Animation(animation: @escaping () -> Void, completion: @escaping (Bool) -> 
     completion(true)
 }
 #else
-@MainActor func Animation(animation: @escaping () -> Void, completion: @escaping (Bool) -> Void = {_ in }) {
-    UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 0.6, options: UIView.AnimationOptions.allowUserInteraction, animations: animation, completion: completion)
+@MainActor func Animate(animation: @escaping () -> Void, completion: @escaping () -> Void = {}) {
+    if #available(iOS 18.0, *) {
+        UIView.animate(.bouncy, changes: animation, completion: completion)
+    } else {
+        UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 0.6, options: UIView.AnimationOptions.allowUserInteraction, animations: animation, completion: { comp in if comp { completion() } })
+    }
 }
 #endif
 
@@ -111,11 +115,7 @@ extension Animation {
     public static let autoAnimation = autoAnimation(speed: 1)
     
     public static func autoAnimation(speed: CGFloat = 1) -> Animation {
-        if #available(iOS 17.0, *) {
-            return .bouncy.speed(speed)// .smooth(duration: 0.4)
-        } else {
-            return .spring().speed(speed)
-        }
+        return .bouncy.speed(speed)
     }
 }
 

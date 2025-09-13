@@ -135,13 +135,13 @@ struct SheetViewModle<Content2: View>: ViewModifier {
                 showThisPage.hosting.view.transform = .identity
                 showThisPage.hosting.view.frame = frame
                 showThisPage.hosting.view.transform = showThisPage.defaultTransform
-                Animation {
+                Animate {
                     showThisPage.backgroundColor = .black.withAlphaComponent(0.3)
                     showThisPage.hosting.view.transform = .identity
                 }
             } else {
                 if showThisPage.hosting.view.frame != frame {
-                    Animation {
+                    Animate {
                         showThisPage.hosting.view.frame = frame
                     }
                 }
@@ -153,10 +153,10 @@ struct SheetViewModle<Content2: View>: ViewModifier {
         isPresented = false
         showThisPage?.isOpen = false
         if let showThisPage {
-            Animation {
+            Animate {
                 showThisPage.backgroundColor = .clear
                 showThisPage.hosting.view.transform = showThisPage.defaultTransform
-            } completion: { Bool in
+            } completion: { 
                 if !showThisPage.isOpen {
                     showThisPage.removeFromSuperview()
                     self.showThisPage = nil
@@ -252,7 +252,7 @@ class SheetShowPageViewWindow: UIView {
                 }
         default:
             if self.hosting.view.transform.ty < 100 {
-                Animation {
+                Animate {
                     self.hosting.view.transform = CGAffineTransform(translationX: 0, y: 0)
                 }
             } else {

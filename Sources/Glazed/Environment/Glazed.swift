@@ -65,18 +65,18 @@ public struct Glazed<Content: View>: View {
                     ])
                 }
             }
-            Animation {
+            Animate {
                 showThisPage?.backgroundColor = .black.withAlphaComponent(0.3)
             }
             Task.detached {
                 await action()
                 await MainActor.run {
                     showThisPage?.isOpen = false
-                    Animation {
+                    Animate {
                         showThisPage?.hosting.view.transform = CGAffineTransform(scaleX: 0.8, y: 0.8)
                         showThisPage?.hosting.view.alpha = 0
                         showThisPage?.backgroundColor = .clear
-                    } completion: { Bool in
+                    } completion: { 
                         if !isOpen {
                             showThisPage?.removeFromSuperview()
                             self.showThisPage = nil
