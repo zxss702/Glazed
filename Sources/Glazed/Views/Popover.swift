@@ -89,6 +89,7 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
     @EnvironmentObject var windowViewModel:WindowViewModel
     
     @State var anchor: UnitPoint = .center
+    @State var dismissTask: Task<Void, Error>? = nil
     func body(content: Content) -> some View {
         Group {
             if type.isCenter {
@@ -138,7 +139,7 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
                 .task(id: isPresented) {
                     showThisPage?.isPresented = isPresented
                     if isPresented {
-                        showThisPage?.dismissTask?.cancel()
+                        dismissTask?.cancel()
                         if showThisPage == nil {
                             let showThisPage = PopoverShowPageViewWindow(
                                 content: AnyView(pageStyle()),
@@ -184,6 +185,8 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
                             
                             if (glazedSuper != nil || type.isCenter) && !type.isTip {
                                 showThisPage.backgroundColor = .black.withAlphaComponent(0.1)
+                            } else {
+                                showThisPage.backgroundColor = .clear
                             }
                         }
                         
@@ -198,7 +201,7 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
                                 showThisPage.hosting.view.transform = unOpenTransform
                                 showThisPage.alpha = 0
                             } completion: {
-                                showThisPage.dismissTask = Task {
+                                dismissTask = Task {
                                     try await Task.sleep(nanoseconds: 500_000_000)
                                     if !isPresented {
                                         showThisPage.removeFromSuperview()
@@ -413,8 +416,6 @@ class PopoverShowPageViewWindow: UIView {
     var buttonFrame: CGRect
     let glazedSuper: UUID?
     
-    var dismissTask: Task<Void, Error>? = nil
-    
     init(content: AnyView, buttonFrame: CGRect, glazedSuper: UUID?, isPresented: Bool, type: popoverType, dismiss: @escaping () -> Void) {
         self.dismiss = dismiss
         self.buttonFrame = buttonFrame
@@ -425,7 +426,6 @@ class PopoverShowPageViewWindow: UIView {
         
         super.init(frame: .zero)
         self.translatesAutoresizingMaskIntoConstraints = false
-        self.backgroundColor = .clear
         self.hosting.view.backgroundColor = .clear
         self.hosting.sizingOptions = .intrinsicContentSize
 //        self.hosting.view.insetsLayoutMarginsFromSafeArea = false
