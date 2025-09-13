@@ -120,17 +120,19 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
             )
             
             let _ = {
-                if isPresented {
-                    showThisPage?.hosting.rootView = AnyView(pageStyle())
-                    showThisPage?.buttonFrame = buttonRectGlobal
-                    
-                    guard let showThisPage else { return }
-                    let frame = setFrame(window: glazedView, showThisPage: showThisPage, buttonRect: buttonRect)
-                    if showThisPage.hosting.view.frame != frame {
-                        Animate {
-                            self.showThisPage?.hosting.view.frame = frame
-                            if type.isShadow {
-                                self.showThisPage?.hosting.view.layer.shadowPath = type.clipedShape.path(in: showThisPage.hosting.view.bounds).cgPath
+                Task { @MainActor in
+                    if isPresented {
+                        showThisPage?.hosting.rootView = AnyView(pageStyle())
+                        showThisPage?.buttonFrame = buttonRectGlobal
+                        
+                        guard let showThisPage else { return }
+                        let frame = setFrame(window: glazedView, showThisPage: showThisPage, buttonRect: buttonRect)
+                        if showThisPage.hosting.view.frame != frame {
+                            Animate {
+                                self.showThisPage?.hosting.view.frame = frame
+                                if type.isShadow {
+                                    self.showThisPage?.hosting.view.layer.shadowPath = type.clipedShape.path(in: showThisPage.hosting.view.bounds).cgPath
+                                }
                             }
                         }
                     }
