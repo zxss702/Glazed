@@ -72,11 +72,7 @@ func Animation(animation: @escaping () -> Void, completion: @escaping (Bool) -> 
 }
 #else
 @MainActor func Animate(animation: @escaping () -> Void, completion: @escaping () -> Void = {}) {
-    if #available(iOS 18.0, *) {
-        UIView.animate(.smooth, changes: animation, completion: completion)
-    } else {
-        UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 0.6, options: UIView.AnimationOptions.allowUserInteraction, animations: animation, completion: { comp in if comp { completion() } })
-    }
+    UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 0.6, options: UIView.AnimationOptions.allowUserInteraction, animations: animation, completion: { comp in if comp { completion() } })
 }
 #endif
 
