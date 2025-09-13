@@ -194,7 +194,7 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
                             }
                         }
                         
-                        Animate {
+                        withAnimation(.smooth) {
                             showThisPage?.alpha = 1
                             showThisPage?.hosting.view.transform = .identity
                         }
@@ -209,9 +209,6 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
                 .transition(.identity)
                 
         }
-        .task(id: isPresented) {
-            showThisPage?.isPresented = isPresented
-        }
         .transition(.identity)
         .allowsHitTesting(false)
     }
@@ -219,7 +216,7 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
     func dismissPopover(buttonRect: CGRect, glazedView: UIView) {
         if let showThisPage {
             let unOpenTransform = setUnOpenTransform(window: glazedView, showThisPage: showThisPage, buttonRect: buttonRect, openFrame: showThisPage.hosting.view.frame)
-            Animate {
+            withAnimation(.smooth) {
                 showThisPage.hosting.view.transform = unOpenTransform
                 showThisPage.alpha = 0
             } completion: {
@@ -408,6 +405,7 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
             .environment(\.safeAreaInsets, EdgeInsets(top: 16, leading: 0, bottom: 16, trailing: 0))
             .buttonStyle(TapButtonStyle())
             .font(.custom("Source Han Serif SC VF", size: 17))
+            .allowsHitTesting(isPresented)
     }
 }
 
