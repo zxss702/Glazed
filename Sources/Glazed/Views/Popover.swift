@@ -81,19 +81,14 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
     
     @Environment(\.glazedView) var glazedView
     
-    @State private var showThisPage: PopoverShowPageViewWindow? = nil
-    @State private var isAnimating: Bool = false
-    @State private var pendingDismiss: Bool = false
-    @State private var cleanupTask: Task<Void, Never>? = nil
+    @State var showThisPage: PopoverShowPageViewWindow? = nil
     
     @Environment(\.glazedSuper) var glazedSuper
     @Environment(\.colorScheme) var colorScheme
     
     @EnvironmentObject var windowViewModel:WindowViewModel
     
-    @State private var anchor: UnitPoint = .center
-    @State private var cachedButtonRect: CGRect = .zero
-    @State private var cachedFrame: CGRect = .zero
+    @State var anchor: UnitPoint = .center
     func body(content: Content) -> some View {
         Group {
             if type.isCenter {
@@ -118,24 +113,15 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
                     )
                     
                     let _ = {
-                        // 只有在非动画状态下才更新frame，并且只在位置真正改变时更新
-                        if let showThisPage, showThisPage.isOpen, !isAnimating {
-                            let hasButtonRectChanged = cachedButtonRect != buttonRect
-                            
-                            if hasButtonRectChanged {
-                                showThisPage.hosting.rootView = AnyView(pageStyle())
-                                showThisPage.buttonFrame = buttonRectGlobal
-                                let newFrame = setFrame(window: glazedView, showThisPage: showThisPage, buttonRect: buttonRect)
-                                
-                                if cachedFrame != newFrame {
-                                    cachedButtonRect = buttonRect
-                                    cachedFrame = newFrame
-                                    
-                                    withAnimation(.easeInOut(duration: 0.2)) {
-                                        showThisPage.hosting.view.frame = newFrame
-                                        if type.isShadow {
-                                            showThisPage.hosting.view.layer.shadowPath = type.clipedShape.path(in: showThisPage.hosting.view.bounds).cgPath
-                                        }
+                        if let showThisPage, showThisPage.isOpen {
+                            showThisPage.hosting.rootView = AnyView(pageStyle())
+                            showThisPage.buttonFrame = buttonRectGlobal
+                            let frame = setFrame(window: glazedView, showThisPage: showThisPage, buttonRect: buttonRect)
+                            if showThisPage.hosting.view.frame != frame {
+                                Animate {
+                                    showThisPage.hosting.view.frame = frame
+                                    if type.isShadow {
+                                        showThisPage.hosting.view.layer.shadowPath = type.clipedShape.path(in: showThisPage.hosting.view.bounds).cgPath
                                     }
                                 }
                             }
@@ -143,140 +129,77 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
                     }()
                     Color.clear
                         .onAppear {
-                            // 取消任何待处理的清理任务
-                            cleanupTask?.cancel()
-                            cleanupTask = nil
-                            pendingDismiss = false
-                            
-                            // 防止重复创建
-                            guard showThisPage == nil else {
-                                showThisPage?.setOpenState(true)
-                                return
-                            }
-                            
-                            isAnimating = true
-                            
-                            showThisPage = PopoverShowPageViewWindow(content: AnyView(pageStyle()), buttonFrame: buttonRectGlobal, glazedSuper: glazedSuper, isOpen: true, isTip: type.isTip, isCenter: type.isCenter, dismiss: {
-                                if type.autoDimiss {
-                                    Task { @MainActor in
-                                        self.isPresented = false
+                            showThisPage?.isOpen = true
+                            if showThisPage == nil {
+                                showThisPage = PopoverShowPageViewWindow(content: AnyView(pageStyle()), buttonFrame: buttonRectGlobal, glazedSuper: glazedSuper, isOpen: true, isTip: type.isTip, isCenter: type.isCenter, dismiss: {
+                                    if type.autoDimiss {
+                                        DispatchQueue.main.async {
+                                            self.isPresented = false
+                                        }
                                     }
+                                })
+                                if let showThisPage {
+                                    glazedView.addSubview(showThisPage)
+                                    glazedView.bringSubviewToFront(showThisPage)
+                                    NSLayoutConstraint.activate([
+                                        showThisPage.topAnchor.constraint(equalTo: glazedView.topAnchor),
+                                        showThisPage.bottomAnchor.constraint(equalTo: glazedView.bottomAnchor),
+                                        showThisPage.leadingAnchor.constraint(equalTo: glazedView.leadingAnchor),
+                                        showThisPage.trailingAnchor.constraint(equalTo: glazedView.trailingAnchor)
+                                    ])
+                                    showThisPage.hosting.view.frame = setFrame(window: glazedView, showThisPage: showThisPage, buttonRect: buttonRect)
+                                    if type.isShadow {
+                                        switch colorScheme {
+                                        case .dark:
+                                            showThisPage.hosting.view.layer.shadowColor = UIColor.gray.withAlphaComponent(0.6).cgColor
+                                        case .light:
+                                            showThisPage.hosting.view.layer.shadowColor = UIColor.gray.withAlphaComponent(0.3).cgColor
+                                        @unknown default:
+                                            showThisPage.hosting.view.layer.shadowColor = UIColor.gray.withAlphaComponent(0.3).cgColor
+                                        }
+                                        showThisPage.hosting.view.layer.shadowOffset = CGSize(width: 0,height: 0)
+                                        showThisPage.hosting.view.layer.shadowRadius = 35
+                                        showThisPage.hosting.view.layer.shadowOpacity = 1
+                                        showThisPage.hosting.view.layer.shadowPath = type.clipedShape.path(in: showThisPage.hosting.view.bounds).cgPath
+                                    }
+                                    showThisPage.hosting.view.transform = setUnOpenTransform(window: glazedView, showThisPage: showThisPage, buttonRect: buttonRect, openFrame: showThisPage.hosting.view.frame)
+                                    showThisPage.hosting.view.alpha = type.isCenter ? 0 : 1
                                 }
-                            })
-                            
-                            guard let showThisPage else { 
-                                isAnimating = false
-                                return 
                             }
-                            
-                            glazedView.addSubview(showThisPage)
-                            glazedView.bringSubviewToFront(showThisPage)
-                            NSLayoutConstraint.activate([
-                                showThisPage.topAnchor.constraint(equalTo: glazedView.topAnchor),
-                                showThisPage.bottomAnchor.constraint(equalTo: glazedView.bottomAnchor),
-                                showThisPage.leadingAnchor.constraint(equalTo: glazedView.leadingAnchor),
-                                showThisPage.trailingAnchor.constraint(equalTo: glazedView.trailingAnchor)
-                            ])
-                            
-                            let initialFrame = setFrame(window: glazedView, showThisPage: showThisPage, buttonRect: buttonRect)
-                            showThisPage.hosting.view.frame = initialFrame
-                            
-                            // 缓存初始值
-                            cachedButtonRect = buttonRect
-                            cachedFrame = initialFrame
-                            
-                            if type.isShadow {
-                                setupShadow(for: showThisPage)
-                            }
-                            
-                            // 设置初始状态
-                            showThisPage.hosting.view.transform = setUnOpenTransform(window: glazedView, showThisPage: showThisPage, buttonRect: buttonRect, openFrame: showThisPage.hosting.view.frame)
-                            showThisPage.hosting.view.alpha = type.isCenter ? 0 : 1
-                            
-                            // 执行显示动画
                             Animate {
                                 if (glazedSuper != nil || type.isCenter) && !type.isTip {
-                                    showThisPage.backgroundColor = .black.withAlphaComponent(0.1)
+                                    showThisPage?.backgroundColor = .black.withAlphaComponent(0.1)
                                 }
-                                showThisPage.hosting.view.alpha = 1
-                                showThisPage.hosting.view.transform = .identity
-                            } completion: {
-                                isAnimating = false
-                                // 如果在动画期间收到了dismiss请求，现在执行它
-                                if pendingDismiss {
-                                    dismissPopover()
-                                }
+                                showThisPage?.hosting.view.alpha = 1
+                                showThisPage?.hosting.view.transform = .identity
                             }
                         }
                         .onDisappear {
-                            dismissPopover()
+                            isPresented = false
+                            if let showThisPage {
+                                showThisPage.isOpen = false
+                                //                                    showThisPage.hosting.view.transform = .identity
+                                let unOpenTransform = setUnOpenTransform(window: glazedView, showThisPage: showThisPage, buttonRect: buttonRect, openFrame: showThisPage.hosting.view.frame)
+                                Animate {
+                                    showThisPage.hosting.view.transform = unOpenTransform
+                                    showThisPage.backgroundColor = .clear
+                                    showThisPage.hosting.view.alpha = type.isCenter ? 0 : 1
+                                } completion: {
+                                    Task {
+                                        try await Task.sleep(nanoseconds: 400_000_000)
+                                        if !showThisPage.isOpen {
+                                            showThisPage.removeFromSuperview()
+                                            self.showThisPage = nil
+                                        }
+                                    }
+                                }
+                            }
                         }
                         .transition(.identity)
                 }
             }
             .transition(.identity)
             .allowsHitTesting(false)
-        }
-    }
-    
-    // MARK: - Helper Methods
-    
-    private func setupShadow(for showThisPage: PopoverShowPageViewWindow) {
-        switch colorScheme {
-        case .dark:
-            showThisPage.hosting.view.layer.shadowColor = UIColor.gray.withAlphaComponent(0.6).cgColor
-        case .light:
-            showThisPage.hosting.view.layer.shadowColor = UIColor.gray.withAlphaComponent(0.3).cgColor
-        @unknown default:
-            showThisPage.hosting.view.layer.shadowColor = UIColor.gray.withAlphaComponent(0.3).cgColor
-        }
-        showThisPage.hosting.view.layer.shadowOffset = CGSize(width: 0, height: 0)
-        showThisPage.hosting.view.layer.shadowRadius = 35
-        showThisPage.hosting.view.layer.shadowOpacity = 1
-        showThisPage.hosting.view.layer.shadowPath = type.clipedShape.path(in: showThisPage.hosting.view.bounds).cgPath
-    }
-    
-    private func dismissPopover() {
-        // 如果正在动画中，标记为待处理
-        guard !isAnimating else {
-            pendingDismiss = true
-            return
-        }
-        
-        isPresented = false
-        
-        guard let showThisPage = self.showThisPage else { return }
-        
-        showThisPage.setOpenState(false)
-        isAnimating = true
-        
-        let unOpenTransform = setUnOpenTransform(window: glazedView!, showThisPage: showThisPage, buttonRect: CGRect(
-            x: showThisPage.buttonFrame.minX - windowViewModel.windowSafeAreaInsets.leading,
-            y: showThisPage.buttonFrame.minY - windowViewModel.windowSafeAreaInsets.top,
-            width: showThisPage.buttonFrame.width,
-            height: showThisPage.buttonFrame.height
-        ), openFrame: showThisPage.hosting.view.frame)
-        
-        Animate {
-            showThisPage.hosting.view.transform = unOpenTransform
-            showThisPage.backgroundColor = .clear
-            showThisPage.hosting.view.alpha = type.isCenter ? 0 : 0.8
-        } completion: {
-            self.isAnimating = false
-            
-            // 延迟清理，确保动画完成
-            self.cleanupTask = Task { @MainActor in
-                try? await Task.sleep(nanoseconds: 100_000_000) // 0.1秒
-                
-                // 再次检查状态，防止在延迟期间重新打开
-                if !showThisPage.isOpen {
-                    showThisPage.removeFromSuperview()
-                    if self.showThisPage === showThisPage {
-                        self.showThisPage = nil
-                    }
-                }
-                self.cleanupTask = nil
-            }
         }
     }
     
@@ -445,10 +368,9 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
         content()
             .clipShape(type.clipedShape)
             .glassRegularStyle(type.clipedShape, interactive: true)
+            .blur(radius: isPresented ? 0 : 10)
             .environment(\.glazedDismiss, {
-                Task { @MainActor in
-                    self.dismissPopover()
-                }
+                self.isPresented = false
             })
             .environment(\.glazedSuper, UUID())
             .environment(\.safeAreaInsets, EdgeInsets(top: 16, leading: 0, bottom: 16, trailing: 0))
@@ -466,14 +388,13 @@ extension CGSize {
 @MainActor
 class PopoverShowPageViewWindow: UIView {
     
-    let hosting: UIHostingController<AnyView>
-    private let dismiss: () -> Void
+    let hosting:UIHostingController<AnyView>
+    let dismiss: () -> Void
     var buttonFrame: CGRect
     let glazedSuper: UUID?
-    private(set) var isOpen: Bool
+    var isOpen: Bool
     let isTip: Bool
     let isCenter: Bool
-    private var isDismissing: Bool = false
     
     init(content: AnyView, buttonFrame: CGRect, glazedSuper: UUID?, isOpen: Bool, isTip: Bool, isCenter: Bool, dismiss: @escaping () -> Void) {
         self.dismiss = dismiss
@@ -511,47 +432,30 @@ class PopoverShowPageViewWindow: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func setOpenState(_ open: Bool) {
-        isOpen = open
-    }
-    
-    private func performDismiss() {
-        guard !isDismissing else { return }
-        isDismissing = true
-        dismiss()
-    }
-    
     override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
-        // 如果正在关闭过程中，不处理点击事件
-        guard isOpen && !isDismissing && !isTip else {
-            return nil
-        }
-        
-        if self.hosting.view.frame.contains(point) {
-            return super.hitTest(point, with: event)
-        } else {
-            if event?.type == .touches {
-                if isCenter {
-                    performDismiss()
-                    return super.hitTest(point, with: event)
-                } else if glazedSuper == nil {
-                    if !self.buttonFrame.contains(point) {
-                        performDismiss()
+        if isOpen && !isTip {
+            if self.hosting.view.frame.contains(point) {
+                return super.hitTest(point, with: event)
+            } else {
+                if event?.type == .touches {
+                    if isCenter {
+                        dismiss()
+                        return super.hitTest(point, with: event)
+                    } else if glazedSuper == nil {
+                        if !self.buttonFrame.contains(point) {
+                            dismiss()
+                        }
+                        return nil
+                    } else if self.buttonFrame.contains(point) {
+                        return nil
+                    } else {
+                        dismiss()
+                        return super.hitTest(point, with: event)
                     }
-                    return nil
-                } else if self.buttonFrame.contains(point) {
-                    return nil
-                } else {
-                    performDismiss()
-                    return super.hitTest(point, with: event)
                 }
             }
         }
         return nil
-    }
-    
-    deinit {
-        hosting.view.removeFromSuperview()
     }
 }
 
@@ -563,7 +467,7 @@ extension View {
         if #available(iOS 26, *) {
             background {
                 Color.clear
-                    . glassEffect(.regular.tint(color).interactive(interactive), in: shape)
+                    .glassEffect(.regular.tint(color).interactive(interactive), in: shape)
             }
         } else {
             if let color {
