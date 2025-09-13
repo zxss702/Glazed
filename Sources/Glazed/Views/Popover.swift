@@ -169,7 +169,6 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
                                 showThisPage.trailingAnchor.constraint(equalTo: glazedView.trailingAnchor)
                             ])
                             
-                            showThisPage.hosting.view.frame = setFrame(window: glazedView, showThisPage: showThisPage, buttonRect: buttonRect)
                             if type.isShadow {
                                 switch colorScheme {
                                 case .dark:
@@ -182,9 +181,7 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
                                 showThisPage.hosting.view.layer.shadowOffset = CGSize(width: 0,height: 0)
                                 showThisPage.hosting.view.layer.shadowRadius = 35
                                 showThisPage.hosting.view.layer.shadowOpacity = 1
-                                showThisPage.hosting.view.layer.shadowPath = type.clipedShape.path(in: showThisPage.hosting.view.bounds).cgPath
                             }
-                            showThisPage.hosting.view.transform = setUnOpenTransform(window: glazedView, showThisPage: showThisPage, buttonRect: buttonRect, openFrame: showThisPage.hosting.view.frame)
                             showThisPage.alpha = 0
                             
                             if (glazedSuper != nil || type.isCenter) && !type.isTip {
@@ -194,16 +191,17 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
                             }
                         }
                         
-                        if showThisPage?.animator?.isRunning ?? false {
-                            showThisPage?.animator?.stopAnimation(true)
-                        }
-                        showThisPage?.animator = UIViewPropertyAnimator(duration: 0.5, dampingRatio: 1)
-                       
                         showThisPage?.hosting.view.frame = setFrame(window: glazedView, showThisPage: showThisPage!, buttonRect: buttonRect)
                         if type.isShadow {
                             showThisPage?.hosting.view.layer.shadowPath = type.clipedShape.path(in: showThisPage!.hosting.view.bounds).cgPath
                         }
                         showThisPage?.hosting.view.transform = setUnOpenTransform(window: glazedView, showThisPage: showThisPage!, buttonRect: buttonRect, openFrame: showThisPage!.hosting.view.frame)
+                        
+                        
+                        if showThisPage?.animator?.isRunning ?? false {
+                            showThisPage?.animator?.stopAnimation(true)
+                        }
+                        showThisPage?.animator = UIViewPropertyAnimator(duration: 0.5, dampingRatio: 1)
                         
                         showThisPage?.animator?.addAnimations {
                             showThisPage?.alpha = 1
