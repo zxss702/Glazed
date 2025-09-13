@@ -198,8 +198,10 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
                                 showThisPage.hosting.view.transform = unOpenTransform
                                 showThisPage.alpha = type.isCenter ? 0 : 1
                             } completion: {
-                                showThisPage.removeFromSuperview()
-                                self.showThisPage = nil
+                                if isPresented {
+                                    showThisPage.removeFromSuperview()
+                                    self.showThisPage = nil
+                                }
                             }
                         }
                     }
