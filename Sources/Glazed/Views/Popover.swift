@@ -198,7 +198,13 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
                             showThisPage?.animator?.stopAnimation(true)
                         }
                         showThisPage?.animator = UIViewPropertyAnimator(duration: 0.5, dampingRatio: 1)
-                        // 2. 添加动画闭包
+                       
+                        showThisPage?.hosting.view.frame = setFrame(window: glazedView, showThisPage: showThisPage!, buttonRect: buttonRect)
+                        if type.isShadow {
+                            showThisPage?.hosting.view.layer.shadowPath = type.clipedShape.path(in: showThisPage!.hosting.view.bounds).cgPath
+                        }
+                        showThisPage?.hosting.view.transform = setUnOpenTransform(window: glazedView, showThisPage: showThisPage!, buttonRect: buttonRect, openFrame: showThisPage!.hosting.view.frame)
+                        
                         showThisPage?.animator?.addAnimations {
                             showThisPage?.alpha = 1
                             showThisPage?.hosting.view.transform = .identity
