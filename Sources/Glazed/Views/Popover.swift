@@ -102,105 +102,115 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
             }
         }
         .overlay {
-            GeometryReader { GeometryProxy in
-                if isPresented, let glazedView {
-                    let buttonRectGlobal = GeometryProxy.frame(in: .global)
-                    let buttonRect = CGRect(
-                        x: buttonRectGlobal.minX - windowViewModel.windowSafeAreaInsets.leading ,
-                        y: buttonRectGlobal.minY - windowViewModel.windowSafeAreaInsets.top,
-                        width: buttonRectGlobal.width,
-                        height: buttonRectGlobal.height
-                    )
-                    
-                    let _ = {
-                        if let showThisPage, showThisPage.isOpen {
-                            showThisPage.hosting.rootView = AnyView(pageStyle())
-                            showThisPage.buttonFrame = buttonRectGlobal
-                            let frame = setFrame(window: glazedView, showThisPage: showThisPage, buttonRect: buttonRect)
-                            if showThisPage.hosting.view.frame != frame {
-                                Animate {
-                                    showThisPage.hosting.view.frame = frame
-                                    if type.isShadow {
-                                        showThisPage.hosting.view.layer.shadowPath = type.clipedShape.path(in: showThisPage.hosting.view.bounds).cgPath
-                                    }
+            if let glazedView {
+                overlayDataHelper(glazedView: glazedView)
+            }
+        }
+    }
+    
+    func overlayDataHelper(glazedView: UIView) -> some View {
+        GeometryReader { GeometryProxy in
+            if isPresented {
+                let buttonRectGlobal = GeometryProxy.frame(in: .global)
+                let buttonRect = CGRect(
+                    x: buttonRectGlobal.minX - windowViewModel.windowSafeAreaInsets.leading ,
+                    y: buttonRectGlobal.minY - windowViewModel.windowSafeAreaInsets.top,
+                    width: buttonRectGlobal.width,
+                    height: buttonRectGlobal.height
+                )
+                
+                let _ = {
+                    if let showThisPage {
+                        showThisPage.hosting.rootView = AnyView(pageStyle())
+                        showThisPage.buttonFrame = buttonRectGlobal
+                        let frame = setFrame(window: glazedView, showThisPage: showThisPage, buttonRect: buttonRect)
+                        if showThisPage.hosting.view.frame != frame {
+                            Animate {
+                                showThisPage.hosting.view.frame = frame
+                                if type.isShadow {
+                                    showThisPage.hosting.view.layer.shadowPath = type.clipedShape.path(in: showThisPage.hosting.view.bounds).cgPath
                                 }
                             }
                         }
-                    }()
-                    Color.clear
-                        .onAppear {
-                            showThisPage?.isOpen = true
-                            if showThisPage == nil {
-                                showThisPage = PopoverShowPageViewWindow(content: AnyView(pageStyle()), buttonFrame: buttonRectGlobal, glazedSuper: glazedSuper, isOpen: true, isTip: type.isTip, isCenter: type.isCenter, dismiss: {
+                    }
+                }()
+                
+                Color.clear
+                    .onAppear {
+                        if showThisPage == nil {
+                            let showThisPage = PopoverShowPageViewWindow(
+                                content: AnyView(pageStyle()),
+                                buttonFrame: buttonRectGlobal,
+                                glazedSuper: glazedSuper,
+                                isPresented: isPresented,
+                                type: type) {
                                     if type.autoDimiss {
-                                        DispatchQueue.main.async {
+                                        Task { @MainActor in
                                             self.isPresented = false
                                         }
                                     }
-                                })
-                                if let showThisPage {
-                                    glazedView.addSubview(showThisPage)
-                                    glazedView.bringSubviewToFront(showThisPage)
-                                    NSLayoutConstraint.activate([
-                                        showThisPage.topAnchor.constraint(equalTo: glazedView.topAnchor),
-                                        showThisPage.bottomAnchor.constraint(equalTo: glazedView.bottomAnchor),
-                                        showThisPage.leadingAnchor.constraint(equalTo: glazedView.leadingAnchor),
-                                        showThisPage.trailingAnchor.constraint(equalTo: glazedView.trailingAnchor)
-                                    ])
-                                    showThisPage.hosting.view.frame = setFrame(window: glazedView, showThisPage: showThisPage, buttonRect: buttonRect)
-                                    if type.isShadow {
-                                        switch colorScheme {
-                                        case .dark:
-                                            showThisPage.hosting.view.layer.shadowColor = UIColor.gray.withAlphaComponent(0.6).cgColor
-                                        case .light:
-                                            showThisPage.hosting.view.layer.shadowColor = UIColor.gray.withAlphaComponent(0.3).cgColor
-                                        @unknown default:
-                                            showThisPage.hosting.view.layer.shadowColor = UIColor.gray.withAlphaComponent(0.3).cgColor
-                                        }
-                                        showThisPage.hosting.view.layer.shadowOffset = CGSize(width: 0,height: 0)
-                                        showThisPage.hosting.view.layer.shadowRadius = 35
-                                        showThisPage.hosting.view.layer.shadowOpacity = 1
-                                        showThisPage.hosting.view.layer.shadowPath = type.clipedShape.path(in: showThisPage.hosting.view.bounds).cgPath
-                                    }
-                                    showThisPage.hosting.view.transform = setUnOpenTransform(window: glazedView, showThisPage: showThisPage, buttonRect: buttonRect, openFrame: showThisPage.hosting.view.frame)
-                                    showThisPage.hosting.view.alpha = type.isCenter ? 0 : 1
                                 }
+                            self.showThisPage = showThisPage
+                            
+                            glazedView.addSubview(showThisPage)
+                            glazedView.bringSubviewToFront(showThisPage)
+                            
+                            NSLayoutConstraint.activate([
+                                showThisPage.topAnchor.constraint(equalTo: glazedView.topAnchor),
+                                showThisPage.bottomAnchor.constraint(equalTo: glazedView.bottomAnchor),
+                                showThisPage.leadingAnchor.constraint(equalTo: glazedView.leadingAnchor),
+                                showThisPage.trailingAnchor.constraint(equalTo: glazedView.trailingAnchor)
+                            ])
+                            
+                            showThisPage.hosting.view.frame = setFrame(window: glazedView, showThisPage: showThisPage, buttonRect: buttonRect)
+                            if type.isShadow {
+                                switch colorScheme {
+                                case .dark:
+                                    showThisPage.hosting.view.layer.shadowColor = UIColor.gray.withAlphaComponent(0.6).cgColor
+                                case .light:
+                                    showThisPage.hosting.view.layer.shadowColor = UIColor.gray.withAlphaComponent(0.3).cgColor
+                                @unknown default:
+                                    showThisPage.hosting.view.layer.shadowColor = UIColor.gray.withAlphaComponent(0.3).cgColor
+                                }
+                                showThisPage.hosting.view.layer.shadowOffset = CGSize(width: 0,height: 0)
+                                showThisPage.hosting.view.layer.shadowRadius = 35
+                                showThisPage.hosting.view.layer.shadowOpacity = 1
+                                showThisPage.hosting.view.layer.shadowPath = type.clipedShape.path(in: showThisPage.hosting.view.bounds).cgPath
                             }
+                            showThisPage.hosting.view.transform = setUnOpenTransform(window: glazedView, showThisPage: showThisPage, buttonRect: buttonRect, openFrame: showThisPage.hosting.view.frame)
+                            showThisPage.alpha = type.isCenter ? 0 : 1
+                            if (glazedSuper != nil || type.isCenter) && !type.isTip {
+                                showThisPage.backgroundColor = .black.withAlphaComponent(0.1)
+                            }
+                        }
+                        
+                        Animate {
+                            showThisPage?.alpha = 1
+                            showThisPage?.hosting.view.transform = .identity
+                        }
+                    }
+                
+                    .onDisappear {
+                        isPresented = false
+                        if let showThisPage {
+                            let unOpenTransform = setUnOpenTransform(window: glazedView, showThisPage: showThisPage, buttonRect: buttonRect, openFrame: showThisPage.hosting.view.frame)
                             Animate {
-                                if (glazedSuper != nil || type.isCenter) && !type.isTip {
-                                    showThisPage?.backgroundColor = .black.withAlphaComponent(0.1)
-                                }
-                                showThisPage?.hosting.view.alpha = 1
-                                showThisPage?.hosting.view.transform = .identity
+                                showThisPage.hosting.view.transform = unOpenTransform
+                                showThisPage.alpha = type.isCenter ? 0 : 1
+                            } completion: {
+                                showThisPage.removeFromSuperview()
+                                self.showThisPage = nil
                             }
                         }
-                        .onDisappear {
-                            isPresented = false
-                            if let showThisPage {
-                                showThisPage.isOpen = false
-                                //                                    showThisPage.hosting.view.transform = .identity
-                                let unOpenTransform = setUnOpenTransform(window: glazedView, showThisPage: showThisPage, buttonRect: buttonRect, openFrame: showThisPage.hosting.view.frame)
-                                Animate {
-                                    showThisPage.hosting.view.transform = unOpenTransform
-                                    showThisPage.backgroundColor = .clear
-                                    showThisPage.hosting.view.alpha = type.isCenter ? 0 : 1
-                                } completion: {
-                                    Task {
-                                        try await Task.sleep(nanoseconds: 400_000_000)
-                                        if !showThisPage.isOpen {
-                                            showThisPage.removeFromSuperview()
-                                            self.showThisPage = nil
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        .transition(.identity)
-                }
+                    }
+                    .transition(.identity)
             }
-            .transition(.identity)
-            .allowsHitTesting(false)
         }
+        .task(id: isPresented) {
+            showThisPage?.isPresented = isPresented
+        }
+        .transition(.identity)
+        .allowsHitTesting(false)
     }
     
     enum PopoverEdge {
@@ -308,7 +318,7 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
         case .center:
             let iW = inWidth(buttonRect.midX)
             let iH = inHeight(buttonRect.midY)
-            Task {
+            Task { @MainActor in
                 anchor = UnitPoint(x: iW / windowSize.width, y: iH / windowSize.height)
             }
             return CGRect(
@@ -389,21 +399,20 @@ extension CGSize {
 class PopoverShowPageViewWindow: UIView {
     
     let hosting:UIHostingController<AnyView>
+    var isPresented: Bool
+    var type: popoverType
     let dismiss: () -> Void
     var buttonFrame: CGRect
     let glazedSuper: UUID?
-    var isOpen: Bool
-    let isTip: Bool
-    let isCenter: Bool
     
-    init(content: AnyView, buttonFrame: CGRect, glazedSuper: UUID?, isOpen: Bool, isTip: Bool, isCenter: Bool, dismiss: @escaping () -> Void) {
+    
+    init(content: AnyView, buttonFrame: CGRect, glazedSuper: UUID?, isPresented: Bool, type: popoverType, dismiss: @escaping () -> Void) {
         self.dismiss = dismiss
         self.buttonFrame = buttonFrame
         self.hosting = UIHostingController(rootView: content)
         self.glazedSuper = glazedSuper
-        self.isOpen = isOpen
-        self.isTip = isTip
-        self.isCenter = isCenter
+        self.type = type
+        self.isPresented = isPresented
         
         super.init(frame: .zero)
         self.translatesAutoresizingMaskIntoConstraints = false
@@ -422,7 +431,7 @@ class PopoverShowPageViewWindow: UIView {
 //            }
 //        }
 //        self.insetsLayoutMarginsFromSafeArea = false
-        hosting.view.alpha = 0
+        alpha = 0
         self.addSubview(hosting.view)
         
         self.hosting.view.becomeFirstResponder()
@@ -433,12 +442,12 @@ class PopoverShowPageViewWindow: UIView {
     }
     
     override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
-        if isOpen && !isTip {
+        if isPresented && !type.isTip {
             if self.hosting.view.frame.contains(point) {
                 return super.hitTest(point, with: event)
             } else {
                 if event?.type == .touches {
-                    if isCenter {
+                    if type.isCenter {
                         dismiss()
                         return super.hitTest(point, with: event)
                     } else if glazedSuper == nil {
@@ -456,6 +465,10 @@ class PopoverShowPageViewWindow: UIView {
             }
         }
         return nil
+    }
+    
+    deinit {
+         Task { @MainActor [weak self] in self?.removeFromSuperview() }
     }
 }
 

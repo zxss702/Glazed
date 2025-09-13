@@ -39,6 +39,7 @@ public struct Glazed<Content: View>: View {
         }
         .environment(\.window, windowViewModel.window)
         .environment(\.glazedView, windowViewModel.glazedView)
+        .environment(\.glazedSuper, nil)
         .environmentObject(windowViewModel)
         .background(
             WindowHandlerRepresentable(windowViewModel: windowViewModel)
