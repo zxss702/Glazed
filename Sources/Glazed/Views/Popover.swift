@@ -137,6 +137,7 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
                 
                 Color.clear
                     .onAppear {
+                        showThisPage?.dismissTask?.cancel()
                         if showThisPage == nil {
                             let showThisPage = PopoverShowPageViewWindow(
                                 content: AnyView(pageStyle()),
@@ -198,9 +199,12 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
                                 showThisPage.hosting.view.transform = unOpenTransform
                                 showThisPage.alpha = type.isCenter ? 0 : 1
                             } completion: {
-                                if isPresented {
-                                    showThisPage.removeFromSuperview()
-                                    self.showThisPage = nil
+                                showThisPage.dismissTask = Task {
+                                    try await Task.sleep(nanoseconds: 500_000_000)
+                                    if isPresented {
+                                        showThisPage.removeFromSuperview()
+                                        self.showThisPage = nil
+                                    }
                                 }
                             }
                         }
@@ -407,6 +411,7 @@ class PopoverShowPageViewWindow: UIView {
     var buttonFrame: CGRect
     let glazedSuper: UUID?
     
+    var dismissTask: Task<Void, Error>? = nil
     
     init(content: AnyView, buttonFrame: CGRect, glazedSuper: UUID?, isPresented: Bool, type: popoverType, dismiss: @escaping () -> Void) {
         self.dismiss = dismiss
