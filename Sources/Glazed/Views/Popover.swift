@@ -180,7 +180,8 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
                                 showThisPage.hosting.view.layer.shadowPath = type.clipedShape.path(in: showThisPage.hosting.view.bounds).cgPath
                             }
                             showThisPage.hosting.view.transform = setUnOpenTransform(window: glazedView, showThisPage: showThisPage, buttonRect: buttonRect, openFrame: showThisPage.hosting.view.frame)
-                            showThisPage.alpha = type.isCenter ? 0 : 1
+                            showThisPage.alpha = 0
+                            
                             if (glazedSuper != nil || type.isCenter) && !type.isTip {
                                 showThisPage.backgroundColor = .black.withAlphaComponent(0.1)
                             }
@@ -195,7 +196,7 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
                             let unOpenTransform = setUnOpenTransform(window: glazedView, showThisPage: showThisPage, buttonRect: buttonRect, openFrame: showThisPage.hosting.view.frame)
                             Animate {
                                 showThisPage.hosting.view.transform = unOpenTransform
-                                showThisPage.alpha = type.isCenter ? 0 : 1
+                                showThisPage.alpha = 0
                             } completion: {
                                 showThisPage.dismissTask = Task {
                                     try await Task.sleep(nanoseconds: 500_000_000)
