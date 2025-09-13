@@ -8,12 +8,9 @@
 import SwiftUI
 
 public struct sheetType {
-    let backGround: AnyShapeStyle
     
-    public init<ShapeS: ShapeStyle>(
-        backGround: ShapeS
-    ) {
-        self.backGround = AnyShapeStyle(backGround)
+    public init() {
+        
     }
 }
 
@@ -22,7 +19,7 @@ public extension View {
     @ViewBuilder
     func Sheet<Content: View>(
         isPresented: Binding<Bool>,
-        type: sheetType = .init(backGround: .background),
+        type: sheetType = .init(),
         @ViewBuilder content: @escaping () -> Content
     ) -> some View {
         self
@@ -170,6 +167,13 @@ struct SheetViewModle<Content2: View>: ViewModifier {
     
     @ViewBuilder
     func pageStyle() -> some View {
+        let path = UnevenRoundedRectangle(cornerRadii: RectangleCornerRadii(
+            topLeading: 26.5,
+            bottomLeading: bottomC ? 26.5 : 0,
+            bottomTrailing: bottomC ? 26.5 : 0,
+            topTrailing: 26.5
+        ), style: .continuous)
+        
         content()
             .safeAreaInset(edge: .bottom, content: {
                 if !bottomC {
@@ -177,14 +181,9 @@ struct SheetViewModle<Content2: View>: ViewModifier {
                         .frame(width: 1, height: windowViewModel.windowSafeAreaInsets.bottom)
                 }
             })
-            .background(type.backGround)
+            .clipShape(path)
+            .glassRegularStyle(path, interactive: true)
             .buttonStyle(TapButtonStyle())
-            .clipShape(UnevenRoundedRectangle(cornerRadii: RectangleCornerRadii(
-                topLeading: 26.5,
-                bottomLeading: bottomC ? 26.5 : 0,
-                bottomTrailing: bottomC ? 26.5 : 0,
-                topTrailing: 26.5
-            ), style: .continuous))
             .animation(.autoAnimation, value: bottomC)
             .environment(\.glazedDismiss, {
                 self.isPresented = false

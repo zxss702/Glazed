@@ -8,7 +8,6 @@
 import SwiftUI
 
 public struct popoverType {
-    let backGround: AnyShapeStyle
     let clipedShape: AnyShape
     let isShadow: Bool
     let autoDimiss: Bool
@@ -16,23 +15,6 @@ public struct popoverType {
     let isTip: Bool
     let isOnlyTop: Bool
     
-    public init<ShapeS: ShapeStyle, ClipShape: Shape>(
-        backGround: ShapeS,
-        clipedShape: ClipShape,
-        isShadow: Bool = true,
-        autoDimiss: Bool = true,
-        isCenter: Bool = false,
-        isTip: Bool = false,
-        isOnlyTop: Bool = false
-    ) {
-        self.backGround = AnyShapeStyle(backGround)
-        self.clipedShape = AnyShape(clipedShape)
-        self.isShadow = isShadow
-        self.autoDimiss = autoDimiss
-        self.isCenter = isCenter
-        self.isTip = isTip
-        self.isOnlyTop = isOnlyTop
-    }
     public init<ShapeS: ShapeStyle>(
         backGround: ShapeS,
         isShadow: Bool = true,
@@ -41,7 +23,6 @@ public struct popoverType {
         isTip: Bool = false,
         isOnlyTop: Bool = false
     ) {
-        self.backGround = AnyShapeStyle(backGround)
         self.clipedShape = AnyShape(RoundedRectangle(cornerRadius: 26.5, style: .continuous))
         self.isShadow = isShadow
         self.autoDimiss = autoDimiss
@@ -57,7 +38,6 @@ public struct popoverType {
         isTip: Bool = false,
         isOnlyTop: Bool = false
     ) {
-        self.backGround = AnyShapeStyle(.background)
         self.clipedShape = AnyShape(clipedShape)
         self.isShadow = isShadow
         self.autoDimiss = autoDimiss
@@ -72,7 +52,6 @@ public struct popoverType {
         isTip: Bool = false,
         isOnlyTop: Bool = false
     ) {
-        self.backGround = AnyShapeStyle(.background)
         self.clipedShape = AnyShape(RoundedRectangle(cornerRadius: 26.5, style: .continuous))
         self.isShadow = isShadow
         self.autoDimiss = autoDimiss
@@ -85,7 +64,7 @@ public struct popoverType {
 public extension View {
     
     @ViewBuilder
-    func Popover<Content: View>(isPresented: Binding<Bool>, type: popoverType = popoverType(backGround: .background, clipedShape: RoundedRectangle(cornerRadius: 26.5, style: .continuous)), @ViewBuilder content: @escaping () -> Content) -> some View {
+    func Popover<Content: View>(isPresented: Binding<Bool>, type: popoverType = popoverType(clipedShape: RoundedRectangle(cornerRadius: 26.5, style: .continuous)), @ViewBuilder content: @escaping () -> Content) -> some View {
         self
             .modifier(PopoverViewModle(isPresented: isPresented, type: type, content: content))
     }
@@ -269,7 +248,7 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
     }
     
     func setFrame(window: UIView, showThisPage: PopoverShowPageViewWindow, buttonRect: CGRect) -> CGRect {
-        var windowSize = windowViewModel.windowFrame
+        let windowSize = windowViewModel.windowFrame
         let defaultSize = showThisPage.hosting.sizeThatFits(in: windowSize.padding(x: leftSpace, y: leftSpace))
         let edge:PopoverEdge = getEdge(buttonRect: buttonRect, defaultSize: defaultSize)
         
@@ -386,8 +365,9 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
     @ViewBuilder
     func pageStyle() -> some View {
         content()
-            .background(type.backGround)
             .clipShape(type.clipedShape)
+            .glassRegularStyle(type.clipedShape, interactive: true)
+            .blur(radius: isPresented ? 0 : 10)
             .environment(\.glazedDismiss, {
                 self.isPresented = false
             })
@@ -475,5 +455,28 @@ class PopoverShowPageViewWindow: UIView {
             }
         }
         return nil
+    }
+}
+
+
+extension View {
+    
+    @ViewBuilder
+    func glassRegularStyle(_ shape: some Shape, color: Color? = nil, interactive: Bool = false) -> some View {
+        if #available(iOS 26, *) {
+            self.glassEffect(.regular.tint(color).interactive(interactive), in: shape)
+        } else {
+            if let color {
+                background {
+                    shape.foregroundStyle(color)
+                        .background(UIShaowd(radius: 16, cornerRaduiu: 100))
+                }
+            } else {
+                background {
+                    shape.foregroundStyle(.background)
+                        .background(UIShaowd(radius: 16, cornerRaduiu: 100))
+                }
+            }
+        }
     }
 }
