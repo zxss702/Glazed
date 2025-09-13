@@ -110,33 +110,34 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
     
     func overlayDataHelper(glazedView: UIView) -> some View {
         GeometryReader { GeometryProxy in
-            if isPresented {
-                let buttonRectGlobal = GeometryProxy.frame(in: .global)
-                let buttonRect = CGRect(
-                    x: buttonRectGlobal.minX - windowViewModel.windowSafeAreaInsets.leading ,
-                    y: buttonRectGlobal.minY - windowViewModel.windowSafeAreaInsets.top,
-                    width: buttonRectGlobal.width,
-                    height: buttonRectGlobal.height
-                )
-                
-                let _ = {
-                    if let showThisPage {
-                        showThisPage.hosting.rootView = AnyView(pageStyle())
-                        showThisPage.buttonFrame = buttonRectGlobal
-                        let frame = setFrame(window: glazedView, showThisPage: showThisPage, buttonRect: buttonRect)
-                        if showThisPage.hosting.view.frame != frame {
-                            Animate {
-                                showThisPage.hosting.view.frame = frame
-                                if type.isShadow {
-                                    showThisPage.hosting.view.layer.shadowPath = type.clipedShape.path(in: showThisPage.hosting.view.bounds).cgPath
-                                }
+            let buttonRectGlobal = GeometryProxy.frame(in: .global)
+            let buttonRect = CGRect(
+                x: buttonRectGlobal.minX - windowViewModel.windowSafeAreaInsets.leading ,
+                y: buttonRectGlobal.minY - windowViewModel.windowSafeAreaInsets.top,
+                width: buttonRectGlobal.width,
+                height: buttonRectGlobal.height
+            )
+            
+            let _ = {
+                if let showThisPage {
+                    showThisPage.hosting.rootView = AnyView(pageStyle())
+                    showThisPage.buttonFrame = buttonRectGlobal
+                    let frame = setFrame(window: glazedView, showThisPage: showThisPage, buttonRect: buttonRect)
+                    if showThisPage.hosting.view.frame != frame {
+                        Animate {
+                            showThisPage.hosting.view.frame = frame
+                            if type.isShadow {
+                                showThisPage.hosting.view.layer.shadowPath = type.clipedShape.path(in: showThisPage.hosting.view.bounds).cgPath
                             }
                         }
                     }
-                }()
-                
-                Color.clear
-                    .onAppear {
+                }
+            }()
+            
+            Color.clear
+                .task(id: isPresented) {
+                    showThisPage?.isPresented = isPresented
+                    if isPresented {
                         showThisPage?.dismissTask?.cancel()
                         if showThisPage == nil {
                             let showThisPage = PopoverShowPageViewWindow(
@@ -189,10 +190,7 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
                             showThisPage?.alpha = 1
                             showThisPage?.hosting.view.transform = .identity
                         }
-                    }
-                
-                    .onDisappear {
-                        isPresented = false
+                    } else {
                         if let showThisPage {
                             let unOpenTransform = setUnOpenTransform(window: glazedView, showThisPage: showThisPage, buttonRect: buttonRect, openFrame: showThisPage.hosting.view.frame)
                             Animate {
@@ -209,11 +207,14 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
                             }
                         }
                     }
-                    .transition(.identity)
-            }
+                }
+                .transition(.identity)
         }
         .task(id: isPresented) {
             showThisPage?.isPresented = isPresented
+        }
+        .onDisappear {
+            isPresented = false
         }
         .transition(.identity)
         .allowsHitTesting(false)
@@ -472,10 +473,6 @@ class PopoverShowPageViewWindow: UIView {
             }
         }
         return nil
-    }
-    
-    deinit {
-         Task { @MainActor [weak self] in self?.removeFromSuperview() }
     }
 }
 
