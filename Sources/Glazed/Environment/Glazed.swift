@@ -30,10 +30,10 @@ public struct Glazed<Content: View>: View {
                     windowViewModel.windowFrame = geometry.size
                     windowViewModel.windowSafeAreaInsets = geometry.safeAreaInsets
                 }
-                .onChange(of: geometry.size) { newValue in
+                .onChange(of: geometry.size) { _, newValue in
                     windowViewModel.windowFrame = newValue
                 }
-                .onChange(of: geometry.safeAreaInsets) { newValue in
+                .onChange(of: geometry.safeAreaInsets) { _, newValue in
                     windowViewModel.windowSafeAreaInsets = newValue
                 }
         }

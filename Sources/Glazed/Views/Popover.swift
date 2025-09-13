@@ -203,11 +203,11 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
                                 showThisPage.hosting.view.transform = unOpenTransform
                                 showThisPage.alpha = 0
                             } completion: {
-                                dismissTask = Task {
+                                dismissTask = Task { @MainActor in
                                     try await Task.sleep(nanoseconds: 500_000_000)
                                     if !isPresented {
-                                        showThisPage.removeFromSuperview()
                                         self.showThisPage = nil
+                                        showThisPage.removeFromSuperview()
                                     }
                                 }
                             }
@@ -392,6 +392,7 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
             .clipShape(type.clipedShape)
             .glassRegularStyle(type.clipedShape, interactive: true)
             .blur(radius: isPresented ? 0 : 10)
+            .animation(.smooth, value: isPresented)
             .environment(\.glazedDismiss, {
                 self.isPresented = false
             })

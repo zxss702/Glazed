@@ -204,7 +204,7 @@ public struct TapButtonStyle: ButtonStyle {
                     }
                 }
             })
-            .onChange(of: configuration.isPressed, perform: { newValue in
+            .onChange(of: configuration.isPressed) { _, newValue in
                 if newValue {
                     if #available(iOS 17.0, *) {
                         paly = UUID()
@@ -234,42 +234,28 @@ public struct TapButtonStyle: ButtonStyle {
                     }
                     
                 }
-            })
+            }
             .background {
                 GeometryReader(content: { geometry in
-                    if #available(iOS 17.0, *) {
-                        Color.clear
-                            .sensoryFeedback(
-                                {
-                                    if #available(iOS 17.5, *) {
-                                        SensoryFeedback.pathComplete
-                                    } else {
-                                        SensoryFeedback.alignment
-                                    }
-                                }(), trigger: paly)
-                            .onChange(of: geometry.size) { _ in
-                                let av = avg(geometry.size.width, geometry.size.height)
-                                sc2 = (av - 4) / av
-                                sc = (av + 4) / av
-                            }
-                            .onAppear {
-                                let av = avg(geometry.size.width, geometry.size.height)
-                                sc2 = (av - 4) / av
-                                sc = (av + 4) / av
-                            }
-                    } else {
-                        Color.clear
-                            .onChange(of: geometry.size) { _ in
-                                let av = avg(geometry.size.width, geometry.size.height)
-                                sc2 = (av - 4) / av
-                                sc = (av + 4) / av
-                            }
-                            .onAppear {
-                                let av = avg(geometry.size.width, geometry.size.height)
-                                sc2 = (av - 4) / av
-                                sc = (av + 4) / av
-                            }
-                    }
+                    Color.clear
+                        .sensoryFeedback(
+                            {
+                                if #available(iOS 17.5, *) {
+                                    SensoryFeedback.pathComplete
+                                } else {
+                                    SensoryFeedback.alignment
+                                }
+                            }(), trigger: paly)
+                        .onChange(of: geometry.size) {
+                            let av = avg(geometry.size.width, geometry.size.height)
+                            sc2 = (av - 4) / av
+                            sc = (av + 4) / av
+                        }
+                        .onAppear {
+                            let av = avg(geometry.size.width, geometry.size.height)
+                            sc2 = (av - 4) / av
+                            sc = (av + 4) / av
+                        }
                 })
             }
     }

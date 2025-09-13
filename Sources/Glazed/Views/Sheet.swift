@@ -48,12 +48,12 @@ struct SheetViewModle<Content2: View>: ViewModifier {
                 if isPresented, let glazedView {
                     let _ = showThisPage?.hosting.rootView = AnyView(pageStyle())
                     Color.clear
-                        .onChange(of: windowViewModel.windowFrame) { _ in
+                        .onChange(of: windowViewModel.windowFrame) {
                             if showThisPage?.isOpen ?? false {
                                 setFrame()
                             }
                         }
-                        .onChange(of: windowViewModel.windowSafeAreaInsets) { _ in
+                        .onChange(of: windowViewModel.windowSafeAreaInsets) {
                             if showThisPage?.isOpen ?? false {
                                 setFrame()
                             }
