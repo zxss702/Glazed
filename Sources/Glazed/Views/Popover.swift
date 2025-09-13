@@ -439,18 +439,7 @@ class PopoverShowPageViewWindow: UIView {
         self.translatesAutoresizingMaskIntoConstraints = false
         self.hosting.view.backgroundColor = .clear
         self.hosting.sizingOptions = .intrinsicContentSize
-//        self.hosting.view.insetsLayoutMarginsFromSafeArea = false
-        
-//        if #available(iOS 17.0, *) {
-//            self.hosting.safeAreaRegions = SafeAreaRegions()
-//        } else {
-//            if let window = self.window {
-//                self.hosting.additionalSafeAreaInsets = UIEdgeInsets(top: -window.safeAreaInsets.top, left: -window.safeAreaInsets.left, bottom: -window.safeAreaInsets.bottom, right: -window.safeAreaInsets.right)
-//            } else {
-//                self.hosting._disableSafeArea = true
-//            }
-//        }
-//        self.insetsLayoutMarginsFromSafeArea = false
+        backgroundColor = .clear
         alpha = 0
         self.addSubview(hosting.view)
         
