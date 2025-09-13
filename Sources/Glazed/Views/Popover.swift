@@ -142,8 +142,8 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
             Color.clear
                 .onChange(of: isPresented, initial: true) {
                     showThisPage?.isPresented = isPresented
+                    dismissTask?.cancel()
                     if isPresented {
-                        dismissTask?.cancel()
                         if showThisPage == nil {
                             let showThisPage = PopoverShowPageViewWindow(
                                 content: AnyView(pageStyle()),
@@ -199,35 +199,40 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
                             showThisPage?.hosting.view.transform = .identity
                         }
                     } else {
-                        if let showThisPage {
-                            let unOpenTransform = setUnOpenTransform(window: glazedView, showThisPage: showThisPage, buttonRect: buttonRect, openFrame: showThisPage.hosting.view.frame)
-                            Animate {
-                                showThisPage.hosting.view.transform = unOpenTransform
-                                showThisPage.alpha = 0
-                            } completion: {
-                                dismissTask = Task { @MainActor in
-                                    try await Task.sleep(nanoseconds: 500_000_000)
-                                    if !isPresented {
-                                        self.showThisPage = nil
-                                        showThisPage.removeFromSuperview()
-                                    }
-                                }
-                            }
-                        }
+                        dismissPopover(buttonRect: buttonRect, glazedView: glazedView)
                     }
                 }
+                .onDisappear {
+                    isPresented = false
+                    dismissPopover(buttonRect: buttonRect, glazedView: glazedView)
+                }
                 .transition(.identity)
+                
         }
         .task(id: isPresented) {
             showThisPage?.isPresented = isPresented
-        }
-        .onDisappear {
-            isPresented = false
         }
         .transition(.identity)
         .allowsHitTesting(false)
     }
     
+    func dismissPopover(buttonRect: CGRect, glazedView: UIView) {
+        if let showThisPage {
+            let unOpenTransform = setUnOpenTransform(window: glazedView, showThisPage: showThisPage, buttonRect: buttonRect, openFrame: showThisPage.hosting.view.frame)
+            Animate {
+                showThisPage.hosting.view.transform = unOpenTransform
+                showThisPage.alpha = 0
+            } completion: {
+                dismissTask = Task { @MainActor in
+                    try await Task.sleep(nanoseconds: 1_000_000_000)
+                    if !isPresented {
+                        self.showThisPage = nil
+                        showThisPage.removeFromSuperview()
+                    }
+                }
+            }
+        }
+    }
     enum PopoverEdge {
         case top, bottom, leading, trailing, center
     }
@@ -391,6 +396,7 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
     @ViewBuilder
     func pageStyle() -> some View {
         content()
+            .geometryGroup()
             .clipShape(type.clipedShape)
             .glassRegularStyle(type.clipedShape, interactive: true)
             .blur(radius: isPresented ? 0 : 10)
