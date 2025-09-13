@@ -138,7 +138,7 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
             }()
             
             Color.clear
-                .task(id: isPresented) {
+                .onChange(of: isPresented, initial: true) {
                     showThisPage?.isPresented = isPresented
                     if isPresented {
                         dismissTask?.cancel()
