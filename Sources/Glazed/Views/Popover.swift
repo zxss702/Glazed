@@ -119,16 +119,16 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
             )
             
             let _ = {
-                if let showThisPage {
-                    showThisPage.hosting.rootView = AnyView(pageStyle())
-                    showThisPage.buttonFrame = buttonRectGlobal
-                    let frame = setFrame(window: glazedView, showThisPage: showThisPage, buttonRect: buttonRect)
-                    if showThisPage.hosting.view.frame != frame {
-                        Animate {
-                            showThisPage.hosting.view.frame = frame
-                            if type.isShadow {
-                                showThisPage.hosting.view.layer.shadowPath = type.clipedShape.path(in: showThisPage.hosting.view.bounds).cgPath
-                            }
+                showThisPage?.hosting.rootView = AnyView(pageStyle())
+                showThisPage?.buttonFrame = buttonRectGlobal
+                
+                guard let showThisPage else { return }
+                let frame = setFrame(window: glazedView, showThisPage: showThisPage, buttonRect: buttonRect)
+                if showThisPage.hosting.view.frame != frame {
+                    Animate {
+                        self.showThisPage?.hosting.view.frame = frame
+                        if type.isShadow {
+                            self.showThisPage?.hosting.view.layer.shadowPath = type.clipedShape.path(in: showThisPage.hosting.view.bounds).cgPath
                         }
                     }
                 }
@@ -200,7 +200,7 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
                             } completion: {
                                 showThisPage.dismissTask = Task {
                                     try await Task.sleep(nanoseconds: 500_000_000)
-                                    if isPresented {
+                                    if !isPresented {
                                         showThisPage.removeFromSuperview()
                                         self.showThisPage = nil
                                     }
