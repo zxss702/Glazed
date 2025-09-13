@@ -467,7 +467,10 @@ extension View {
     @ViewBuilder
     func glassRegularStyle(_ shape: some Shape, color: Color? = nil, interactive: Bool = false) -> some View {
         if #available(iOS 26, *) {
-            glassEffect(.regular.tint(color).interactive(interactive), in: shape)
+            background {
+                Color.clear
+                    . glassEffect(.regular.tint(color).interactive(interactive), in: shape)
+            }
         } else {
             if let color {
                 background {
