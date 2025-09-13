@@ -194,10 +194,17 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
                             }
                         }
                         
-                        withAnimation(.smooth) {
+                        if showThisPage?.animator?.isRunning ?? false {
+                            showThisPage?.animator?.stopAnimation(true)
+                        }
+                        showThisPage?.animator = UIViewPropertyAnimator(duration: 0.5, dampingRatio: 1)
+                        // 2. 添加动画闭包
+                        showThisPage?.animator?.addAnimations {
                             showThisPage?.alpha = 1
                             showThisPage?.hosting.view.transform = .identity
                         }
+                        showThisPage?.animator?.startAnimation()
+                        
                     } else {
                         dismissPopover(buttonRect: buttonRect, glazedView: glazedView)
                     }
@@ -207,7 +214,6 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
                     dismissPopover(buttonRect: buttonRect, glazedView: glazedView)
                 }
                 .transition(.identity)
-                
         }
         .transition(.identity)
         .allowsHitTesting(false)
@@ -216,18 +222,30 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
     func dismissPopover(buttonRect: CGRect, glazedView: UIView) {
         if let showThisPage {
             let unOpenTransform = setUnOpenTransform(window: glazedView, showThisPage: showThisPage, buttonRect: buttonRect, openFrame: showThisPage.hosting.view.frame)
-            withAnimation(.smooth) {
+            
+            if showThisPage.animator?.isRunning ?? false {
+                showThisPage.animator?.stopAnimation(true)
+            }
+            showThisPage.animator = UIViewPropertyAnimator(duration: 0.5, dampingRatio: 1)
+            // 2. 添加动画闭包
+            showThisPage.animator?.addAnimations {
                 showThisPage.hosting.view.transform = unOpenTransform
                 showThisPage.alpha = 0
-            } completion: {
-                dismissTask = Task { @MainActor in
-                    try await Task.sleep(nanoseconds: 1_000_000_000)
-                    if !isPresented {
-                        self.showThisPage = nil
-                        showThisPage.removeFromSuperview()
+            }
+            showThisPage.animator?.addCompletion { position in
+                switch position {
+                case .end:
+                    dismissTask = Task { @MainActor in
+                        try await Task.sleep(nanoseconds: 1_000_000_000)
+                        if !isPresented {
+                            self.showThisPage = nil
+                            showThisPage.removeFromSuperview()
+                        }
                     }
+                default: break
                 }
             }
+            showThisPage.animator?.startAnimation()
         }
     }
     enum PopoverEdge {
@@ -424,6 +442,8 @@ class PopoverShowPageViewWindow: UIView {
     let dismiss: () -> Void
     var buttonFrame: CGRect
     let glazedSuper: UUID?
+    
+    var animator: UIViewPropertyAnimator?
     
     init(content: AnyView, buttonFrame: CGRect, glazedSuper: UUID?, isPresented: Bool, type: popoverType, dismiss: @escaping () -> Void) {
         self.dismiss = dismiss
