@@ -63,7 +63,7 @@ struct GlazedProgresView: View {
                 .clipShape(Circle())
                 .compositingGroup()
                 .drawingGroup()
-                .glassRegularStyle(Circle(), interactive: true)
+                .background(.background)
                 .background(UIShaowd(radius: 8, cornerRaduiu: 50))
                 .scaleEffect(x: size + 1, y: size + 1)
                 .modifier(Drag3DModifier())
