@@ -417,7 +417,7 @@ struct PopoverViewModle<Content2: View>: ViewModifier {
         content()
             .geometryGroup()
             .clipShape(type.clipedShape)
-            .glassRegularStyle(type.clipedShape, interactive: true)
+            .glassRegularStyle(type.clipedShape)
             .blur(radius: isPresented ? 0 : 10)
             .animation(.smooth, value: isPresented)
             .environment(\.glazedDismiss, {
